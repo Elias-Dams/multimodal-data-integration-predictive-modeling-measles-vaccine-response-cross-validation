@@ -1,67 +1,86 @@
-# Generate Modules --------------------------------------------------------
-# Load WGCNA and flashClust libraries every time you open R
 library(WGCNA)
 library(flashClust)
 
+produce_cytokine_modules <- function(input_mat, plotsDir) {
+  
+  require(pheatmap)
+  
+  # Compute correlation matrix
+  cor_matrix <- cor(input_mat, use = "pairwise.complete.obs")
+  
+  # Convert correlation matrix to a distance matrix for clustering
+  dist_matrix <- as.dist(1 - abs(cor_matrix))
+  
+  # Hierarchical clustering
+  hc <-  stats::hclust(dist_matrix, method = "ward.D2")
+  
+  
+  png(paste0(plotsDir, "cytokine_features_clustering.png"), width = 1400, height = 1000, res = 150)
+  plot(hc, main = "Cytokine Feature Clustering", sub = "", xlab = "", cex.lab = 1.5, cex.axis = 1.5, cex.main = 2)
+  dev.off()
+  
+  png(paste0(plotsDir, "cytokine_features_clustering_cut.png"), width = 1400, height = 1000, res = 150)
+  plot(hc, main = "Cytokine Feature Clustering", sub = "", xlab = "", cex.lab = 1.5, cex.axis = 1.5, cex.main = 2)
+  rect.hclust(hc, h = .9, border = "red",)
+  dev.off()
+  
+  png(paste0(plotsDir, "cytokine_features_clustering_cut_colors.png"), width = 1400, height = 1000, res = 150)
+  clusters <- cutree(hc, h = .9)
+  clusterColors <- labels2colors(clusters)
+  
+  # Plot dendrogram
+  plotDendroAndColors(
+    dendro = hc,
+    colors = clusterColors,         
+    groupLabels = "Clusters",       
+    main = "Cytokine Feature Clustering"
+  )
+  dev.off()
+  
+  
+  pheatmap(cor_matrix,
+           cluster_rows = hc,        
+           cluster_cols = hc,        
+           display_numbers = TRUE,   
+           number_format = "%.2f",   
+           fontsize_number = 10,     
+           cutree_rows = length(unique(clusters)),
+           cutree_cols = length(unique(clusters)),
+           main = "Clustered Correlation Heatmap",
+           filename = paste0(plotsDir, "correlation_heatmap_cytokines_ward2.png"),
+           width = 20, height = 20)
+  
+  return(clusterColors)
+  
+}
 
-# Uploading data into R and formatting it for WGCNA
-# This creates an object called "datExpr" that contains the normalized counts file output from DESeq2
-datExpr = read.csv("School/Master 2/Thesis/Thesis/data/cytokines_data_copy.csv")
-# "head" the file to preview it
-geneLabels = colnames(datExpr)
-print(geneLabels)
-datExpr <- log2(datExpr + 1)  # Simple log transformation for normalization
-head(datExpr) # You see that genes are listed in a column named "X" and samples are in columns
+correlation_heatmap <- function(data, plotTitle, plotsDir){
+  
+  require(pheatmap)
+  require(glue)
+  
+  # Generate correlation matrix
+  mat <- cor(data)
+  
+  # Create heatmap with pheatmap
+  pheatmap(as.matrix(mat),
+           color = colorRampPalette(c("blue", "white", "red"))(100),
+           main = "",
+           display_numbers = TRUE,          
+           number_format = "%.2f",          
+           fontsize = 10,
+           fontsize_number = 10,
+           cutree_rows = 7,
+           cutree_cols = 7,
+           cluster_rows = TRUE, 
+           cluster_cols = TRUE,
+           filename = paste0(plotsDir, glue("{plotTitle}_correlation_plot.png")),
+           width = 20, height = 20)
+  
+  return
+  
+}
 
-# Manipulate file so it matches the format WGCNA needs
-row.names(datExpr) = datExpr$X
-datExpr$X = NULL
-datExpr = as.data.frame(datExpr) # now samples are rows and genes are columns
-dim(datExpr) # 48 samples and 1000 genes (you will have many more genes in reality)
-
-
-# Run this to check if there are gene outliers
-gsg = goodSamplesGenes(datExpr, verbose = 3)
-gsg$allOK
-
-# Choose a soft threshold power- USE A SUPERCOMPUTER IRL ------------------------------------a
-
-powers = seq(from =10, to=30, by=1) #choosing a set of soft-thresholding powers
-sft = pickSoftThreshold(datExpr, powerVector=powers, verbose =5, networkType="signed") #call network topology analysis function
-
-sizeGrWindow(9,5)
-par(mfrow= c(1,2))
-cex1=0.7
-plot(sft$fitIndices[,1], -sign(sft$fitIndices[,3])*sft$fitIndices[,2], xlab= "Soft Threshold (power)", ylab="Scale Free Topology Model Fit, signed R^2", type= "n", main= paste("Scale independence"))
-text(sft$fitIndices[,1], -sign(sft$fitIndices[,3])*sft$fitIndices[,2], labels=powers, cex=cex1, col="red")
-abline(h=0.80, col="red")
-abline(v=20, col="green")
-plot(sft$fitIndices[,1], sft$fitIndices[,5], xlab= "Soft Threshold (power)", ylab="Mean Connectivity", type="n", main = paste("Mean connectivity"))
-text(sft$fitIndices[,1], sft$fitIndices[,5], labels=powers, cex=cex1, col="red")
-
-
-#build a adjacency "correlation" matrix
-enableWGCNAThreads()
-softPower = 1
-adjacency = adjacency(datExpr, power = softPower, type = "signed") #specify network type
-head(adjacency)
-
-# Construct Networks- USE A SUPERCOMPUTER IRL -----------------------------
-#translate the adjacency into topological overlap matrix and calculate the corresponding dissimilarity:
-TOM = TOMsimilarity(adjacency, TOMType="signed") # specify network type
-dissTOM = 1-TOM
-
-
-
-# Generate a clustered gene tree
-geneTree = flashClust(as.dist(dissTOM), method="average")
-#This sets the minimum number of genes to cluster into a module
-minModuleSize = 1
-dynamicMods = cutreeDynamic(dendro= geneTree, distM= dissTOM, deepSplit=4, pamRespectsDendro= FALSE, minClusterSize = minModuleSize)
-dynamicColors= labels2colors(dynamicMods)
-
-#plot dendrogram with module colors below it
-plotDendroAndColors(geneTree,  dynamicColors, "Clusters", hang = 0.03, dendroLabels = geneLabels,  addGuide = TRUE)
-
-#INCLUE THE NEXT LINE TO SAVE TO FILE
-# dev.off()
+test = read.csv("School/Master 2/Thesis/Thesis/data/cytokines_data_copy.csv")
+produce_cytokine_modules(as.data.frame(test), "School/Master 2/Thesis/Thesis/R_code/")
+correlation_heatmap(as.data.frame(test), "Cytokine", "School/Master 2/Thesis/Thesis/R_code/")
