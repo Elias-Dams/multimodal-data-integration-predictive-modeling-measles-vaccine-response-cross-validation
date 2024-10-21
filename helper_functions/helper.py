@@ -36,9 +36,12 @@ def evaluate_model(rf_model, X_test, y_test):
     y_pred = rf_model.predict(X_test)
     conf_matrix = confusion_matrix(y_test, y_pred)
     accuracy_metrics = classification_report(y_test, y_pred, zero_division=0, output_dict=True)
-    filtered_metrics = {"accuracy":accuracy_metrics['accuracy'],
-                         'f1-macro avg':accuracy_metrics['macro avg']['f1-score'],
-                         "f1-weighted avg": accuracy_metrics['weighted avg']['f1-score']}
+    filtered_metrics = {'accuracy':accuracy_metrics['accuracy'],
+                        'f1-macro avg':accuracy_metrics['macro avg']['f1-score'],
+                        'f1-weighted avg': accuracy_metrics['weighted avg']['f1-score'],
+                        'precision-macro avg': accuracy_metrics['macro avg']['precision'],
+                        'precision-weighted avg': accuracy_metrics['weighted avg']['precision'],
+                        }
     return filtered_metrics, conf_matrix
 
 
@@ -66,7 +69,7 @@ def shap_analysis(rf_model, X_data, explainer=None):
     return shap_values_
 
 
-def plot_metrics(metrics_list):
+def plot_metrics(metrics_list, average_metric):
     """
     Plot accuracy, F1-macro avg, and F1-weighted avg per fold.
 
@@ -77,6 +80,8 @@ def plot_metrics(metrics_list):
     accuracies = [metrics['accuracy'] for metrics in metrics_list]
     f1_macro_avg = [metrics['f1-macro avg'] for metrics in metrics_list]
     f1_weighted_avg = [metrics['f1-weighted avg'] for metrics in metrics_list]
+    precision_macro_avg = [metrics['precision-macro avg'] for metrics in metrics_list]
+    precision_weighted_avg = [metrics['precision-weighted avg'] for metrics in metrics_list]
 
     # Number of folds
     n_folds = len(metrics_list)
@@ -86,18 +91,28 @@ def plot_metrics(metrics_list):
 
     # Plot each metric
     plt.plot(range(1, n_folds + 1), accuracies, marker='o', linestyle='-', color='b', label='Accuracy')
-    plt.plot(range(1, n_folds + 1), f1_macro_avg, marker='o', linestyle='-', color='g', label='F1 Macro Avg')
-    plt.plot(range(1, n_folds + 1), f1_weighted_avg, marker='o', linestyle='-', color='r', label='F1 Weighted Avg')
+    if average_metric == 'Macro' :
+        plt.plot(range(1, n_folds + 1), f1_macro_avg, marker='o', linestyle='-', color='g', label='F1 Macro Avg')
+        plt.plot(range(1, n_folds + 1), precision_macro_avg, marker='o', linestyle='-', color='r', label='Precision Macro Avg')
+    else:
+        plt.plot(range(1, n_folds + 1), f1_weighted_avg, marker='o', linestyle='-', color='g', label='F1 Weighted Avg')
+        plt.plot(range(1, n_folds + 1), precision_weighted_avg, marker='o', linestyle='-', color='r', label='Precision Weighted Avg')
 
     # Plot average lines
     plt.axhline(y=np.mean(accuracies), color='b', linestyle='--', label=f'Average Accuracy = {np.mean(accuracies):.2f}')
-    plt.axhline(y=np.mean(f1_macro_avg), color='g', linestyle='--',
-                label=f'Average F1 Macro Avg = {np.mean(f1_macro_avg):.2f}')
-    plt.axhline(y=np.mean(f1_weighted_avg), color='r', linestyle='--',
-                label=f'Average F1 Weighted Avg = {np.mean(f1_weighted_avg):.2f}')
+    if average_metric == 'Macro':
+        plt.axhline(y=np.mean(f1_macro_avg), color='g', linestyle='--',
+                    label=f'Average F1 Macro Avg = {np.mean(f1_macro_avg):.2f}')
+        plt.axhline(y=np.mean(precision_macro_avg), color='r', linestyle='--',
+                    label=f'Average Precision Macro Avg = {np.mean(precision_macro_avg):.2f}')
+    else:
+        plt.axhline(y=np.mean(f1_weighted_avg), color='g', linestyle='--',
+                    label=f'Average F1 Weighted Avg = {np.mean(f1_weighted_avg):.2f}')
+        plt.axhline(y=np.mean(precision_weighted_avg), color='r', linestyle='--',
+                    label=f'Average Precision Weighted Avg = {np.mean(precision_weighted_avg):.2f}')
 
     # Set titles and labels
-    plt.title('Metrics per Fold (Accuracy, F1 Macro, F1 Weighted)')
+    plt.title('Metrics per Fold (Accuracy, F1 Macro, F1 Weighted, Precision Macro Avg, Precision Weighted Avg)')
     plt.xlabel('Fold')
     plt.ylabel('Score')
     plt.xticks(range(1, n_folds + 1))
@@ -261,7 +276,7 @@ def model_with_shap(X, y, crossval="", n_splits=None, random_state=42, smote=Tru
             visualize_class_distribution(train_labels_per_folds, title="Class Distribution")
 
         # Calculate and print average accuracy and confusion matrix
-        plot_metrics(accuracy_per_fold)
+        plot_metrics(accuracy_per_fold, "Weighted")
 
         average_conf_matrix = np.mean(conf_matrices, axis=0)
         interpret_conf_matrix(average_conf_matrix)
@@ -324,6 +339,8 @@ def model_with_shap(X, y, crossval="", n_splits=None, random_state=42, smote=Tru
         print(f"Accuracy: {accuracy:.3f} ")
         print(f"f1-macro avg: {classification_report_values['macro avg']['f1-score']:.3f} ")
         print(f"f1-weighted avg: {classification_report_values['weighted avg']['f1-score']:.3f} ")
+        print(f"precision-macro avg: {classification_report_values['macro avg']['precision']:.3f} ")
+        print(f"precision-weighted avg: {classification_report_values['weighted avg']['precision']:.3f} ")
         interpret_conf_matrix(conf_matrix)
 
         # Create a single index for SHAP summary plot across all iterations
@@ -350,6 +367,8 @@ def model_with_shap(X, y, crossval="", n_splits=None, random_state=42, smote=Tru
         print(f"Accuracy: {accuracy_metrics['accuracy']:.3f} ")
         print(f"f1-macro avg: {accuracy_metrics['f1-macro avg']:.3f} ")
         print(f"f1-weighted avg: {accuracy_metrics['f1-weighted avg']:.3f} ")
+        print(f"precision-macro avg: {accuracy_metrics['precision-macro avg']:.3f} ")
+        print(f"precision-weighted avg: {accuracy_metrics['precision-weighted avg']:.3f} ")
         interpret_conf_matrix(conf_matrix)
 
         # SHAP analysis
