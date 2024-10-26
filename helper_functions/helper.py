@@ -45,14 +45,20 @@ def evaluate_model(rf_model, X_test, y_test):
     return filtered_metrics, conf_matrix
 
 
-def shap_analysis(rf_model, X_data, explainer=None):
+def shap_analysis(model, X_data, explainer=None, background_data=None):
     """
     Perform SHAP analysis for a trained model.
     """
     if explainer is None:
         raise ValueError('You have not added an explainer')
-    explainer = explainer(rf_model)
-    shap_values = np.array(explainer.shap_values(X_data))
+        # Use background data for KernelExplainer if provided
+    if explainer == shap.KernelExplainer:
+        if background_data is None:
+            background_data = X_data.sample(10, random_state=0)  # Sample a small subset if no background data is given
+        explainer_instance = explainer(model.predict_proba, background_data)
+    else:
+        explainer_instance = explainer(model)
+    shap_values = np.array(explainer_instance.shap_values(X_data))
 
     # Transpose to reorder the axes as needed.
     # found it on(https://stackoverflow.com/questions/65549588/shap-treeexplainer-for-randomforest-multiclass-what-is-shap-valuesi)
@@ -62,8 +68,8 @@ def shap_analysis(rf_model, X_data, explainer=None):
     # Sanity check: Ensure that SHAP predictions match the model's predicted probabilities
     # We sum over the last dimension (SHAP values across classes) and add the expected value to compare
     assert np.allclose(
-        rf_model.predict_proba(X_data),  # Model's predicted probabilities
-        shap_values__.sum(2) + explainer.expected_value  # Summed SHAP values + expected value
+        model.predict_proba(X_data),  # Model's predicted probabilities
+        shap_values__.sum(2) + explainer_instance.expected_value  # Summed SHAP values + expected value
     ), "SHAP values do not match the model predictions!"
 
     return shap_values_
@@ -215,33 +221,42 @@ def visualize_class_distribution(y, title="Class Distribution"):
         plt.show()
 
 
-def model_with_shap(X, y, crossval="", n_splits=None, random_state=42, smote=True, model=None, shap_explainer=None):
+def model_with_shap(X, y, crossval="", n_splits=None, random_state=42, smote=True, model=None, shap_explainer=None, background_data=None, verbose=True):
     """
-    Trains a Random Forest model with optional cross-validation, and performs SHAP analysis.
+    Trains a model with optional cross-validation, performs SHAP analysis, and returns performance metrics.
 
     Parameters:
     X: pd.DataFrame - Features dataset.
     y: pd.Series - Target variable.
-    crossval: bool - Whether to use cross-validation. Default is True.
-    n_splits: int - Number of folds for cross-validation. Default is 5.
+    crossval: str - Type of cross-validation ("K-fold" or "Leave-One-Out").
+    n_splits: int - Number of folds for K-fold cross-validation. Default is None.
     random_state: int - Random state for reproducibility. Default is 42.
     smote: bool - Whether to apply SMOTE to balance the classes. Default is True.
+    model: model object - Machine learning model to train.
+    shap_explainer: SHAP explainer class - SHAP explainer to use (e.g., shap.KernelExplainer).
+    background_data: pd.DataFrame - Background data for SHAP explainer.
+    verbose: bool - If False, suppresses print statements and only returns metrics.
 
     Returns:
-    - Prints out accuracy, confusion matrix, and SHAP analysis.
+    - Dictionary of performance metrics: accuracy, f1-score, precision, and confusion matrix.
     """
+
+    results = {}
+
+    def log(message):
+        """Helper function for conditional logging based on verbose setting."""
+        if verbose:
+            print(message)
+
     if crossval == "K-fold":
         if n_splits is None:
-            raise ValueError("K-fold cross-validation requires 'n_splits' to be set. Please provide a valid value for 'n_splits' to specify the number of folds.")
+            raise ValueError("K-fold cross-validation requires 'n_splits' to be set.")
 
         # Stratified K-Folds cross-validator
         skf = StratifiedKFold(n_splits=n_splits, shuffle=True, random_state=random_state)
 
         # Placeholder to accumulate SHAP values and other metrics
-        shap_values_all_folds = []
-        train_labels_per_folds = []
-        accuracy_per_fold = []
-        conf_matrices = []
+        shap_values_all_folds , train_labels_per_folds, accuracy_per_fold, conf_matrices = [], [], [], []
 
         if smote:
             X, y = apply_smote(X, y, random_state=random_state)
@@ -276,7 +291,8 @@ def model_with_shap(X, y, crossval="", n_splits=None, random_state=42, smote=Tru
             visualize_class_distribution(train_labels_per_folds, title="Class Distribution")
 
         # Calculate and print average accuracy and confusion matrix
-        plot_metrics(accuracy_per_fold, "Weighted")
+        if verbose:
+            plot_metrics(accuracy_per_fold, "Weighted")
 
         average_conf_matrix = np.mean(conf_matrices, axis=0)
         interpret_conf_matrix(average_conf_matrix)
@@ -287,12 +303,7 @@ def model_with_shap(X, y, crossval="", n_splits=None, random_state=42, smote=Tru
     # Leave-One-Out Cross-Validation
     elif crossval == "Leave-One-Out":
         loo = LeaveOneOut()
-
-        # Placeholder to accumulate SHAP values and other metrics
-        shap_values_all_folds = []
-        train_labels_per_folds = []
-        y_true = []
-        y_pred = []
+        shap_values_all_folds, train_labels_per_folds, y_true, y_pred = [], [], [], []
 
         if smote:
             X, y = apply_smote(X, y, random_state=random_state)
@@ -318,17 +329,15 @@ def model_with_shap(X, y, crossval="", n_splits=None, random_state=42, smote=Tru
             pred = rf_model.predict(X_test)
             y_pred.append(pred[0])
 
-            # Predict and evaluate
-
-            # SHAP analysis
-            shap_values = shap_analysis(rf_model, X_test, explainer=shap_explainer)
+            shap_values = shap_analysis(rf_model, X_test, explainer=shap_explainer, background_data=background_data)
             shap_values_all_folds.append(shap_values[1])
 
         # Visualize the class distribution after SMOTE (if applicable)
-        if smote:
-            visualize_class_distribution(train_labels_per_folds, title="Class Distribution After SMOTE")
-        else:
-            visualize_class_distribution(train_labels_per_folds, title="Class Distribution")
+        if verbose:
+            if smote:
+                visualize_class_distribution(train_labels_per_folds, title="Class Distribution After SMOTE")
+            else:
+                visualize_class_distribution(train_labels_per_folds, title="Class Distribution")
 
         # Calculate the metrics based on y_pred
         # make a conf_matrix
@@ -336,44 +345,59 @@ def model_with_shap(X, y, crossval="", n_splits=None, random_state=42, smote=Tru
         conf_matrix = confusion_matrix(y_true, y_pred)
         classification_report_values = classification_report(y_true, y_pred, zero_division=0, output_dict=True)
 
-        print(f"Accuracy: {accuracy:.3f} ")
-        print(f"f1-macro avg: {classification_report_values['macro avg']['f1-score']:.3f} ")
-        print(f"f1-weighted avg: {classification_report_values['weighted avg']['f1-score']:.3f} ")
-        print(f"precision-macro avg: {classification_report_values['macro avg']['precision']:.3f} ")
-        print(f"precision-weighted avg: {classification_report_values['weighted avg']['precision']:.3f} ")
-        interpret_conf_matrix(conf_matrix)
+        results = {
+            'accuracy': accuracy,
+            'f1_macro': classification_report_values['macro avg']['f1-score'],
+            'f1_weighted': classification_report_values['weighted avg']['f1-score'],
+            'precision_macro': classification_report_values['macro avg']['precision'],
+            'precision_weighted': classification_report_values['weighted avg']['precision'],
+            'conf_matrix': conf_matrix
+        }
 
-        # Create a single index for SHAP summary plot across all iterations
-        new_index = [ix for ix_test_fold in ix_test for ix in ix_test_fold]
-        shap.summary_plot(np.vstack(shap_values_all_folds), X.iloc[new_index])
+        if verbose:
+            log(f"Accuracy: {results['accuracy']:.3f}")
+            log(f"f1-macro avg: {results['f1_macro']:.3f}")
+            log(f"f1-weighted avg: {results['f1_weighted']:.3f}")
+            log(f"precision-macro avg: {results['precision_macro']:.3f}")
+            log(f"precision-weighted avg: {results['precision_weighted']:.3f}")
+            interpret_conf_matrix(conf_matrix)
+
+            # Create a single index for SHAP summary plot across all iterations
+            new_index = [ix for ix_test_fold in ix_test for ix in ix_test_fold]
+            shap.summary_plot(np.vstack(shap_values_all_folds), X.iloc[new_index])
 
     else:
-        # Apply SMOTE on the training data if needed
         if smote:
             X, y = apply_smote(X, y, random_state=random_state)
-            visualize_class_distribution(y, title="Class Distribution After SMOTE")
+            if verbose:
+                visualize_class_distribution(y, title="Class Distribution After SMOTE")
         else:
-            visualize_class_distribution(y, title="Class Distribution")
+            if verbose:
+                visualize_class_distribution(y, title="Class Distribution")
 
-        # Train-test split
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=random_state)
-
-        # Train Random Forest Classifier
         rf_model = train_model(X_train, y_train, model=model)
-
-        # Predict and evaluate
         accuracy_metrics, conf_matrix = evaluate_model(rf_model, X_test, y_test)
 
-        print(f"Accuracy: {accuracy_metrics['accuracy']:.3f} ")
-        print(f"f1-macro avg: {accuracy_metrics['f1-macro avg']:.3f} ")
-        print(f"f1-weighted avg: {accuracy_metrics['f1-weighted avg']:.3f} ")
-        print(f"precision-macro avg: {accuracy_metrics['precision-macro avg']:.3f} ")
-        print(f"precision-weighted avg: {accuracy_metrics['precision-weighted avg']:.3f} ")
-        interpret_conf_matrix(conf_matrix)
+        results = {
+            'accuracy': accuracy_metrics['accuracy'],
+            'f1_macro': accuracy_metrics['f1-macro avg'],
+            'f1_weighted': accuracy_metrics['f1-weighted avg'],
+            'precision_macro': accuracy_metrics['precision-macro avg'],
+            'precision_weighted': accuracy_metrics['precision-weighted avg'],
+            'conf_matrix': conf_matrix
+        }
 
-        # SHAP analysis
-        shap_values = shap_analysis(rf_model, X_test, explainer=shap_explainer)
-
-        # Plot SHAP summary plot for class 1 (positive class)
-        shap.summary_plot(shap_values[1], X_test)
+        if verbose:
+            log(f"Accuracy: {results['accuracy']:.3f}")
+            log(f"f1-macro avg: {results['f1_macro']:.3f}")
+            log(f"f1-weighted avg: {results['f1_weighted']:.3f}")
+            log(f"precision-macro avg: {results['precision_macro']:.3f}")
+            log(f"precision-weighted avg: {results['precision_weighted']:.3f}")
+            interpret_conf_matrix(conf_matrix)
+            
+            # SHAP analysis
+            shap_values = shap_analysis(rf_model, X_test, explainer=shap_explainer)
+            # Plot SHAP summary plot for class 1 (positive class)
+            shap.summary_plot(shap_values[1], X_test)
 
