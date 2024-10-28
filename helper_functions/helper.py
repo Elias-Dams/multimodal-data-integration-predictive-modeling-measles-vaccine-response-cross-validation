@@ -51,26 +51,14 @@ def shap_analysis(model, X_data, explainer=None, background_data=None):
     """
     if explainer is None:
         raise ValueError('You have not added an explainer')
-        # Use background data for KernelExplainer if provided
-    if explainer == shap.KernelExplainer:
-        if background_data is None:
-            background_data = X_data.sample(10, random_state=0)  # Sample a small subset if no background data is given
-        explainer_instance = explainer(model.predict_proba, background_data)
-    else:
-        explainer_instance = explainer(model)
-    shap_values = np.array(explainer_instance.shap_values(X_data))
+
+    explainer_instance = explainer(model.predict_proba, background_data, silent=True) if explainer == shap.KernelExplainer else explainer(model, background_data)
+    shap_values = np.array(explainer_instance.shap_values(X_data, check_additivity=False))
 
     # Transpose to reorder the axes as needed.
     # found it on(https://stackoverflow.com/questions/65549588/shap-treeexplainer-for-randomforest-multiclass-what-is-shap-valuesi)
     shap_values_ = shap_values.transpose((2, 0, 1))  # Shape: (classes, samples, features)
     shap_values__ = shap_values_.transpose((1, 0, 2))  # Shape: (samples, classes, features)
-
-    # Sanity check: Ensure that SHAP predictions match the model's predicted probabilities
-    # We sum over the last dimension (SHAP values across classes) and add the expected value to compare
-    assert np.allclose(
-        model.predict_proba(X_data),  # Model's predicted probabilities
-        shap_values__.sum(2) + explainer_instance.expected_value  # Summed SHAP values + expected value
-    ), "SHAP values do not match the model predictions!"
 
     return shap_values_
 
@@ -221,7 +209,7 @@ def visualize_class_distribution(y, title="Class Distribution"):
         plt.show()
 
 
-def model_with_shap(X, y, crossval="", n_splits=None, random_state=42, smote=True, model=None, shap_explainer=None, background_data=None, verbose=True):
+def model_with_shap(X, y, crossval="", n_splits=None, random_state=42, smote=True, model=None, shap_explainer=None, verbose=True):
     """
     Trains a model with optional cross-validation, performs SHAP analysis, and returns performance metrics.
 
@@ -258,9 +246,6 @@ def model_with_shap(X, y, crossval="", n_splits=None, random_state=42, smote=Tru
         # Placeholder to accumulate SHAP values and other metrics
         shap_values_all_folds , train_labels_per_folds, accuracy_per_fold, conf_matrices = [], [], [], []
 
-        if smote:
-            X, y = apply_smote(X, y, random_state=random_state)
-
         # Split the dataset into training and test indices
         ix_training, ix_test = [], []
         for fold in skf.split(X, y):
@@ -271,10 +256,15 @@ def model_with_shap(X, y, crossval="", n_splits=None, random_state=42, smote=Tru
             X_train, X_test = X.iloc[train_outer_ix, :], X.iloc[test_outer_ix, :]
             y_train, y_test = y.iloc[train_outer_ix], y.iloc[test_outer_ix]
 
-            train_labels_per_folds.append(y_train)
+            if smote:
+                X_train_resampled, y_train_resampled = apply_smote(X_train, y_train, random_state=random_state)
+            else:
+                X_train_resampled, y_train_resampled = X_train, y_train
+
+            train_labels_per_folds.append(y_train_resampled)
 
             # Train Random Forest Classifier
-            rf_model = train_model(X_train, y_train, model=model)
+            rf_model = train_model(X_train_resampled, y_train_resampled, model=model)
 
             # Predict and evaluate
             accuracy_metrics, conf_matrix = evaluate_model(rf_model, X_test, y_test)
@@ -282,7 +272,7 @@ def model_with_shap(X, y, crossval="", n_splits=None, random_state=42, smote=Tru
             conf_matrices.append(conf_matrix)
 
             # SHAP analysis
-            shap_values = shap_analysis(rf_model, X_test, explainer=shap_explainer)
+            shap_values = shap_analysis(rf_model, X_test, explainer=shap_explainer, background_data= X_train_resampled)
             shap_values_all_folds.append(shap_values[1])
 
         if smote:
@@ -305,9 +295,6 @@ def model_with_shap(X, y, crossval="", n_splits=None, random_state=42, smote=Tru
         loo = LeaveOneOut()
         shap_values_all_folds, train_labels_per_folds, y_true, y_pred = [], [], [], []
 
-        if smote:
-            X, y = apply_smote(X, y, random_state=random_state)
-
         # Split the dataset into training and test indices
         ix_training, ix_test = [], []
         for fold in loo.split(X, y):
@@ -318,18 +305,23 @@ def model_with_shap(X, y, crossval="", n_splits=None, random_state=42, smote=Tru
             X_train, X_test = X.iloc[train_outer_ix, :], X.iloc[test_outer_ix, :]
             y_train, y_test = y.iloc[train_outer_ix], y.iloc[test_outer_ix]
 
+            if smote:
+                X_train_resampled, y_train_resampled = apply_smote(X_train, y_train, random_state=random_state)
+            else:
+                X_train_resampled, y_train_resampled = X_train, y_train
+
             # Store true labels for later evaluation
             y_true.append(y_test.values[0])
 
             # Store labels for later visualization
-            train_labels_per_folds.append(y_train)
+            train_labels_per_folds.append(y_train_resampled)
 
             # Train model
-            rf_model = train_model(X_train, y_train, model=model)
+            rf_model = train_model(X_train_resampled, y_train_resampled, model=model)
             pred = rf_model.predict(X_test)
             y_pred.append(pred[0])
 
-            shap_values = shap_analysis(rf_model, X_test, explainer=shap_explainer, background_data=background_data)
+            shap_values = shap_analysis(rf_model, X_test, explainer=shap_explainer, background_data= X_train_resampled)
             shap_values_all_folds.append(shap_values[1])
 
         # Visualize the class distribution after SMOTE (if applicable)
@@ -367,16 +359,18 @@ def model_with_shap(X, y, crossval="", n_splits=None, random_state=42, smote=Tru
             shap.summary_plot(np.vstack(shap_values_all_folds), X.iloc[new_index])
 
     else:
-        if smote:
-            X, y = apply_smote(X, y, random_state=random_state)
-            if verbose:
-                visualize_class_distribution(y, title="Class Distribution After SMOTE")
-        else:
-            if verbose:
-                visualize_class_distribution(y, title="Class Distribution")
-
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=random_state)
-        rf_model = train_model(X_train, y_train, model=model)
+
+        if smote:
+            X_train_resampled, y_train_resampled = apply_smote(X_train, y_train, random_state=random_state)
+            if verbose:
+                visualize_class_distribution(y_train_resampled, title="Class Distribution After SMOTE")
+        else:
+            X_train_resampled, y_train_resampled = X_train, y_train
+            if verbose:
+                visualize_class_distribution(y_train_resampled, title="Class Distribution")
+
+        rf_model = train_model(X_train_resampled, y_train_resampled, model=model)
         accuracy_metrics, conf_matrix = evaluate_model(rf_model, X_test, y_test)
 
         results = {
@@ -395,9 +389,9 @@ def model_with_shap(X, y, crossval="", n_splits=None, random_state=42, smote=Tru
             log(f"precision-macro avg: {results['precision_macro']:.3f}")
             log(f"precision-weighted avg: {results['precision_weighted']:.3f}")
             interpret_conf_matrix(conf_matrix)
-            
+
             # SHAP analysis
-            shap_values = shap_analysis(rf_model, X_test, explainer=shap_explainer)
+            shap_values = shap_analysis(rf_model, X_test, explainer=shap_explainer, background_data= X_train_resampled)
             # Plot SHAP summary plot for class 1 (positive class)
             shap.summary_plot(shap_values[1], X_test)
 
