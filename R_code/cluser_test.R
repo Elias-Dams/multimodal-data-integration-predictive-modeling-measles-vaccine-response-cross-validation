@@ -15,16 +15,16 @@ produce_cytokine_modules <- function(input_mat, plotsDir) {
   hc <-  stats::hclust(dist_matrix, method = "ward.D2")
   
   
-  png(paste0(plotsDir, "cytokine_features_clustering.png"), width = 1400, height = 1000, res = 150)
+  png(paste0(plotsDir, "merged_features_clustering.png"), width = 1400, height = 1000, res = 150)
   plot(hc, main = "Cytokine Feature Clustering", sub = "", xlab = "", cex.lab = 1.5, cex.axis = 1.5, cex.main = 2)
   dev.off()
   
-  png(paste0(plotsDir, "cytokine_features_clustering_cut.png"), width = 1400, height = 1000, res = 150)
+  png(paste0(plotsDir, "merged_features_clustering_cut.png"), width = 1400, height = 1000, res = 150)
   plot(hc, main = "Cytokine Feature Clustering", sub = "", xlab = "", cex.lab = 1.5, cex.axis = 1.5, cex.main = 2)
   rect.hclust(hc, h = .9, border = "red",)
   dev.off()
   
-  png(paste0(plotsDir, "cytokine_features_clustering_cut_colors.png"), width = 1400, height = 1000, res = 150)
+  png(paste0(plotsDir, "merged_features_clustering_cut_colors.png"), width = 1400, height = 1000, res = 150)
   clusters <- cutree(hc, h = .9)
   clusterColors <- labels2colors(clusters)
   
@@ -47,7 +47,7 @@ produce_cytokine_modules <- function(input_mat, plotsDir) {
            cutree_rows = length(unique(clusters)),
            cutree_cols = length(unique(clusters)),
            main = "Clustered Correlation Heatmap",
-           filename = paste0(plotsDir, "correlation_heatmap_cytokines_ward2.png"),
+           filename = paste0(plotsDir, "correlation_heatmap_merged_ward2.png"),
            width = 20, height = 20)
   
   return(clusterColors)
@@ -81,6 +81,9 @@ correlation_heatmap <- function(data, plotTitle, plotsDir){
   
 }
 
-test = read.csv("School/Master 2/Thesis/Thesis/data/cytokines_data_copy.csv")
+test = read.csv("School/Master 2/Thesis/Thesis/data/merged_cytokines_cyto_meta.csv")
+# Remove the 'Vaccinee' and 'response_label' columns
+test <- test[, !names(test) %in% c("Vaccinee", "response_label")]
+
 produce_cytokine_modules(as.data.frame(test), "School/Master 2/Thesis/Thesis/R_code/")
 correlation_heatmap(as.data.frame(test), "Cytokine", "School/Master 2/Thesis/Thesis/R_code/")
