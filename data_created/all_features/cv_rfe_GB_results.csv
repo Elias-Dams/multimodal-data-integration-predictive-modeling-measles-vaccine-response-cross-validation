@@ -1,0 +1,6 @@
+fold,selected_features,balanced_accuracy,accuracy
+1,"['IFNa2', 'GRO', 'IP-10', 'MCP-1', 'TNFa', 'WBC Day 0', 'HGB Day 0', '%LYM Day 0', '%MON Day 0', '%GRA Day 0']",0.5666666666666667,0.625
+2,"['HHV6.Status', 'Eotaxin', 'GRO', 'MIP1b', 'VEGF', 'HGB Day 0', 'PLT Day 0', '%LYM Day 0', '%MON Day 0', '%GRA Day 0']",0.6666666666666667,0.75
+3,"['GRO', 'MDC', 'IL17A', 'IP-10', 'MIP1a', 'RBC Day 0', 'HCT Day 0', 'PLT Day 0', '%LYM Day 0', '%MON Day 0']",0.4166666666666667,0.625
+4,"['EGF', 'IFNg', 'IL1a', 'IL-6', 'MCP-1', 'VEGF', 'WBC Day 0', 'RBC Day 0', 'HGB Day 0', 'PLT Day 0']",0.3333333333333333,0.25
+5,"['EGF', 'GRO', 'IL17A', 'IL1a', 'IL-8', 'RBC Day 0', 'PLT Day 0', '%LYM Day 0', '%MON Day 0', 'Gender']",0.6666666666666667,0.75

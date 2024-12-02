@@ -1,0 +1,6 @@
+fold,selected_features,balanced_accuracy,accuracy
+1,"['CMV.Status', 'HSV1_2.Status', 'IL-9', 'IL-8', 'MCP-1', 'TNFa', 'WBC Day 0', '%MON Day 0', 'Gender', 'Age']",0.6333333333333333,0.625
+2,"['HHV6.Status', 'EGF', 'Eotaxin', 'GCSF', 'IL-13', 'IL1a', 'MCP-1', 'HGB Day 0', '%LYM Day 0', '%MON Day 0']",0.4166666666666667,0.625
+3,"['GCSF', 'GM-CSF', 'Fractalkine', 'IFNa2', 'IL1a', 'IL-8', 'MCP-1', 'VEGF', 'HGB Day 0', '%MON Day 0']",0.4166666666666667,0.625
+4,"['HHV6.Status', 'EGF', 'IFNg', 'IL-15', 'IL17A', 'IL1Ra', 'IL1a', 'VEGF', 'HGB Day 0', 'Age']",0.16666666666666666,0.25
+5,"['HHV6.Status', 'Eotaxin', 'Fractalkine', 'IFNg', 'IL-15', 'IL-8', 'VEGF', '%LYM Day 0', '%MON Day 0', 'Gender']",0.5833333333333333,0.625

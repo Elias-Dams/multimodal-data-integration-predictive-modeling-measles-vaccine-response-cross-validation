@@ -1,0 +1,34 @@
+Model,Feature
+RandomForest,GRO
+RandomForest,MCP-1
+RandomForest,RBC Day 0
+RandomForest,HGB Day 0
+RandomForest,HCT Day 0
+RandomForest,%LYM Day 0
+RandomForest,%MON Day 0
+RandomForest,%GRA Day 0
+RandomForest,IL17A
+RandomForest,PLT Day 0
+SVM,IL-8
+SVM,MCP-1
+SVM,%MON Day 0
+SVM,HHV6.Status
+SVM,IL1a
+SVM,HGB Day 0
+SVM,VEGF
+GradientBoosting,GRO
+GradientBoosting,HGB Day 0
+GradientBoosting,%LYM Day 0
+GradientBoosting,%MON Day 0
+GradientBoosting,PLT Day 0
+GradientBoosting,RBC Day 0
+LogisticRegression,IL-8
+LogisticRegression,IP-10
+LogisticRegression,MCP-1
+LogisticRegression,VEGF
+LogisticRegression,%LYM Day 0
+LogisticRegression,%MON Day 0
+LogisticRegression,Gender
+LogisticRegression,Age
+LogisticRegression,HHV6.Status
+LogisticRegression,GCSF
