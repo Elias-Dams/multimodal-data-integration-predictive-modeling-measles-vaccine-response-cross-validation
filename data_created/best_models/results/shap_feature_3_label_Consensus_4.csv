@@ -1,0 +1,33 @@
+Model,Feature,Importance
+Cytokines,MDC,0.4325
+Cytokines,VEGF,0.3608
+Cytokines,Flt3 Ligand,0.342
+Cytokines,IL-8,0.3338
+Cytokines,TNFa,0.3169
+Cytokines,CMV.Status,0.3114
+Cytokines,MIP1b,0.2435
+Cytokines,HSV1_2.Status,0.2369
+Cytokines,IL-5,0.2327
+Cytokines,Eotaxin,0.2165
+Cytometry,HGB Day 0,0.1045
+Cytometry,WBC Day 0,0.0889
+Cytometry,HCT Day 0,0.0674
+Cytometry,%MON Day 0,0.0565
+Cytometry,RBC Day 0,0.0487
+Cytometry,%LYM Day 0,0.0331
+Cytometry,%GRA Day 0,0.028
+Cytometry,PLT Day 0,0.0196
+Clonal Breadth,fraction_sequences_ab,0.2933
+Clonal Breadth,fraction_sequences_gd,0.2902
+Clonal Depth,uniqueMoleculeFraction_gd,0.5794
+Clonal Depth,uniqueMoleculeFraction_ab,0.2837
+RNA Data,M14.43.TBD_EXP7,0.0079
+RNA Data,M14.24.Inflammation_EXP3,0.0067
+RNA Data,M16.71.TBD_EXP0,0.0054
+RNA Data,M16.24.T cells_EXP0,0.0051
+RNA Data,M15.111.TBD_EXP7,0.005
+RNA Data,M15.90.TBD_EXP0,0.0048
+RNA Data,M16.8.TBD_EXP0,0.0047
+RNA Data,M14.60.TBD_EXP0,0.0043
+RNA Data,M13.23.TBD_EXP7,0.0042
+RNA Data,M16.93.TBD_EXP3,0.0042

@@ -1,0 +1,33 @@
+Model,Feature,Importance
+Cytokines,IL1Ra,0.044
+Cytokines,GRO,0.0378
+Cytokines,VEGF,0.0371
+Cytokines,EGF,0.0306
+Cytokines,FGF-2,0.0303
+Cytokines,IFNg,0.0229
+Cytokines,TNFa,0.0206
+Cytokines,MIP1b,0.0206
+Cytokines,IL1a,0.0183
+Cytokines,MCP-1,0.017
+Cytometry,WBC Day 0,0.1354
+Cytometry,HGB Day 0,0.0746
+Cytometry,PLT Day 0,0.0683
+Cytometry,%LYM Day 0,0.0665
+Cytometry,HCT Day 0,0.0639
+Cytometry,%GRA Day 0,0.0585
+Cytometry,RBC Day 0,0.0473
+Cytometry,%MON Day 0,0.0224
+Clonal Breadth,fraction_sequences_gd,0.1532
+Clonal Breadth,fraction_sequences_ab,0.1166
+Clonal Depth,uniqueMoleculeFraction_gd,0.6873
+Clonal Depth,uniqueMoleculeFraction_ab,0.6157
+RNA Data,M16.97.Cell death_EXP3,0.0103
+RNA Data,M15.90.TBD_EXP0,0.0095
+RNA Data,M16.70.TBD_EXP3,0.009
+RNA Data,M16.93.TBD_EXP3,0.0085
+RNA Data,M14.31.Cell cycle_EXP7,0.008
+RNA Data,M15.31.Protein modification_EXP3,0.0073
+RNA Data,M16.65.TGF-beta_EXP7,0.0072
+RNA Data,M15.125.TBD_EXP7,0.007
+RNA Data,M14.56.TBD_EXP0,0.0067
+RNA Data,M16.36.Gene transcription_EXP0,0.0064

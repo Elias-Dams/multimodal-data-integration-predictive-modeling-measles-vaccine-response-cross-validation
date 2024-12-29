@@ -1,0 +1,33 @@
+Model,Feature,Importance
+Cytokines,MDC,0.4649
+Cytokines,VEGF,0.3703
+Cytokines,CMV.Status,0.3667
+Cytokines,IL-8,0.3362
+Cytokines,TNFa,0.3233
+Cytokines,Flt3 Ligand,0.2715
+Cytokines,HSV1_2.Status,0.2554
+Cytokines,MIP1b,0.2459
+Cytokines,IL-5,0.2433
+Cytokines,IL-6,0.2149
+Cytometry,HGB Day 0,0.0901
+Cytometry,WBC Day 0,0.0754
+Cytometry,HCT Day 0,0.0694
+Cytometry,%MON Day 0,0.0547
+Cytometry,RBC Day 0,0.0547
+Cytometry,%LYM Day 0,0.0408
+Cytometry,%GRA Day 0,0.0382
+Cytometry,PLT Day 0,0.0191
+Clonal Breadth,fraction_sequences_ab,0.2852
+Clonal Breadth,fraction_sequences_gd,0.2661
+Clonal Depth,uniqueMoleculeFraction_gd,0.5966
+Clonal Depth,uniqueMoleculeFraction_ab,0.2589
+RNA Data,M14.74.TBD_EXP0,0.0042
+RNA Data,M15.25.TBD_EXP0,0.004
+RNA Data,M13.8.TBD_EXP0,0.0038
+RNA Data,M16.26.TBD_EXP0,0.0036
+RNA Data,M15.45.Platelet_EXP3,0.0036
+RNA Data,M15.79.Mitochondrial Stress/Proteasome_EXP0,0.0036
+RNA Data,M16.97.Cell death_EXP3,0.0036
+RNA Data,M14.55.Gene transcription_EXP0,0.0035
+RNA Data,M16.73.Protein synthesis_EXP3,0.0035
+RNA Data,M16.4.TBD_EXP0,0.0035

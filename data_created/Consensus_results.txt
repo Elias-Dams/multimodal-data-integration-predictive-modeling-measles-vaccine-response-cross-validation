@@ -1,0 +1,110 @@
+#### TEST1:
+LABELS = 'response', 'no response',
+COMPRESS_CORRELATED = False,
+BALANCE_TEST_SET = False,
+OVERSAMPLING_METHODE = 'remove'
+
+            Model  Accuracy  Precision  Recall  F1-Score
+0       Cytokines   0.45455    0.08333 0.50000   0.14286
+1       Cytometry   0.63636    0.12500 0.50000   0.20000
+2  Clonal Breadth   0.72727    0.25000 1.00000   0.40000
+3    Clonal Depth   0.86364    0.40000 1.00000   0.57143
+4        RNA Data   0.50000    0.00000 0.00000   0.00000
+5       Consensus   0.86364    0.40000 1.00000   0.57143
+
+
+--- Cytokines Permutation Test Results ---
+	Observed Accuracy: 0.5556
+	P-Value: 0.3520
+	Permuted Scores Mean: 0.4749
+	Permuted Scores Standard Deviation: 0.1268
+	Result is not statistically significant (p >= 0.05).
+
+--- Cytometry Permutation Test Results ---
+	Observed Accuracy: 0.6111
+	P-Value: 0.2520
+	Permuted Scores Mean: 0.4818
+	Permuted Scores Standard Deviation: 0.1507
+	Result is not statistically significant (p >= 0.05).
+
+--- Clonal Breadth Permutation Test Results ---
+	Observed Accuracy: 0.6667
+	P-Value: 0.1730
+	Permuted Scores Mean: 0.4858
+	Permuted Scores Standard Deviation: 0.1761
+	Result is not statistically significant (p >= 0.05).
+
+--- Clonal Depth Permutation Test Results ---
+	Observed Accuracy: 0.6667
+	P-Value: 0.1060
+	Permuted Scores Mean: 0.4305
+	Permuted Scores Standard Deviation: 0.1674
+	Result is not statistically significant (p >= 0.05).
+
+--- RNN Permutation Test Results ---
+	Observed Accuracy: 0.6111
+	P-Value: 0.1810
+	Permuted Scores Mean: 0.4375
+	Permuted Scores Standard Deviation: 0.1508
+	Result is not statistically significant (p >= 0.05).
+
+95% Confidence Interval for Cytokines Balanced Accuracy: 0.1667 - 1.0000
+95% Confidence Interval for Cytometry Balanced Accuracy: 0.2500 - 1.0000
+95% Confidence Interval for Clonal Breadth Balanced Accuracy: 0.1667 - 1.0000
+95% Confidence Interval for Clonal Depth Balanced Accuracy: 0.1667 - 1.0000
+95% Confidence Interval for RNN Balanced Accuracy: 0.0000 - 1.0000
+
+#### TEST2:
+LABELS = 'response', 'no response',
+COMPRESS_CORRELATED = True,
+BALANCE_TEST_SET = False,
+OVERSAMPLING_METHODE = 'remove'
+
+            Model  Accuracy  Precision  Recall  F1-Score
+0       Cytokines   0.68182    0.00000 0.00000   0.00000
+1       Cytometry   0.77273    0.28571 1.00000   0.44444
+2  Clonal Breadth   0.72727    0.25000 1.00000   0.40000
+3    Clonal Depth   0.86364    0.40000 1.00000   0.57143
+4        RNA Data   0.50000    0.00000 0.00000   0.00000
+5       Consensus   0.95455    0.66667 1.00000   0.80000
+
+--- Cytokines Permutation Test Results ---
+	Observed Accuracy: 0.6111
+	P-Value: 0.2490
+	Permuted Scores Mean: 0.4989
+	Permuted Scores Standard Deviation: 0.1228
+	Result is not statistically significant (p >= 0.05).
+
+--- Cytometry Permutation Test Results ---
+	Observed Accuracy: 0.6111
+	P-Value: 0.1890
+	Permuted Scores Mean: 0.4487
+	Permuted Scores Standard Deviation: 0.1518
+	Result is not statistically significant (p >= 0.05).
+
+--- Clonal Breadth Permutation Test Results ---
+	Observed Accuracy: 0.6667
+	P-Value: 0.1910
+	Permuted Scores Mean: 0.5003
+	Permuted Scores Standard Deviation: 0.1727
+	Result is not statistically significant (p >= 0.05).
+
+--- Clonal Depth Permutation Test Results ---
+	Observed Accuracy: 0.6667
+	P-Value: 0.1310
+	Permuted Scores Mean: 0.4439
+	Permuted Scores Standard Deviation: 0.1685
+	Result is not statistically significant (p >= 0.05).
+
+--- RNN Permutation Test Results ---
+	Observed Accuracy: 0.6111
+	P-Value: 0.1800
+	Permuted Scores Mean: 0.4366
+	Permuted Scores Standard Deviation: 0.1510
+	Result is not statistically significant (p >= 0.05).
+
+95% Confidence Interval for Cytokines Balanced Accuracy: 0.1667 - 1.0000
+95% Confidence Interval for Cytometry Balanced Accuracy: 0.2458 - 1.0000
+95% Confidence Interval for Clonal Breadth Balanced Accuracy: 0.1667 - 1.0000
+95% Confidence Interval for Clonal Depth Balanced Accuracy: 0.1667 - 1.0000
+95% Confidence Interval for RNN Balanced Accuracy: 0.0000 - 1.0000
