@@ -1,0 +1,33 @@
+Model,Feature,Importance
+Cytokines,HHV6.Status,0.0606
+Cytokines,GCSF,0.0575
+Cytokines,IL-8,0.0533
+Cytokines,IL-9,0.0394
+Cytokines,IL12-p40,0.027
+Cytokines,IL-13,0.0146
+Cytokines,IL-2,0.0138
+Cytokines,TNFb,0.0122
+Cytokines,GM-CSF,0.0102
+Cytokines,IL12-p70,0.0101
+Cytometry,HGB Day 0,0.2384
+Cytometry,%LYM Day 0,0.1367
+Cytometry,HCT Day 0,0.1057
+Cytometry,WBC Day 0,0.0843
+Cytometry,%GRA Day 0,0.0665
+Cytometry,PLT Day 0,0.0547
+Cytometry,RBC Day 0,0.0
+Cytometry,%MON Day 0,0.0
+Clonal Breadth,fraction_sequences_ab,0.6147
+Clonal Breadth,fraction_sequences_gd,0.337
+Clonal Depth,uniqueMoleculeFraction_gd,0.6455
+Clonal Depth,uniqueMoleculeFraction_ab,0.6031
+RNA Data,M14.38.TBD_EXP0,0.0171
+RNA Data,M15.26.Neutrophils_EXP0,0.0085
+RNA Data,M15.58.Monocytes_EXP0,0.0075
+RNA Data,M14.74.TBD_EXP0,0.0068
+RNA Data,M14.67.Gene transcription_EXP0,0.0067
+RNA Data,M16.108.TBD_EXP0,0.0066
+RNA Data,M14.48.Inflammation_EXP0,0.0065
+RNA Data,M12.10.Inflammation_EXP0,0.0062
+RNA Data,M14.26.Inflammation_EXP0,0.0061
+RNA Data,M15.43.TBD_EXP0,0.006

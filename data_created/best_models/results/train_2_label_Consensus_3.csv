@@ -1,7 +1,0 @@
-Data,Model,LABELS,COMPRESS_CORRELATED,BALANCE_METHODE,OVERSAMPLING_METHOD,TRAIN Balanced_Accuracy,TRAIN Accuracy,EVAL P-Value,EVAL Permuted Scores Mean,EVAL Permuted Scores Std Dev,EVAL CI Lower,EVAL CI Upper,TRAIN Precision_0,TRAIN Precision_1,TRAIN Recall_0,TRAIN Recall_1,TRAIN F1_0,TRAIN F1_1
-Cytokines,Naive Bayes,"response, no response",False,Balanced,remove,0.5556,0.5556,0.587,0.5037,0.1557,0.2244,0.725,0.3846,0.3846,0.5556,0.5556,0.4545,0.4545
-Cytometry,Naive Bayes,"response, no response",False,Balanced,remove,0.6111,0.6111,0.25,0.4971,0.1747,0.425,0.925,0.4545,0.4286,0.5556,0.6667,0.5,0.5217
-Clonal Breadth,Logistic Regression,"response, no response",False,Balanced,remove,0.6667,0.6667,0.171,0.4792,0.3118,0.325,0.875,0.5,0.5,0.6667,0.6667,0.5714,0.5714
-Clonal Depth,Decision Tree,"response, no response",False,Balanced,remove,0.6667,0.6667,0.012,0.3554,0.2474,0.6244,0.975,0.5,0.5,0.6667,0.6667,0.5714,0.5714
-RNA Data,Logistic Regression,"response, no response",False,Balanced,remove,0.4444,0.4444,0.612,0.4951,0.1961,0.175,0.6756,0.2857,0.2857,0.4444,0.4444,0.3478,0.3478
-Consensus,Consensus,"response, no response",False,Balanced,remove,,,,,,,,,,,,,

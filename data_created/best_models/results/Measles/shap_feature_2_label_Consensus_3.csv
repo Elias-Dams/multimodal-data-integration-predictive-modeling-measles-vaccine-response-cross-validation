@@ -1,0 +1,33 @@
+Model,Feature,Importance
+Cytokines,Fractalkine,0.1151
+Cytokines,HHV6.Status,0.0897
+Cytokines,sCD40L,0.0508
+Cytokines,IL-8,0.0468
+Cytokines,GCSF,0.031
+Cytokines,IL-9,0.0252
+Cytokines,IL-13,0.0168
+Cytokines,TNFb,0.0138
+Cytokines,MCP3,0.0132
+Cytokines,IL12-p40,0.0119
+Cytometry,PLT Day 0,0.1036
+Cytometry,%LYM Day 0,0.0782
+Cytometry,WBC Day 0,0.0757
+Cytometry,HGB Day 0,0.0705
+Cytometry,%GRA Day 0,0.0639
+Cytometry,HCT Day 0,0.0628
+Cytometry,RBC Day 0,0.0486
+Cytometry,%MON Day 0,0.0421
+Clonal Breadth,fraction_sequences_ab,0.5767
+Clonal Breadth,fraction_sequences_gd,0.0666
+Clonal Depth,uniqueMoleculeFraction_ab,0.3796
+Clonal Depth,uniqueMoleculeFraction_gd,0.1907
+RNA Data,M16.76.TBD_EXP0,0.0009
+RNA Data,M14.60.TBD_EXP0,0.0008
+RNA Data,M15.58.Monocytes_EXP0,0.0008
+RNA Data,M16.44.Protein synthesis_EXP0,0.0007
+RNA Data,M14.26.Inflammation_EXP0,0.0007
+RNA Data,M16.104.Cell cycle_EXP0,0.0007
+RNA Data,M16.70.TBD_EXP0,0.0007
+RNA Data,M13.27.Lymphocytes_EXP0,0.0007
+RNA Data,M15.61.Monocytes_EXP0,0.0007
+RNA Data,M14.76.Leukocyte activation_EXP0,0.0007

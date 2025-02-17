@@ -1,7 +1,0 @@
-Data,Model,LABELS,COMPRESS_CORRELATED,OVERSAMPLING_METHOD,BALANCE_METHODE,Accuracy,Precision_Class_0,Precision_Class_1,Precision_Class_2,Recall_Class_0,Recall_Class_1,Recall_Class_2,F1_Score_Class_0,F1_Score_Class_1,F1_Score_Class_2
-Cytokines,Logistic Regression,"response, no response - high ab, no response - low ab",False,,Balanced,0.5,1.0,0.5,0.0,0.3333,1.0,0.0,0.5,0.6667,0.0
-Cytometry,Naive Bayes,"response, no response - high ab, no response - low ab",False,,Balanced,0.25,0.0,0.5,0.0,0.0,0.6667,0.0,0.0,0.5714,0.0
-Clonal Breadth,Logistic Regression,"response, no response - high ab, no response - low ab",False,,Balanced,0.5,1.0,0.0,0.3333,0.6667,0.0,1.0,0.8,0.0,0.5
-Clonal Depth,Logistic Regression,"response, no response - high ab, no response - low ab",False,,Balanced,0.375,0.3333,0.0,0.5,0.6667,0.0,0.5,0.4444,0.0,0.5
-RNA Data,Naive Bayes,"response, no response - high ab, no response - low ab",False,,Balanced,0.375,0.5,0.4,0.0,0.3333,0.6667,0.0,0.4,0.5,0.0
-Consensus,Consensus,"response, no response - high ab, no response - low ab",False,,Balanced,0.5,0.5,0.5,0.5,0.6667,0.3333,0.5,0.5714,0.4,0.5

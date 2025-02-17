@@ -1,0 +1,5 @@
+Data,Model,LABELS,COMPRESS_CORRELATED,OVERSAMPLING_METHOD,BALANCE_METHODE,Accuracy,Precision_Class_0,Precision_Class_1,Recall_Class_0,Recall_Class_1,F1_Score_Class_0,F1_Score_Class_1
+Cytometry,Decision Tree,"response, no response",False,random,Balanced,0.4286,0.3333,0.5,0.3333,0.5,0.3333,0.5
+TCR Data,Random Forest,"response, no response",False,random,Balanced,0.8571,1.0,0.8,0.6667,1.0,0.8,0.8889
+RNA Data,Logistic Regression,"response, no response",False,random,Balanced,0.5714,0.5,0.6,0.3333,0.75,0.4,0.6667
+Consensus,Consensus,"response, no response",False,random,Balanced,0.5714,0.5,0.6,0.3333,0.75,0.4,0.6667

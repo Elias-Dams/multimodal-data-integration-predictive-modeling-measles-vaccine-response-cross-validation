@@ -1,0 +1,5 @@
+Data,Model,LABELS,COMPRESS_CORRELATED,BALANCE_METHODE,OVERSAMPLING_METHOD,TRAIN Balanced_Accuracy,TRAIN Accuracy,EVAL P-Value,EVAL Permuted Scores Mean,EVAL Permuted Scores Std Dev,EVAL CI Lower,EVAL CI Upper,TRAIN Precision_0,TRAIN Precision_1,TRAIN Recall_0,TRAIN Recall_1,TRAIN F1_0,TRAIN F1_1
+Cytometry,Logistic Regression,"response, no response",False,Balanced,remove,0.6,0.6,0.374,0.4996,0.2004,0.303,0.8182,0.4286,0.4286,0.6,0.6,0.5,0.5
+TCR Data,SVM,"response, no response",False,Balanced,remove,0.6,0.6,0.075,0.5047,0.2233,0.5,0.9545,0.4545,0.4118,0.5,0.7,0.4762,0.5185
+RNA Data,Logistic Regression,"response, no response",False,Balanced,remove,0.7,0.7,0.418,0.5014,0.1458,0.3939,0.6818,0.5,0.6,0.8,0.6,0.6154,0.6
+Consensus,Consensus,"response, no response",False,Balanced,remove,,,,,,,,,,,,,

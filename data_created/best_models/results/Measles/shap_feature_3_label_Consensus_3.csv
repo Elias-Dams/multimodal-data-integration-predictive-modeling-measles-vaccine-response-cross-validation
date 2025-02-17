@@ -1,0 +1,33 @@
+Model,Feature,Importance
+Cytokines,MDC,0.9242
+Cytokines,IL-8,0.4942
+Cytokines,CMV.Status,0.4038
+Cytokines,TNFa,0.3963
+Cytokines,IL-6,0.3797
+Cytokines,GM-CSF,0.3591
+Cytokines,MIP1a,0.2921
+Cytokines,IL1a,0.2794
+Cytokines,Eotaxin,0.275
+Cytokines,IL1Ra,0.2566
+Cytometry,%MON Day 0,0.1093
+Cytometry,WBC Day 0,0.0957
+Cytometry,RBC Day 0,0.0556
+Cytometry,PLT Day 0,0.0457
+Cytometry,HCT Day 0,0.0438
+Cytometry,%GRA Day 0,0.0393
+Cytometry,%LYM Day 0,0.0381
+Cytometry,HGB Day 0,0.0319
+Clonal Breadth,fraction_sequences_gd,0.1955
+Clonal Breadth,fraction_sequences_ab,0.1928
+Clonal Depth,uniqueMoleculeFraction_gd,0.3974
+Clonal Depth,uniqueMoleculeFraction_ab,0.0184
+RNA Data,M10.4.Neutrophil activation_EXP0,0.3744
+RNA Data,M8.2.Prostanoids_EXP0,0.3451
+RNA Data,M15.118.Erythroid cells_EXP0,0.338
+RNA Data,M16.57.B cells_EXP0,0.2505
+RNA Data,M12.15.Plasma cells_EXP0,0.2366
+RNA Data,M15.52.TBD_EXP0,0.2249
+RNA Data,M16.90.TBD_EXP0,0.2059
+RNA Data,M16.33.TBD_EXP0,0.2039
+RNA Data,M14.52.TBD_EXP0,0.2014
+RNA Data,M14.21.TBD_EXP0,0.1868

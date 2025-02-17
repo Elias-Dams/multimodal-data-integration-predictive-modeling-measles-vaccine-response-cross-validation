@@ -1,0 +1,23 @@
+Model,Feature,Importance
+Cytometry,%LYM Day 0,0.0666
+Cytometry,%GRA Day 0,0.063
+Cytometry,HGB Day 0,0.0555
+Cytometry,PLT Day 0,0.0413
+Cytometry,WBC Day 0,0.0384
+Cytometry,%MON Day 0,0.0376
+Cytometry,HCT Day 0,0.032
+Cytometry,RBC Day 0,0.0311
+Clonal Breadth,HepBTCRs,0.1599
+Clonal Breadth,B0,0.0728
+Clonal Breadth,PPnrB0,0.072
+Clonal Breadth,PSB0,0.0685
+RNA Data,M14.43.TBD_EXP0,0.0046
+RNA Data,M16.66.TBD_EXP0,0.0044
+RNA Data,M15.95.TBD_EXP0,0.0041
+RNA Data,M16.93.TBD_EXP0,0.0038
+RNA Data,M14.47.Protein synthesis_EXP0,0.0038
+RNA Data,M15.78.TBD_EXP0,0.0037
+RNA Data,M15.115.TBD_EXP0,0.0034
+RNA Data,M14.55.Gene transcription_EXP0,0.0034
+RNA Data,M13.20.Cell cycle_EXP0,0.0033
+RNA Data,M15.23.Cell death_EXP0,0.0032
