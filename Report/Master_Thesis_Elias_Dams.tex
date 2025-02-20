@@ -1,0 +1,101 @@
+\documentclass[12pt,a4paper]{report}
+\usepackage[a4paper,margin=1in]{geometry}
+\usepackage{graphicx}
+\usepackage{lmodern}
+\usepackage{setspace}
+\usepackage{titlesec}
+\usepackage{lipsum}
+\usepackage{fancyhdr}
+\usepackage[Sonny]{fncychap}
+
+%--------------------------------
+% Chapter Title
+%--------------------------------
+\ChNameVar{\raggedleft\bfseries\Large}   % "CHAPTER" word
+\ChNumVar{\raggedleft\bfseries\Large}    % Chapter number
+\ChTitleVar{\raggedleft\bfseries\Large}  % Chapter title
+
+%--------------------------------
+% Section Title
+%--------------------------------
+\titleformat{\section}[block]
+    {\titlerule[2pt]\addvspace{0.8ex}%
+    \bfseries\Large}
+    {\thesection}{0.5em}
+    {}[{\addvspace{0.4ex}\titlerule[2pt]}]
+\titlespacing{\section}{0pt}{*4}{*4}
+
+% Display current section in header:
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\nouppercase{\rightmark}}
+\fancyfoot[C]{\thepage}
+
+\begin{document}
+
+% Title Page
+\begin{titlepage}
+    \centering
+    
+    % University logo at the top
+    \includegraphics[width=0.3\textwidth]{images/uantwerp_logo.png}\\[1cm]
+    
+    {\Huge \textbf{Multimodal Data Integration for Predictive Modelling of Measles Vaccine Response with Cross-Vaccine Marker Validation}} \\
+    \vfill
+    
+    {\Large \textbf{Elias Dams}}\\[1cm]
+    
+    \textbf{Promotor:} Dr. Pieter Meysman\\
+    \textbf{Supervisor:} Fabio Affaticati\\[1.5cm]
+    
+    {\Large \textbf{University of Antwerp}}\\
+    {\large Faculty of Science}\\[0.5cm]
+    
+    \textbf{2024-2025}\\[1.5cm]
+    
+    Submitted in fulfilment of the requirements for the degree of\\
+    \textbf{Master in Computer Science: AI \& Data Science}\\[1cm]
+    
+    \textbf{June 2025}\\[2cm]
+    
+    % Decorative line at the bottom
+    \vfill
+    \includegraphics[width=1.0\textwidth]{images/bottom_design.jpg}
+
+\end{titlepage}
+
+% Table of Contents
+\tableofcontents
+\newpage
+
+% List of Figures, Tables, Acronyms
+\listoffigures
+
+\listoftables
+
+\chapter*{List of Acronyms}
+
+% Preliminary Sections
+\chapter*{Summary}
+
+\chapter*{Acknowledgements}
+
+\chapter*{Abstract}
+
+
+% Chapters
+\chapter{Background}
+
+\section{Background in Biology}
+
+...
+
+\subsection{Immunology}
+
+...
+
+\subsection{Immunology}
+
+...
+
+\end{document}
