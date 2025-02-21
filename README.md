@@ -27,7 +27,7 @@ The goal is to accurately predict these outcomes and identify biological markers
 
 #### **3. Cross-Vaccine Marker Validation**  
 To ensure the model's robustness, **validation** is performed using **data from other vaccines** 
-(e.g., flu or COVID-19 vaccines). If markers such as **cytokines** or **antibodies** are effective predictors 
+(e.g., Hepatitis B vaccines). If markers such as **cytokines** or **antibodies** are effective predictors 
 for measles vaccine response, this validation step checks whether they are also reliable for other vaccines.
 
 ---
