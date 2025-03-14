@@ -1,0 +1,5 @@
+Data,Model,LABELS,COMPRESS_CORRELATED,OVERSAMPLING_METHOD,BALANCE_METHODE,Accuracy,Precision_Class_0,Precision_Class_1,Recall_Class_0,Recall_Class_1,F1_Score_Class_0,F1_Score_Class_1
+Cytometry,Random Forest,"no response, response",True,smote-borderline,Balanced,0.4286,0.4,0.5,0.6667,0.25,0.5,0.3333
+TCR Data,SVM,"no response, response",True,smote-borderline,Balanced,0.8571,1.0,0.8,0.6667,1.0,0.8,0.8889
+RNA Data,Logistic Regression,"no response, response",True,smote-borderline,Balanced,0.8571,0.75,1.0,1.0,0.75,0.8571,0.8571
+Consensus,Consensus,"no response, response",True,smote-borderline,Balanced,0.8571,0.75,1.0,1.0,0.75,0.8571,0.8571

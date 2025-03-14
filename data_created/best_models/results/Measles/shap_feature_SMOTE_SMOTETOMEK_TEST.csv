@@ -1,0 +1,31 @@
+Model,Feature,Importance
+Cytokines,Cluster1_Compressed,0.2668
+Cytokines,Cluster6_Compressed,0.1769
+Cytokines,Cluster2c_Compressed,0.0939
+Cytokines,Cluster11_Compressed,0.0551
+Cytokines,CMV.Status,0.0
+Cytokines,Cluster13_Compressed,0.0
+Cytokines,Cluster12_Compressed,0.0
+Cytokines,Cluster10_Compressed,0.0
+Cytokines,Cluster9_Compressed,0.0
+Cytokines,Cluster8_Compressed,0.0
+Cytometry,Cluster2_Compressed,0.1891
+Cytometry,Cluster1_Compressed,0.0862
+Cytometry,Cluster4_Compressed,0.0727
+Cytometry,Cluster3_Compressed,0.0656
+Cytometry,Cluster6_Compressed,0.0626
+Cytometry,Cluster5_Compressed,0.0323
+Clonal Breadth,fraction_sequences_gd,0.9329
+Clonal Breadth,fraction_sequences_ab,0.5053
+Clonal Depth,uniqueMoleculeFraction_ab,0.2301
+Clonal Depth,uniqueMoleculeFraction_gd,0.1199
+RNA Data,cluster27_Compressed,0.0425
+RNA Data,cluster26_Compressed,0.041
+RNA Data,cluster25_Compressed,0.0297
+RNA Data,cluster23_Compressed,0.0242
+RNA Data,cluster6_Compressed,0.0211
+RNA Data,cluster12_Compressed,0.0188
+RNA Data,cluster21_Compressed,0.0178
+RNA Data,cluster24_Compressed,0.0175
+RNA Data,cluster20_Compressed,0.0174
+RNA Data,cluster15_Compressed,0.0158

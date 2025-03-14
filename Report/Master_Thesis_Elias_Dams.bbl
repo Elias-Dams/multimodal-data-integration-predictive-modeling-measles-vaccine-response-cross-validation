@@ -1,0 +1,21 @@
+\begin{thebibliography}{1}
+
+\bibitem{smoking2014}
+{\em The Health Consequences of Smoking—50 Years of Progress: A Report of the
+  Surgeon General}.
+\newblock Centers for Disease Control and Prevention, Atlanta, GA, 2014.
+\newblock Figure 10.5: Diagram of innate and adaptive immunity.
+
+\bibitem{janeway2001immunobiology}
+C.~A. Janeway, P.~Travers, M.~Walport, and M.~J. Shlomchik.
+\newblock {\em Immunobiology (9th Edition)}.
+\newblock Garland Science, 2001.
+\newblock innate vs adaptive immunity.
+
+\bibitem{murtagh2014wards}
+F.~Murtagh and P.~Legendre.
+\newblock Ward’s hierarchical agglomerative clustering method: Which
+  algorithms implement ward’s criterion?
+\newblock {\em Journal of Classification}, 31(3):274--295, 2014.
+
+\end{thebibliography}

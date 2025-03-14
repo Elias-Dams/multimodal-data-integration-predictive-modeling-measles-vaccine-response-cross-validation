@@ -1,0 +1,21 @@
+Model,Feature,Importance
+Cytometry,Cluster6_Compressed,0.108
+Cytometry,Cluster4_Compressed,0.1014
+Cytometry,Cluster2_Compressed,0.0534
+Cytometry,Cluster1_Compressed,0.0386
+Cytometry,Cluster3_Compressed,0.0298
+Cytometry,Cluster5_Compressed,0.0125
+Clonal Breadth,HepBTCRs,0.1094
+Clonal Breadth,B0,0.0665
+Clonal Breadth,PSB0,0.0566
+Clonal Breadth,PPnrB0,0.0329
+RNA Data,cluster27_Compressed,0.0543
+RNA Data,cluster24_Compressed,0.0386
+RNA Data,cluster33_Compressed,0.0373
+RNA Data,cluster32_Compressed,0.0368
+RNA Data,cluster20_Compressed,0.035
+RNA Data,cluster19_Compressed,0.0349
+RNA Data,cluster21_Compressed,0.0337
+RNA Data,cluster10_Compressed,0.031
+RNA Data,cluster25_Compressed,0.0294
+RNA Data,cluster28_Compressed,0.0294

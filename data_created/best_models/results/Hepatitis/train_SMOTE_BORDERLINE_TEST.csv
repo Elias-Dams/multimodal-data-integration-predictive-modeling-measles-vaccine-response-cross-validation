@@ -1,0 +1,5 @@
+Data,Model,LABELS,COMPRESS_CORRELATED,BALANCE_METHODE,OVERSAMPLING_METHOD,TRAIN Balanced_Accuracy,TRAIN Accuracy,EVAL P-Value,EVAL Permuted Scores Mean,EVAL Permuted Scores Std Dev,EVAL CI Lower,EVAL CI Upper,TRAIN Precision_0,TRAIN Precision_1,TRAIN Recall_0,TRAIN Recall_1,TRAIN F1_0,TRAIN F1_1
+Cytometry,Random Forest,"no response, response",True,Balanced,smote-borderline,0.6765,0.6765,0.592,0.4981,0.1831,0.2917,0.75,0.65,0.7143,0.7647,0.5882,0.7027,0.6452
+TCR Data,SVM,"no response, response",True,Balanced,smote-borderline,0.6471,0.6471,0.158,0.4972,0.2524,0.4583,1.0,0.6923,0.619,0.5294,0.7647,0.6,0.6842
+RNA Data,Logistic Regression,"no response, response",True,Balanced,smote-borderline,0.7059,0.7059,0.026,0.496,0.1765,0.4583,0.875,0.7059,0.7059,0.7059,0.7059,0.7059,0.7059
+Consensus,Consensus,"no response, response",True,Balanced,smote-borderline,,,,,,,,,,,,,

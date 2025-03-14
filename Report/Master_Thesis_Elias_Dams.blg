@@ -1,0 +1,49 @@
+This is BibTeX, Version 0.99d (TeX Live 2024)
+Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
+The top-level auxiliary file: Master_Thesis_Elias_Dams.aux
+The style file: plain.bst
+Database file #1: references.bib
+Warning--to sort, need author, editor, or key in smoking2014
+Warning--empty author and editor in smoking2014
+You've used 3 entries,
+            2118 wiz_defined-function locations,
+            516 strings with 4594 characters,
+and the built_in function-call counts, 866 in all, are:
+= -- 81
+> -- 37
+< -- 0
++ -- 16
+- -- 12
+* -- 61
+:= -- 147
+add.period$ -- 10
+call.type$ -- 3
+change.case$ -- 13
+chr.to.int$ -- 0
+cite$ -- 5
+duplicate$ -- 36
+empty$ -- 74
+format.name$ -- 12
+if$ -- 178
+int.to.chr$ -- 0
+int.to.str$ -- 3
+missing$ -- 4
+newline$ -- 19
+num.names$ -- 4
+pop$ -- 18
+preamble$ -- 1
+purify$ -- 12
+quote$ -- 0
+skip$ -- 20
+stack$ -- 0
+substring$ -- 41
+swap$ -- 3
+text.length$ -- 0
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 8
+warning$ -- 2
+while$ -- 6
+width$ -- 4
+write$ -- 36
+(There were 2 warnings)

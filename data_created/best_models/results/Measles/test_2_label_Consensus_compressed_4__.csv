@@ -1,0 +1,7 @@
+Data,Model,LABELS,COMPRESS_CORRELATED,OVERSAMPLING_METHOD,BALANCE_METHODE,Accuracy,Precision_Class_0,Precision_Class_1,Recall_Class_0,Recall_Class_1,F1_Score_Class_0,F1_Score_Class_1
+Cytokines,Random Forest,"no response, response",True,random,Balanced,0.5,0.6667,0.0,0.6667,0.0,0.6667,0.0
+Cytometry,Random Forest,"no response, response",True,random,Balanced,0.875,0.8571,1.0,1.0,0.5,0.9231,0.6667
+Clonal Breadth,Random Forest,"no response, response",True,random,Balanced,0.625,1.0,0.4,0.5,1.0,0.6667,0.5714
+Clonal Depth,Logistic Regression,"no response, response",True,random,Balanced,0.875,1.0,0.6667,0.8333,1.0,0.9091,0.8
+RNA Data,SVM,"no response, response",True,random,Balanced,0.875,1.0,0.6667,0.8333,1.0,0.9091,0.8
+Consensus,Consensus,"no response, response",True,random,Balanced,0.875,1.0,0.6667,0.8333,1.0,0.9091,0.8

@@ -1,0 +1,17 @@
+\contentsline {chapter}{\numberline {1}Introduction}{8}{}%
+\contentsline {chapter}{\numberline {2}Background}{9}{}%
+\contentsline {section}{\numberline {2.1}Background in Biology}{9}{}%
+\contentsline {subsection}{\numberline {2.1.1}Immune System Overview}{9}{}%
+\contentsline {subsection}{\numberline {2.1.2}Antibody Titers }{11}{}%
+\contentsline {section}{\numberline {2.2}Background in Computer science}{12}{}%
+\contentsline {chapter}{\numberline {3}Data Exploration and Preprocessing}{13}{}%
+\contentsline {section}{\numberline {3.1}Label Assignment Strategy}{13}{}%
+\contentsline {section}{\numberline {3.2}Antibody Titer Trajectories}{13}{}%
+\contentsline {subsection}{\numberline {3.2.1}By Response Label}{13}{}%
+\contentsline {section}{\numberline {3.3}Correlation Analysis Within Individual Datasets}{15}{}%
+\contentsline {subsection}{\numberline {3.3.1}Methodology}{15}{}%
+\contentsline {subsection}{\numberline {3.3.2}Cytokine Data}{16}{}%
+\contentsline {subsection}{\numberline {3.3.3}Cytometry Data}{17}{}%
+\contentsline {subsection}{\numberline {3.3.4}TCR Metrics}{17}{}%
+\contentsline {subsection}{\numberline {3.3.5}RNA Data}{17}{}%
+\contentsline {section}{\numberline {3.4}Integrated Correlation Analysis}{18}{}%
