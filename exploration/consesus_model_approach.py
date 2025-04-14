@@ -212,59 +212,131 @@ for oversample_method in OVERSAMPLING_METHODS:
         }
 
         best_model = None
-        best_composite_score = -1
+        best_model_name = None
+        best_model_composite_score = -1
+        best_model_p_value = 1.0
+        best_model_cv_mean = -float('inf')
         validation_results = []
+
+        best_significant_model = None
+        best_significant_model_name = None
+        best_significant_cv_mean = -float('inf')
+        best_significant_p_value = 1.0
+        best_significant_val_composite = -float('inf')
+
+        best_overall_model = None
+        best_overall_model_name = None
+        best_overall_cv_mean = -float('inf')
+        best_overall_composite_score = -1
+        best_overall_p_value = 1.0
+
+        # --- Define Thresholds ---
+        pval_threshold = 0.05
+        # Tolerance for comparing CV Mean scores (e.g., if difference is <= 0.01, consider it a tie)
+        cv_tolerance = 0.01
 
         # Evaluate each model on the validation set
         tolerance = 0.01  # Define a small tolerance for tie-breaking
         for name, model in models.items():
             model_clone = clone(model)
             model_clone.fit(X_train, y_train)
-            metrics = repeated_cv_confidence_intervals(model_clone, X_train, y_train, n_repeats=1000, n_folds=5,
-                                                       ci=0.95)
-            p_value, observed_score, _ = correct_permutation_test(model_clone, X_train, y_train, n_folds=5,
-                                                                  n_permutations=1000)
+            metrics = repeated_cv_confidence_intervals(model_clone, X_train, y_train, n_repeats=1000, n_folds=5,ci=0.95)
+            cv_mean = metrics.get('CV mean', None)
+            p_value, observed_score, _ = correct_permutation_test(model_clone, X_train, y_train, n_folds=5,n_permutations=1000)
 
             y_val_pred = model_clone.predict(X_val)
 
             val_f1 = f1_score(y_val, y_val_pred, average='weighted')
             val_bal_acc = balanced_accuracy_score(y_val, y_val_pred)
-            current_composite_score = val_f1 + val_bal_acc
 
             validation_results.append({
                 'Model': name,
                 'Validation F1': val_f1,
                 'Validation Balanced Accuracy': val_bal_acc,
-                'Validation Composite Score': current_composite_score,
-                'CV Mean (Val Metric)': metrics.get('CV mean', None),  # Assuming CV was done for a relevant metric
+                'CV Mean': cv_mean,  # Ensure key matches what your function returns
                 'P-value': p_value
             })
 
-            if current_composite_score > best_composite_score:
-                best_composite_score = current_composite_score
-                best_model = clone(model)
-                best_model_name = name
-                best_model_training_metrics = metrics
-                best_model_p_value = p_value
-            elif abs(current_composite_score - best_composite_score) <= tolerance:
-                # Tie-breaker: Higher CV mean (assuming it's a relevant metric)
-                if metrics.get('CV mean', -1) > best_model_training_metrics.get('CV mean', -2):
-                    best_composite_score = current_composite_score
-                    best_model = clone(model)
-                    best_model_name = name
-                    best_model_training_metrics = metrics
-                    best_model_p_value = p_value
-                # Further tie-breaker: Lower p-value (more significant)
-                elif abs(metrics.get('CV mean', -1) - best_model_training_metrics.get('CV mean',
-                                                                                      -2)) <= 0.001 and p_value < best_model_p_value:
-                    best_composite_score = current_composite_score
-                    best_model = clone(model)
-                    best_model_name = name
-                    best_model_training_metrics = metrics
-                    best_model_p_value = p_value
+            # --- New Prioritized Selection Logic ---
+            current_is_significant = p_value is not None and p_value < pval_threshold
+            current_val_composite = (val_f1 if val_f1 is not None else 0) + \
+                                    (val_bal_acc if val_bal_acc is not None else 0)
+
+            # 1. Check if the current model is significant
+            if current_is_significant:
+                # Compare with the best significant model found so far
+                if best_significant_model is None:
+                    is_new_best_significant = True
+                else:
+                    # Compare CV Mean with the current best significant model
+                    if cv_mean > best_significant_cv_mean + cv_tolerance:
+                        is_new_best_significant = True
+                    elif abs(cv_mean - best_significant_cv_mean) <= cv_tolerance:
+                        # CV Means are within tolerance - use validation composite score as tie-breaker
+                        if current_val_composite > best_significant_val_composite:
+                            is_new_best_significant = True
+                        else:
+                            # Similar CV Mean, worse or equal validation score - not better
+                            is_new_best_significant = False
+                    else:
+                        # Current model has a lower CV Mean - not better
+                        is_new_best_significant = False
+
+                # Update the best significant model if necessary
+                if is_new_best_significant:
+                    best_significant_model = clone(model)
+                    best_significant_model_name = name
+                    best_significant_cv_mean = cv_mean
+                    best_significant_p_value = p_value
+                    best_significant_val_composite = current_val_composite
+
+            # 2. Fallback Tracking: Always track the best model based on validation composite score alone
+            # This is used ONLY if no model passes the p-value threshold
+            if best_overall_model is None or current_val_composite > best_overall_composite_score:
+                best_overall_composite_score = current_val_composite
+                best_overall_model = clone(model)
+                best_overall_model_name = name
+                best_overall_cv_mean = cv_mean
+                best_overall_p_value = p_value
+
+            # --- AFTER the loop finishes ---
+
+            # Determine the final best model based on the logic
+            if best_significant_model is not None:
+                # Select the best significant model found
+                print(
+                    f"\nFinal Best Model (Significant, P<{pval_threshold}, prioritizing CV Mean): {best_significant_model_name}")
+                print(f"  CV Mean: {best_significant_cv_mean:.4f}")
+                print(f"  P-value: {best_significant_p_value:.4f}")
+                print(f"  Validation Composite Score (F1+BalAcc): {best_significant_val_composite:.4f}")
+
+                best_model = best_significant_model
+                best_model_name = best_significant_model_name
+                best_model_p_value = best_significant_p_value
+                best_model_cv_mean = best_significant_cv_mean
+                best_model_composite_score = best_significant_val_composite
+
+            else:
+                # Fallback if no model met the p-value criterion
+                print(
+                    f"\nWarning: No models passed p-value threshold (P<{pval_threshold}). Using best overall model based on Validation F1 + Balanced Accuracy.")
+                if best_overall_model is not None:
+                    best_model = best_overall_model
+                    best_model_name = best_overall_model_name
+                    best_model_p_value = best_overall_p_value  # Use p-value of the fallback model
+                    best_model_cv_mean = best_overall_cv_mean
+                    print(
+                        f"Selected Fallback Model: {best_model_name} (Val Comp Score: {best_overall_composite_score:.4f}, P-value: {best_model_p_value:.4f})")
+                else:
+                    # Handle unlikely case where no models could be evaluated at all
+                    print("\nERROR: No models were successfully evaluated.")
+                    best_model = None
+                    best_model_name = None
+                    best_model_p_value = 1.0
+                    best_model_cv_mean =  -float('inf')
 
         print(
-            f"\n{data_name}: Best model based on validation set: {best_model_name} (oversampling: {OVERSAMPLING_METHOD}) (Validation Composite Score: {best_composite_score:.4f})")
+            f"\n{data_name}: Best model based on validation set: {best_model_name} (oversampling: {OVERSAMPLING_METHOD}) (Validation Composite Score: {best_model_composite_score:.4f})")
         validation_results_df = pd.DataFrame(validation_results)
         print("\nValidation Results:\n", validation_results_df)
 
@@ -282,11 +354,9 @@ for oversample_method in OVERSAMPLING_METHODS:
         # Prepare evaluation results for saving
         evaluation_results = [{
             'Model': best_model_name,
-            'Train CV Mean': validation_results_df[validation_results_df['Model'] == best_model_name]['CV Mean (Val Metric)'].iloc[0],
-            'Train P-value': validation_results_df[validation_results_df['Model'] == best_model_name]['P-value'].iloc[0],
-            'Validation F1': validation_results_df[validation_results_df['Model'] == best_model_name]['Validation F1'].iloc[0],
-            'Validation Balanced Accuracy': validation_results_df[validation_results_df['Model'] == best_model_name]['Validation Balanced Accuracy'].iloc[0],
-            'Validation Composite Score': best_composite_score,
+            'Train CV Mean': best_model_cv_mean,
+            'Train P-value': best_model_p_value,
+            'Validation Composite Score': best_model_composite_score,
             'Test Accuracy': test_acc,
             'Test Balanced_Accuracy': test_bal_acc,
             'Test Classification Report': report,

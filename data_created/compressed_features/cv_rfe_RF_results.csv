@@ -1,6 +1,0 @@
-fold,selected_features,balanced_accuracy,accuracy
-1,"['GRO', 'IL1a', 'MCP-1', 'WBC Day 0', 'PLT Day 0', '%LYM Day 0', '%MON Day 0', '%GRA Day 0', 'Age', 'Group_3_Compressed']",0.4,0.5
-2,"['GRO', 'MDC', 'IL-8', 'MCP-1', 'WBC Day 0', 'PLT Day 0', '%LYM Day 0', '%MON Day 0', '%GRA Day 0', 'Group_3_Compressed']",0.5833333333333333,0.625
-3,"['GRO', 'MDC', 'IL-8', 'MCP-1', '%LYM Day 0', '%MON Day 0', '%GRA Day 0', 'Group_1_Compressed', 'Group_3_Compressed', 'Group_4_Compressed']",0.4166666666666667,0.625
-4,"['GRO', 'IL1a', 'IL-8', 'MCP-1', 'WBC Day 0', 'PLT Day 0', '%LYM Day 0', '%MON Day 0', '%GRA Day 0', 'Group_3_Compressed']",0.3333333333333333,0.5
-5,"['Eotaxin', 'GRO', 'IL-8', 'MCP-1', 'MIP1a', 'WBC Day 0', '%LYM Day 0', '%MON Day 0', '%GRA Day 0', 'Group_3_Compressed']",0.6666666666666667,0.75

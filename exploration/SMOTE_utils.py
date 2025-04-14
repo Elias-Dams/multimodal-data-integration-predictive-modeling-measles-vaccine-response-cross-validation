@@ -3,30 +3,39 @@ import json
 from sklearn.decomposition import PCA
 import matplotlib.pyplot as plt
 from sklearn.preprocessing import LabelEncoder
-from sklearn.model_selection import train_test_split
 from imblearn.over_sampling import RandomOverSampler
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.linear_model import LogisticRegression
-from sklearn.naive_bayes import GaussianNB
-from sklearn.svm import SVC
-from sklearn.tree import DecisionTreeClassifier
+import matplotlib.colors as mcolors
 from collections import Counter
 from imblearn.over_sampling import SMOTE
 from sklearn.impute import SimpleImputer, KNNImputer
-from sklearn.metrics import precision_score, recall_score, f1_score, balanced_accuracy_score, accuracy_score
+from sklearn.metrics import precision_score, recall_score, f1_score, accuracy_score
 from sklearn.model_selection import StratifiedKFold, cross_val_predict
 from imblearn.combine import SMOTETomek, SMOTEENN
 from imblearn.over_sampling import BorderlineSMOTE, ADASYN
 from sklearn.utils import resample, shuffle
 from sklearn.metrics import balanced_accuracy_score
 from sklearn.base import clone
-from scipy.stats import bootstrap
 import numpy as np
 import pandas as pd
-import os
-
+import joblib
+import pickle
 from tqdm import tqdm
+from sklearn.model_selection import train_test_split
 
+def check_missing_values(df, dataset_name, nr_samples):
+    missing = df.isnull().sum()
+    missing = missing[missing > 0]
+
+    print(f"{dataset_name}:")
+
+    if len(df['Vaccinee']) < nr_samples:
+        print(f"\tMissing samples: only contains {len(df['Vaccinee'])} samples instead of {nr_samples}.")
+
+    if not missing.empty:
+        print(f"\tMissing values:")
+        print(f"\t{missing}")
+    else:
+        print(f"\tNo missing values.")
 
 def handle_missing_values(df, dataset_name, complete_samples, strategy='mean'):
     print(f"Handling missing values for {dataset_name}...")
@@ -134,7 +143,267 @@ def encode_labels(df):
     print("Label mapping:", mapping)
     return df
 
-def split_dataset(df, train_vaccinees, test_vaccinees, oversampling_method=None):
+def visualize_pca_oversampling_with_label(
+        X_train, y_train,
+        X_train_resampled, y_train_resampled,
+        label_colors={0: "blue", 1: "green", 2: "red"},
+        data_name = None, model_name = None, methode_name = None
+):
+    """
+    Perform a 2D PCA on the resampled training data, coloring points by their label,
+    drawing a red circle (edgecolor='red') around synthetic (new) samples,
+    and marking removed samples from the original training set with an "x".
+    """
+
+    def row_to_tuple(row):
+        return tuple(np.round(row, decimals=5))
+
+    # Create sets of rounded rows
+    original_set = {row_to_tuple(row) for row in X_train.to_numpy()}
+    resampled_set = {row_to_tuple(row) for row in X_train_resampled.to_numpy()}
+
+    # Label resampled set: "org" if from original, "new" if synthetic.
+    types_resampled = ["org" if row_to_tuple(row) in original_set else "new"
+                       for row in X_train_resampled.to_numpy()]
+
+    # Label original set: "org" if still present in resampled, "del" if removed.
+    types_train = ["org" if row_to_tuple(row) in resampled_set else "del"
+                   for row in X_train.to_numpy()]
+
+    # Save labels in dataframes for later use
+    X_train_labeled = X_train.copy()
+    X_train_labeled["type"] = types_train
+
+    X_train_resampled_labeled = X_train_resampled.copy()
+    X_train_resampled_labeled["type"] = types_resampled
+
+    scaler = StandardScaler()
+    # Fit and transform the training data, and transform the test data
+    X_train_resampled_scaled = scaler.fit_transform(X_train_resampled)
+    X_train_scaled = scaler.transform(X_train)
+    # Wrap the numpy arrays back into DataFrames with the original indices and column names
+    X_train_resampled_scaled = pd.DataFrame(X_train_resampled_scaled, index=X_train_resampled.index,columns=X_train_resampled.columns)
+    X_train_scaled = pd.DataFrame(X_train_scaled, index=X_train.index, columns=X_train.columns)
+
+    # Fit PCA on the resampled scaled data
+    pca = PCA(n_components=2, random_state=42)
+    pca_coords_resampled = pca.fit_transform(X_train_resampled_scaled)
+
+    # Transform the original scaled data into the same PCA space
+    pca_coords_original = pca.transform(X_train_scaled)
+
+    # Create PCA dataframes with corresponding labels (indexes assumed aligned)
+    df_resampled_pca = pd.DataFrame(pca_coords_resampled, columns=["PC1", "PC2"], index=X_train_resampled.index)
+    df_resampled_pca["type"] = X_train_resampled_labeled["type"]
+    df_resampled_pca["label"] = y_train_resampled
+
+    df_original_pca = pd.DataFrame(pca_coords_original, columns=["PC1", "PC2"], index=X_train.index)
+    df_original_pca["type"] = X_train_labeled["type"]
+    df_original_pca["label"] = y_train
+
+    # Select only the 'del' samples from the original PCA dataframe
+    df_original_del = df_original_pca[df_original_pca["type"] == "del"]
+
+    # Concatenate the resampled PCA dataframe with the deleted samples
+    df_union_pca = pd.concat([df_resampled_pca, df_original_del], axis=0)
+
+    # Plotting the union points with markers for synthetic (new) and removed samples.
+    plt.figure(figsize=(8, 6))
+    for idx, row in df_union_pca.iterrows():
+        pc1 = row["PC1"]
+        pc2 = row["PC2"]
+        sample_type = row["type"]
+        color = label_colors[row["label"]]
+
+        # Apply plotting logic based on type
+        if sample_type == "new":
+            # Plot new synthetic samples with a red circle edge
+            plt.scatter(pc1, pc2, color=color, edgecolor="red",
+                        linewidth=1.2, s=40, alpha=0.8)
+        elif sample_type == "del":
+            # Plot deleted samples with an 'x' marker
+            plt.scatter(pc1, pc2, color="grey", marker="x", linewidth=1.2,
+                        s=40, alpha=0.8)
+        else:
+            # Plot original samples normally (using the green color)
+            plt.scatter(pc1, pc2, color=color, edgecolor="none",
+                        s=40, alpha=0.8)
+
+    plt.title(f"Train Set \n(Data: {data_name} Model: {model_name}, Methode: {methode_name})")
+    plt.xlabel("PC1")
+    plt.ylabel("PC2")
+    plt.grid(True, linestyle=":", alpha=0.4)
+
+    label_names = {
+        0: "Non responder",
+        1: "responder",
+        2: "created sample"
+    }
+
+    # Create a legend for the original labels (avoid duplicate "Removed" entries)
+    handles = {}
+    for lbl_val, lbl_color in label_colors.items():
+        if lbl_val not in handles:
+            handles[lbl_val] = plt.Line2D([0], [0], marker='o', color=lbl_color,
+                                          label=f"{label_names[lbl_val]}",
+                                          markerfacecolor=lbl_color, markersize=8,
+                                          linewidth=0)
+    # Add one legend entry for removed samples.
+    handles["Removed"] = plt.Line2D([0], [0], marker='x', linestyle='None', color='black',
+                                    label="Removed", markersize=8)
+    plt.legend(handles=list(handles.values()), title="Labels")
+    plt.show()
+
+    return pca
+
+def visualize_decision_boundary_in_pca_space(model, pca, X_train, y_train, X_test, y_test, n_points=500 ,
+        data_name = None, model_name = None, methode_name = None, save=False):
+    """
+    Visualize the decision boundary in PCA space for both training and test sets in separate plots.
+    Both plots use the same grid so that the decision boundary is consistent.
+    """
+    # Transform both training and test sets into PCA space
+    X_train_pca = pca.transform(X_train)
+    X_test_pca = pca.transform(X_test)
+
+    # Compute overall grid boundaries using both train and test data
+    all_pca = np.vstack([X_train_pca, X_test_pca])
+    x_min, x_max = all_pca[:, 0].min(), all_pca[:, 0].max()
+    y_min, y_max = all_pca[:, 1].min(), all_pca[:, 1].max()
+
+    # Add margins (10% of the range)
+    x_margin = 0.1 * (x_max - x_min)
+    y_margin = 0.1 * (y_max - y_min)
+
+    xx, yy = np.meshgrid(
+        np.linspace(x_min - x_margin, x_max + x_margin, n_points),
+        np.linspace(y_min - y_margin, y_max + y_margin, n_points)
+    )
+    grid_pca = np.c_[xx.ravel(), yy.ravel()]
+
+    # Inverse-transform the grid to the original feature space for predictions
+    grid_original = pca.inverse_transform(grid_pca)
+    Z = model.predict(grid_original).reshape(xx.shape)
+
+    # Create a custom colormap (blue-green, for example)
+    cmap = mcolors.LinearSegmentedColormap.from_list("blue_green", ["blue", "green"], N=256)
+
+    # -------------------
+    # Plot for Training Data
+    # -------------------
+    plt.figure(figsize=(8, 6))
+    plt.contourf(xx, yy, Z, alpha=0.3, cmap=cmap, levels=np.linspace(Z.min(), Z.max(), 100))
+    plt.scatter(X_train_pca[:, 0], X_train_pca[:, 1], c=y_train, cmap=cmap, edgecolor="k", s=50)
+    plt.title(f"Decision Boundary (Train) \n(Data: {data_name} Model: {model_name}, Methode: {methode_name})")
+    plt.xlabel("PC1")
+    plt.ylabel("PC2")
+    plt.tight_layout()
+    plt.show()
+
+    # -------------------
+    # Plot for Test Data
+    # -------------------
+    plt.figure(figsize=(8, 6))
+    plt.contourf(xx, yy, Z, alpha=0.3, cmap=cmap, levels=np.linspace(Z.min(), Z.max(), 100))
+    plt.scatter(X_test_pca[:, 0], X_test_pca[:, 1], c=y_test, cmap=cmap, edgecolor="k", s=50)
+    plt.title(f"Decision Boundary (Test) \n(Data: {data_name} Model: {model_name}, Methode: {methode_name})")
+    plt.xlabel("PC1")
+    plt.ylabel("PC2")
+    plt.tight_layout()
+    plt.show()
+
+    if save:
+        joblib.dump(pca, f'../data_created/SMOTE/saved_decision_boundaries/pca_{data_name}_{model_name}_{methode_name}.pkl')
+        joblib.dump(model, f'../data_created/SMOTE/saved_decision_boundaries/trained_{data_name}_{model_name}_{methode_name}.pkl')
+
+
+
+def train_val_test_split(data, labels, train_size=0.7, val_size=0.15, test_size=0.15, random_state=42, stratify=None):
+    """
+    Splits data into train, validation, and test sets with specified sizes.
+
+    Returns:
+    - Tuple of (train_data, val_data, test_data, train_labels, val_labels, test_labels).
+    """
+
+    if abs(train_size + val_size + test_size - 1.0) > 1e-9:
+        raise ValueError("train_size, val_size, and test_size must sum to 1.")
+
+    # First split: train (70%) and temporary (30%)
+    train_data, temp_data = train_test_split(
+        data, train_size=train_size, random_state=random_state, stratify=labels
+    )
+
+    # Second split: validation (15%) and test (15%) from the temporary set
+    val_data, test_data = train_test_split(
+        temp_data, test_size=0.5, random_state=random_state, stratify=labels[temp_data.index]
+    )
+
+    return train_data, val_data, test_data
+
+def oversample_data(X_train, y_train, oversampling_method):
+    if oversampling_method == 'smote':
+        # Perform oversampling on the training data
+        sm = SMOTE(random_state=42)
+        X_train_resampled, y_train_resampled = sm.fit_resample(X_train, y_train)
+        # Creates new synthetic examples by interpolating between a minority class instance and one of its k-nearest neighbors.
+        # This helps to enlarge the minority class without simply duplicating existing samples.
+
+    elif oversampling_method == 'smote-borderline':
+        # Perform oversampling on the training data
+        sm = BorderlineSMOTE(kind='borderline-1', random_state=42)
+        X_train_resampled, y_train_resampled = sm.fit_resample(X_train, y_train)
+        # Focuses on instances that lie near the decision boundary (the “borderline” samples).
+        # By generating new examples only for those hard-to-learn cases, it aims to improve the classifier’s ability to separate classes where they overlap.
+
+    elif oversampling_method == 'smote-adasyn':
+        # Perform oversampling on the training data
+        sm = ADASYN(random_state=42)
+        X_train_resampled, y_train_resampled = sm.fit_resample(X_train, y_train)
+        # Similar to SMOTE, but it adaptively generates more synthetic examples for minority class samples that are harder to learn
+        # (i.e., those with fewer minority neighbors). This way, the algorithm shifts the decision boundary toward the
+        # majority class and focuses on areas with higher complexity.
+
+    elif oversampling_method == 'smote-smotetomek':
+        # Perform oversampling on the training data
+        sm = SMOTETomek(random_state=42)
+        X_train_resampled, y_train_resampled = sm.fit_resample(X_train, y_train)
+        # Combines SMOTE with an under-sampling technique called Edited Nearest Neighbors (ENN).
+        # After oversampling with SMOTE, ENN removes samples that are misclassified by their neighbors.
+        # This helps clean up noise and can improve model performance.
+
+    elif oversampling_method == 'smote-smoteenn':
+        # Perform oversampling on the training data
+        sm = SMOTEENN(random_state=42)
+        X_train_resampled, y_train_resampled = sm.fit_resample(X_train, y_train)
+        # Merges SMOTE with Tomek links under-sampling. Tomek links are pairs of samples from opposite classes that are each other’s nearest neighbors.
+        # Removing these links after SMOTE oversampling can help eliminate overlapping samples and create a cleaner decision boundary.
+
+    elif oversampling_method == 'random':
+        # Perform random oversampling on the training data (simply duplicates existing minority class samples)
+        ros = RandomOverSampler(random_state=42)
+        X_train_resampled, y_train_resampled = ros.fit_resample(X_train, y_train)
+
+    else:
+        raise ValueError(f"Unsupported oversampling method: {oversampling_method}")
+
+    # After oversampling
+    print(f"Resampled class distribution using {oversampling_method} for train set: {Counter(y_train_resampled)}")
+
+    # Check if oversampling left only one class
+    if len(np.unique(y_train_resampled)) < 2:
+        print(f"Only one class present after oversampling with {oversampling_method}. Skipping this dataset.")
+        return None, None
+
+    class_counts = Counter(y_train_resampled)
+    if min(class_counts.values()) < 5:
+        print(
+            f"Error: n_splits = {5} is greater than the number of samples in at least one class in the training set: {class_counts}")
+        return None, None
+
+    return X_train_resampled, y_train_resampled
+
+def split_dataset(df, train_vaccinees, test_vaccinees, oversampling_method=None, visualise_oversampling=False, data_name = None, model_name = None, methode_name = None):
     # Use the pre-defined train and test vaccinees
     train_df = df[df['Vaccinee'].isin(train_vaccinees)]
     test_df = df[df['Vaccinee'].isin(test_vaccinees)]
@@ -148,104 +417,30 @@ def split_dataset(df, train_vaccinees, test_vaccinees, oversampling_method=None)
     X_train_resampled = X_train
     y_train_resampled = y_train
 
+    pca = None
+
     if oversampling_method is not None:
-        if oversampling_method == 'smote':
-            # Perform oversampling on the training data
-            sm = SMOTE(random_state=42)
-            X_train_resampled, y_train_resampled = sm.fit_resample(X_train, y_train)
-            # Creates new synthetic examples by interpolating between a minority class instance and one of its k-nearest neighbors.
-            # This helps to enlarge the minority class without simply duplicating existing samples.
+        X_train_resampled, y_train_resampled = oversample_data(X_train, y_train, oversampling_method)
 
-        elif oversampling_method == 'smote-borderline':
-            # Perform oversampling on the training data
-            sm = BorderlineSMOTE(kind='borderline-1', random_state=42)
-            X_train_resampled, y_train_resampled = sm.fit_resample(X_train, y_train)
-            # Focuses on instances that lie near the decision boundary (the “borderline” samples).
-            # By generating new examples only for those hard-to-learn cases, it aims to improve the classifier’s ability to separate classes where they overlap.
+        if X_train_resampled is None or y_train_resampled is None:
+            return None, None, None, None, None
 
-        elif oversampling_method == 'smote-adasyn':
-            # Perform oversampling on the training data
-            sm = ADASYN(random_state=42)
-            X_train_resampled, y_train_resampled = sm.fit_resample(X_train, y_train)
-            # Similar to SMOTE, but it adaptively generates more synthetic examples for minority class samples that are harder to learn
-            # (i.e., those with fewer minority neighbors). This way, the algorithm shifts the decision boundary toward the
-            # majority class and focuses on areas with higher complexity.
-
-        elif oversampling_method == 'smote-smotetomek':
-            # Perform oversampling on the training data
-            sm = SMOTETomek(random_state=42)
-            X_train_resampled, y_train_resampled = sm.fit_resample(X_train, y_train)
-            # Combines SMOTE with an under-sampling technique called Edited Nearest Neighbors (ENN).
-            # After oversampling with SMOTE, ENN removes samples that are misclassified by their neighbors.
-            # This helps clean up noise and can improve model performance.
-
-        elif oversampling_method == 'smote-smoteenn':
-            # Perform oversampling on the training data
-            sm = SMOTEENN(random_state=42)
-            X_train_resampled, y_train_resampled = sm.fit_resample(X_train, y_train)
-            # Merges SMOTE with Tomek links under-sampling. Tomek links are pairs of samples from opposite classes that are each other’s nearest neighbors.
-            # Removing these links after SMOTE oversampling can help eliminate overlapping samples and create a cleaner decision boundary.
-
-        elif oversampling_method == 'random':
-            # Perform random oversampling on the training data (simply duplicates existing minority class samples)
-            ros = RandomOverSampler(random_state=42)
-            X_train_resampled, y_train_resampled = ros.fit_resample(X_train, y_train)
-
-        elif oversampling_method == 'remove':
-            # Perform random undersampling on the majority class
-            majority_class = Counter(y_train).most_common(1)[0][0]  # Get the majority class label
-            minority_class = [cls for cls in set(y_train) if cls != majority_class][0]  # Get minority class label
-
-            # Separate majority and minority classes
-            X_majority = X_train[y_train == majority_class]
-            y_majority = y_train[y_train == majority_class]
-            X_minority = X_train[y_train == minority_class]
-            y_minority = y_train[y_train == minority_class]
-
-            # Downsample majority class to match minority class size
-            X_majority_downsampled, y_majority_downsampled = resample(
-                X_majority, y_majority,
-                replace=False,
-                n_samples=len(y_minority),
-                random_state=42
+        if visualise_oversampling:
+            pca = visualize_pca_oversampling_with_label(
+                X_train, y_train,
+                X_train_resampled,
+                y_train_resampled,
+                data_name=data_name,
+                model_name=model_name,
+                methode_name=methode_name
             )
-
-            # Identify the removed majority class samples
-            # Use index to ensure accurate removal
-            removed_indices = X_majority.index.difference(X_majority_downsampled.index)
-            X_majority_removed = X_majority.loc[removed_indices]
-            y_majority_removed = y_majority.loc[removed_indices]
-
-            # Combine downsampled majority class with the minority class
-            X_train_resampled = pd.concat([X_majority_downsampled, X_minority])
-            y_train_resampled = pd.concat([y_majority_downsampled, y_minority])
-
-            # Add the removed samples to the rest set
-            # Concatenate features and labels for the rest set
-            removed_samples = pd.concat([X_majority_removed, y_majority_removed], axis=1)
-            X_rest = removed_samples.drop(['response_label'], axis=1)
-            y_rest = removed_samples['response_label']
-            X_test = pd.concat([X_test, X_rest])
-            y_test = pd.concat([y_test, y_rest])
-
-        else:
-            raise ValueError(f"Unsupported oversampling method: {oversampling_method}")
-
-        # After oversampling
-        print(f"Resampled class distribution using {oversampling_method} for train set: {Counter(y_train_resampled)}")
-        print(f"Resampled class distribution using {oversampling_method} for test set: {Counter(y_test)}")
-
-        # Check if oversampling left only one class
-        if len(np.unique(y_train_resampled)) < 2:
-            print(f"Only one class present after oversampling with {oversampling_method}. Skipping this dataset.")
-            return None, None, None, None
 
     else:
         # No oversampling
         print(f"Class distribution for train set: {Counter(y_train_resampled)}")
         print(f"Class distribution for test set: {Counter(y_test)}")
 
-    return X_train_resampled, X_test, y_train_resampled, y_test
+    return X_train_resampled, X_test, y_train_resampled, y_test, pca
 
 def scale_features(X_train, X_test):
     scaler = StandardScaler()
@@ -357,8 +552,7 @@ def permutation_test(model, X_train, y_train, X_test, y_test, n_permutations=100
 
     return p_value, observed_score, permuted_scores
 
-def bootstrap_confidence_intervals(model, X_train, y_train, X_test, y_test, n_bootstraps=1000, ci=0.95,
-                                   random_state=42):
+def bootstrap_confidence_intervals(model, X_train, y_train, X_test, y_test, n_bootstraps=1000, ci=0.95, random_state=42):
     """
     Computes percentile-based bootstrap confidence intervals for both train and test balanced accuracy.
     Uses custom_stratified_metrics (i.e. stratified CV) to compute the training balanced accuracy.
@@ -415,6 +609,95 @@ def bootstrap_confidence_intervals(model, X_train, y_train, X_test, y_test, n_bo
         'test IC lower': test_lower_bound,
         'test IC upper': test_upper_bound,
     }
+
+def remove_random_state(model):
+    if hasattr(model, "random_state"):
+        model.random_state = None
+    return model
+
+def repeated_cv_confidence_intervals(model, X_train, y_train, n_repeats=1000, n_folds=5, ci=0.95):
+    """
+    Perform repeated cross-validation to estimate confidence intervals.
+
+    Returns:
+    - Dictionary with lower and upper bounds of the confidence interval
+    """
+    cv_scores = []
+
+    # Remove the random state from the model
+    model = remove_random_state(model)
+
+    # Perform multiple cross-validation runs
+    for _ in tqdm(range(n_repeats), desc="Repeated Cross-Validation"):
+        fold_scores = []
+        skf = StratifiedKFold(n_splits=n_folds, shuffle=True)
+
+        for train_idx, val_idx in skf.split(X_train, y_train):
+            X_cv_train, X_cv_val = X_train.iloc[train_idx], X_train.iloc[val_idx]
+            y_cv_train, y_cv_val = y_train.iloc[train_idx], y_train.iloc[val_idx]
+
+            model_clone = clone(model)
+            model_clone.fit(X_cv_train, y_cv_train)
+            y_pred = model_clone.predict(X_cv_val)
+
+            score = balanced_accuracy_score(y_cv_val, y_pred)
+            fold_scores.append(score)
+
+        # Store the mean CV score of this iteration
+        cv_scores.append(np.mean(fold_scores))
+
+    # Confidence Interval Calculation
+    lower_percentile = (100 - ci * 100) / 2
+    upper_percentile = 100 - lower_percentile
+
+    lower_bound = np.percentile(cv_scores, lower_percentile)
+    upper_bound = np.percentile(cv_scores, upper_percentile)
+
+    plot_boot_scores_with_ci(cv_scores, confidence_level=ci)
+
+    return {
+        "CV mean": np.mean(cv_scores),
+        "CV median": np.median(cv_scores),
+        "CV IC lower": lower_bound,
+        "CV IC upper": upper_bound,
+    }
+
+def correct_permutation_test(model, X_train, y_train, n_folds=5, n_permutations=1000):
+    """
+    Performs a permutation test using inner cross-validation to avoid test set leakage.
+    """
+    skf = StratifiedKFold(n_splits=n_folds, shuffle=True)
+    observed_scores = []
+
+    # Step 1: Compute the observed performance using inner CV
+    for train_idx, val_idx in skf.split(X_train, y_train):
+        model_clone = clone(model)
+        model_clone.fit(X_train.iloc[train_idx], y_train.iloc[train_idx])
+        y_pred = model_clone.predict(X_train.iloc[val_idx])
+        observed_scores.append(balanced_accuracy_score(y_train.iloc[val_idx], y_pred))
+
+    observed_score = np.mean(observed_scores)
+
+    # Step 2: Permutation Testing
+    permuted_scores = []
+    for _ in tqdm(range(n_permutations), desc="Permutation Test"):
+        y_permuted = shuffle(y_train).reset_index(drop=True)  # Shuffle labels
+
+        permuted_cv_scores = []
+        for train_idx, val_idx in skf.split(X_train, y_permuted):
+            model_clone = clone(model)
+            model_clone.fit(X_train.iloc[train_idx], y_permuted.iloc[train_idx])
+            y_pred_perm = model_clone.predict(X_train.iloc[val_idx])
+            permuted_cv_scores.append(balanced_accuracy_score(y_permuted.iloc[val_idx], y_pred_perm))
+
+        permuted_scores.append(np.mean(permuted_cv_scores))
+
+    permuted_scores = np.array(permuted_scores)
+
+    # Step 3: Calculate p-value
+    p_value = np.mean(permuted_scores >= observed_score)
+
+    return p_value, observed_score, permuted_scores
 
 def custom_stratified_metrics(model, X, y, cv_splits=5, random_state=None):
     """

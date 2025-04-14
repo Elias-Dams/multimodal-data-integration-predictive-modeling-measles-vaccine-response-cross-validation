@@ -1,12 +1,14 @@
 import pandas as pd
 import re
-import pandas as pd
-import re
 from sklearn.decomposition import PCA
 from sklearn.preprocessing import StandardScaler
 
+from exploration.SMOTE_models_pipeline import VACCINE
+
+VACCINE = "Combined"
+
 # Step 1: Read the module scores CSV
-df = pd.read_csv("../data/Hepatitis B/module_scores_model_input_all_self_made.csv")
+df = pd.read_csv(f"../data/{VACCINE}/module_scores_model_input_all_self_made.csv")
 
 # Step 2: Filter columns: keep "Vaccinee" and columns that end with "EXP0"
 cols_to_keep = [col for col in df.columns if col == "Vaccinee" or col.endswith("EXP0")]
@@ -57,11 +59,11 @@ print(f"Number of distinct functionalities: '{len(names)}'")
 
 # Rename the columns in the filtered DataFrame
 df_filtered.rename(columns=new_col_names, inplace=True)
-df_filtered.to_csv("../data/Hepatitis B/RNA_circos.csv", index=False)
+df_filtered.to_csv(f"../data/{VACCINE}/RNA_circos.csv", index=False)
 
 # Optionally, create a mapping DataFrame and save it
 mapping_df = pd.DataFrame(list(mapping.items()), columns=["original_name", "new_name"])
-mapping_df.to_csv("../data/Hepatitis B/RNA_circos_mapping.csv", index=False)
+mapping_df.to_csv(f"../data/{VACCINE}/RNA_circos_mapping.csv", index=False)
 
 # Separate out the "Vaccinee" column for reattachment later
 vaccinee_series = df_filtered["Vaccinee"].copy()
@@ -109,7 +111,6 @@ for base_name, cols in grouped_columns.items():
 compressed_data.insert(0, "Vaccinee", vaccinee_series)
 
 # 5) Save the compressed DataFrame
-output_path = "../data/Hepatitis B/RNA_circos_compressed_by_feature.csv"
+output_path = f"../data/{VACCINE}/RNA_circos_compressed_by_feature.csv"
 compressed_data.to_csv(output_path, index=False)
 print(f"Compressed data saved to {output_path}")
-

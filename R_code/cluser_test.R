@@ -19,14 +19,14 @@ produce_cytokine_modules <- function(data, plotTitle, plotsDir){
                            main = "",
                            display_numbers = TRUE,          
                            number_format = "%.2f",          
-                           fontsize = 5,
-                           fontsize_number = 5,
-                           cutree_rows = 36,
-                           cutree_cols = 36,
+                           fontsize = 10,
+                           fontsize_number = 10,
+                           cutree_rows = 10,
+                           cutree_cols = 10,
                            cluster_rows = TRUE, 
                            cluster_cols = TRUE,
                            filename = paste0(plotsDir, glue("{plotTitle}_euclidean_distance.png")),
-                           width = 40, height = 40)
+                           width = 20, height = 20)
   
   
   row_dendrogram <- pheatmap_obj$tree_row
@@ -102,9 +102,9 @@ correlation_heatmap <- function(data, plotTitle, plotsDir){
   
 }
 
-test = read.csv("School/Master 2/Thesis/Thesis/data/Hepatitis B/RNA_circos.csv")
+test = read.csv("School/Master 2/Thesis/Thesis/data/Measles/________test.csv")
 # Remove the 'Vaccinee' and 'response_label' columns
 test <- test[, !names(test) %in% c("Vaccinee", "response_label")]
 
-produce_cytokine_modules(as.data.frame(test), "RNA_Hepatitis B", "School/Master 2/Thesis/Thesis/R_code/plots/")
+produce_cytokine_modules(as.data.frame(test), "________test", "School/Master 2/Thesis/Thesis/R_code/plots/")
 #correlation_heatmap(as.data.frame(test), "Cytometry", "School/Master 2/Thesis/Thesis/R_code/plots/")
