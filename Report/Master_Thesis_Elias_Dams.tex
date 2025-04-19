@@ -16,9 +16,10 @@
 \usepackage{algorithm}
 \usepackage{algorithmic}
 \usepackage{pifont}
+\usepackage{booktabs}
 \usepackage[Sonny]{fncychap}
 
-\captionsetup{font=small} 
+\captionsetup{font=small}
 
 \newcommand{\todo}[1]{%
   \par\noindent%
@@ -71,28 +72,28 @@
 % Title Page
 \begin{titlepage}
     \centering
-    
+
     % University logo at the top
     \includegraphics[width=0.3\textwidth]{images/uantwerpen_logo.jpg}\\[1cm]
-    
+
     {\Huge \textbf{Multimodal Data Integration for Predictive Modelling of Measles Vaccine Response with Cross-Vaccine Marker Validation}} \\
     \vfill
-    
+
     {\Large \textbf{Elias Dams}}\\[1cm]
-    
+
     \textbf{Promotor:} Dr. Pieter Meysman\\
     \textbf{Supervisor:} Fabio Affaticati\\[1.5cm]
-    
+
     {\Large \textbf{University of Antwerp}}\\
     {\large Faculty of Science}\\[0.5cm]
-    
+
     \textbf{2024-2025}\\[1.5cm]
-    
+
     Submitted in fulfilment of the requirements for the degree of\\
     \textbf{Master in Computer Science: AI \& Data Science}\\[1cm]
-    
+
     \textbf{June 2025}\\[2cm]
-    
+
     % Decorative line at the bottom
     \vfill
     \includegraphics[width=1.0\textwidth]{images/bottom_design.jpg}
@@ -134,21 +135,20 @@
 
 Vaccination is widely recognized as one of the most cost‑effective public health strategies, yet individuals exhibit significant variability in their immune responses. Foundational studies in systems immunology \cite{castrucci2018factors,brodin2017human} have shown that while vaccines like yellow fever and influenza generally trigger robust immune responses, the intensity of these responses (such as antibody production) can vary considerably. This variability is especially noticeable among very young or very old individuals, or those with other health issues, because their immune systems tend to be less robust and more unpredictable.\\
 \\
-%This thesis takes a data‑driven, computer science approach to predict responses to the measles (\remark{I would call it the MMR (Measles Mumps and Rubella trivalent vaccine, like you call it afterwards}Rubeola) 
-This thesis takes a data‑driven, computer science approach to predict responses to the MMR (Measles, Mumps, and Rubella) trivalent vaccine using multimodal data integration, meaning that it combines different types of data (each representing a distinct aspect of the immune response) into a single, unified analysis. Measles is a highly contagious viral disease characterized by fever and a red rash, and it can lead to serious complications like pneumonia, particularly in infants and young children \cite{moss2017measles}. In this thesis, the immune response is primarily evaluated based on antibody titers, which are regarded as the gold standard for assessing vaccine effectiveness because they offer a precise, quantifiable measure of the immune system’s capacity to generate protective antibodies \cite{plotkin2010correlates} (see Section~\ref{sec:antibody_titers} for further details). The goal is to develop predictive models that not only forecast individual vaccine responses but also identify specific immune markers that consistently correlate with vaccine effectiveness across various vaccines. A process known as cross‑vaccine marker validation.\\
+%This thesis takes a data‑driven, computer science approach to predict responses to the measles (\remark{I would call it the MMR (Measles Mumps and Rubella trivalent vaccine, like you call it afterwards}Rubeola)
+This thesis takes a data‑driven, computer science approach to predict responses to the MMR (Measles, Mumps, and Rubella) trivalent vaccine using multimodal data integration, meaning that it combines different types of data (each representing a distinct aspect of the immune response) into a single, unified analysis. In this thesis, the immune response is primarily evaluated based on antibody titers, which are regarded as the gold standard for assessing vaccine effectiveness because they offer a precise, quantifiable measure of the immune system’s capacity to generate protective antibodies \cite{plotkin2010correlates} (see Section~\ref{sec:antibody_titers} for further details). The goal is to develop predictive models that not only forecast individual measles vaccine responses but also identify specific immune markers that consistently correlate with vaccine effectiveness. Furthermore, aligning with the full scope of the thesis, a key objective involves cross-vaccine marker validation. This aims to assess whether markers predictive of the measles response are also indicates of immune response strength to different vaccines, specifically using data from a separate Hepatitis B vaccination study. Such cross-vaccine analysis is crucial for distinguishing between immune signatures specific to the measles vaccine and potentially universal markers associated with general vaccine-induced immune responses.\\
 \\
-Predictive modeling is essential because it allows anticipation of an individual’s vaccine response well before the full immune reaction is measured. For example, Van Tilbeurgh et al. (2021) \cite{vanTilbeurgh2021predictive} demonstrated that combining high‑throughput technologies (such as transcriptomics, proteomics, and \textit{in vivo} imaging) with computational models can reveal immune signatures linked to vaccine efficacy. Such models support personalized vaccination strategies by allowing healthcare providers to tailor vaccine schedules, dosages, or even select alternative vaccines based on predicted responses. For instance, if a model indicates a low immune response based on specific genetic markers, healthcare providers might opt for an additional booster or an adjusted formulation. Ultimately, this targeted strategy not only optimizes vaccine efficacy but also ensures better resource allocation.\\
-\\
+Recent measles outbreaks in the United States and across Europe highlight the continued risk this highly contagious disease presents. Despite the widespread availability of an effective vaccine, factors such as declining vaccination rates in certain communities and the inherent variability in individual immune responses continue to contribute to the reappearance of measles \cite{Broom2025Measles,WHOEuropeUNICEF2025Measles,CDC2025MeaslesData}. The tragic consequences of these outbreaks, including hospitalizations and deaths, particularly among vulnerable populations such as young children, underscore the need for continued research to optimize vaccination strategies \cite{moss2017measles}. Predictive modeling is essential because it allows anticipation of an individual’s vaccine response well before the full immune reaction is measured. For example, Van Tilbeurgh et al. (2021) \cite{vanTilbeurgh2021predictive} demonstrated that combining high‑throughput technologies (such as transcriptomics, proteomics, and \textit{in vivo} imaging) with computational models can reveal immune signatures linked to vaccine efficacy. Such models support personalized vaccination strategies by allowing healthcare providers to tailor vaccine schedules, dosages, or even select alternative vaccines based on predicted responses. For example, if a model indicates a low immune response based on specific genetic markers, healthcare providers might opt for an additional booster or an adjusted formulation. Ultimately, this targeted strategy not only optimizes vaccine efficacy, but also ensures better resource allocation.\\
 % \todo{@Fabio info about the study my data is coming from.}
 % \remark{doi of the original study 10.1016/j.vaccine.2020.03.004} - Fabio
-
-%The initial measles dataset used is derived from the study \remark{simply citing the first author and the date is fine} “Transcriptomic profiling of different responder types in adults after a Priorix$^{\mbox{\scriptsize\textregistered}}$ vaccination” \cite{bartholomeus2020transcriptomic}. 
-\noindent
+%The initial measles dataset used is derived from the study \remark{simply citing the first author and the date is fine} “Transcriptomic profiling of different responder types in adults after a Priorix$^{\mbox{\scriptsize\textregistered}}$ vaccination” \cite{bartholomeus2020transcriptomic}.
+\\
 The initial measles dataset used is derived from the study by Bartholomeus et al. (2020) \cite{bartholomeus2020transcriptomic}.
 In this study, adult volunteers (23 females and 17 males, aged between 19 and 29 years, all of whom were previously primed with MMR vaccines in childhood) received a booster dose of Priorix$^{\mbox{\scriptsize\textregistered}}$ and were monitored at four time points (Day 0, Day 21, Day 150, and Day 365) to measure antibody titers and gene expression profiles. In this thesis, the focus will be concentrated specifically on the measles-related data from this dataset. \\
 %For a detailed exploration of the dataset’s biological composition and characteristics, refer to Section~\ref{sec:biological_characterization_of_the_dataset}.\\
 \\
-Nevertheless, several challenges must be addressed to realize the full potential of predictive modeling. One challenge in this research is that the dataset comprises only 40 samples. This small sample size limits statistical power and increases the risk of overfitting, making it difficult to generalize the model to a broader population. In addition, the project involves integrating heterogeneous data types, such as cytokine levels, cytometry data, T cell receptor sequences, and RNA profiles. These different modalities come with varying scales and units, which adds complexity to data normalization and feature selection. Moreover, any noise or missing values in a small dataset can have a large impact on the model’s performance, potentially leading to biased results. The high number of features (in the RNA data) relative to the number of samples may require careful feature selection or dimensionality reduction to prevent the models from becoming too complex and overfitted. Finally, an additional challenge arises from the risk of data leakage during the feature selection process. Selecting features based on their relevance to the Hepatitis B response prior to model evaluation can introduce bias, artificially inflating performance metrics and ofcourse reducing generalizability.
+Nevertheless, several challenges must be addressed to realize the full potential of predictive modeling. One challenge in this research is that the dataset comprises only 40 samples. This small sample size limits statistical power and increases the risk of overfitting, making it difficult to generalize the model to a broader population. In addition, the project involves integrating heterogeneous data types, such as cytokine levels, cytometry data, T cell receptor sequences, and RNA profiles. These different modalities come with varying scales and units, which adds complexity to data normalization and feature selection. In addition, any noise or missing values in a small dataset can have a large impact on the model’s performance, potentially leading to biased results. The high number of features (in the RNA data) relative to the number of samples may require careful feature selection or dimensionality reduction to prevent the models from becoming too complex and overfitted.
+Finally, the objective of performing cross-vaccine marker validation introduces a specific challenge related to potential data leakage during feature selection. Methodologies must carefully ensure that information from the Hepatitis B dataset (e.g., test set performance or labels) does not influence feature selection or model training conducted primarily on the measles dataset (and vice versa). Such leakage could artificially inflate performance metrics and reduce the reliability of identified cross-vaccine markers.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
@@ -186,7 +186,7 @@ The concentration of these antibodies in the blood is measured as “antibody ti
 \begin{figure}[h]
   \centering
   \includegraphics[width=1\textwidth]{images/TCR_profiling.png}
-  \caption[ TCR sequencing Workflow]{Schematic outline of how TCR data is obtained from peripheral blood mononuclear cells (PBMCs) after vaccination. By extracting and profiling TCR sequences, it becomes possible to identify which T cell clones expand in response to the vaccine. This information provides insights into the breadth (diversity) and Depth (magnitude or intensity) of the adaptive immune response.}
+  \caption[ TCR sequencing Workflow]{Schematic outline of how TCR data is obtained from peripheral blood mononuclear cells (PBMCs) after vaccination. By extracting and profiling TCR sequences, it becomes possible to identify which T cell clones expand in response to the vaccine. This information provides insights into the breadth (diversity) and depth (magnitude or intensity) of the adaptive immune response.}
   \label{fig:TCR_profiling}
 \end{figure}
 
@@ -195,7 +195,7 @@ Together, these three pillars provide a robust defence system that is able to su
 
 \subsection{Antibody Titers}
 \label{sec:antibody_titers}
-As mentioned above, antibody titers provide a quantitative measure of the concentration of specific antibodies in the blood, making them a reliable indicator of the immune system’s functional response against a pathogen \cite{plotkin2010correlates}. In essence, they reflect the “signal strength” of the response, with high titers indicating robust protection and low titers suggesting a weaker response. In this thesis, antibody titers serve as a crucial biomarker for classifying vaccine responses into strong and weak responders. 
+As mentioned above, antibody titers provide a quantitative measure of the concentration of specific antibodies in the blood, making them a reliable indicator of the immune system’s functional response against a pathogen \cite{plotkin2010correlates}. In essence, they reflect the “signal strength” of the response, with high titers indicating robust protection and low titers suggesting a weaker response. In this thesis, antibody titers serve as a crucial biomarker for classifying vaccine responses into strong and weak responders.
 
 \pagebreak
 \section{Background in Computer science}
@@ -212,32 +212,42 @@ As mentioned above, antibody titers provide a quantitative measure of the concen
 \todo{Detail the measles dataset (Cytokines, Cytometry, Clonal Breadth/Depth, RNA data) along with preprocessing steps taken.
 Maybe i'll include a brief section here on hepatitis B preprocessing to set up the validation later.}
 \noindent
-In this chapter, I provide an overview of the measles dataset used in this study and outline the preprocessing steps required to prepare the data for analysis. The dataset integrates multiple biological modalities (including cytokine profiles, cytometry measurements, clonal breadth and depth of T cell receptors, and RNA sequencing data) to capture various aspects of the immune response to the measles vaccine. Additionally, I explain how response labels were assigned based on antibody titer trajectories, which serve as a key indicator of vaccine effectiveness. 
+In this chapter, I provide an overview of the measles dataset used in this study and outline the preprocessing steps required to prepare the data for analysis. The dataset integrates multiple biological modalities (including cytokine profiles, cytometry measurements, clonal breadth and depth of T cell receptors, and RNA sequencing data) to capture various aspects of the immune response to the measles vaccine. Additionally, I explain how response labels were assigned based on antibody titer trajectories, which serve as a key indicator of vaccine effectiveness.
 
 \section{Label Assignment Strategy}
 % \todo{@Fabio How where they initially defined to be sure? And also where it general antibody titers or specific to measles, because it it is specific a friend who studies biomedical science said that high titers over the whole trajectory should be considered "responder".  }
 % \remark{They are specific to Measles (we also have the ABs for the other 2 components as well). The problem is that these individuals were already primed/they already had received a stimulation to the antigens before thus some had preexisting antibody titers but they didn't grow after vaccination thus technically not having a response to the stimulus. From the original paper: "For classification of the immune responses, a hierarchical clustering method was applied on the antibody (Ab) titers at day 0 (prevaccination baseline) and days 21, 150 and 365 (post-vaccination). This clustering technique groups individuals with similar patterns in Ab titer evolution. This avoids using cut-off values, which may be biased. As shown in Figure 2, four different response groups were identified for each antibody titer: 159 (a) High Ab: individuals with a relatively high Ab titer before vaccination that remained stable or further 160 increased after vaccination (b) Low Ab: individuals with a relatively low Ab titer before vaccination that remained low after vaccination (c) Long response: individuals with a relatively low Ab titer before vaccination that increased after vaccination and stayed stable within the first year (d) Peak response: individuals with a relatively low Ab titer before vaccination that increased at day 21, and then decreased by day 150 and 365."}
 
 \noindent
-The original dataset included antibody titer measurements at four time points (Day0, Day21, Day150, and Day365), along with detailed qualitative classifications for each subject. These classifications, as noted in the original study \cite{bartholomeus2020transcriptomic}, were derived using a hierarchical clustering method that groups individuals based on similar patterns in antibody titer evolution, effectively avoiding potentially biased cut-off values. Specifically, the study identified four response groups: High Ab, Low Ab, Long response, and Peak response.\\
+Defining a successful immune response following vaccination can be complex, particularly in the presence of pre-existing immunity due to prior exposure or vaccination. To capture the dynamics of antibody levels over time, this study utilizes antibody titer measurements taken at four time points: Day0, Day21, Day150, and Day365.\\
 \\
-It is important to acknowledge that these classifications, and the responder definition used in this study, are specific to measles. A significant factor in this dataset is the presence of pre-existing antibody titers due to prior exposure or vaccination. Consequently, some individuals with high pre-existing titers did not show an increase after vaccination, thus they don't technically respond to the stimulus.\\
+The original source study \cite{bartholomeus2020transcriptomic} employed a hierarchical clustering method based on these antibody titer evolution patterns to classify subjects into more granular response groups, effectively avoiding potentially biased arbitrary cut-off values. The study identified four primary response clusters: High Ab, Low Ab, Long response, and Peak response. For visualization purposes, these original classifications were consolidated into three categories displayed in Figure~\ref{fig:titer_original_label}: \texttt{responder}, \texttt{no response - high ab} (representing individuals with high baseline antibody levels who did not show a significant increase), and \texttt{no response - low ab} (representing individuals with low baseline levels who also did not show a significant increase).\\
 \\
-For the initial stages of modeling, I simplified the labels to a binary classification (\texttt{responder} and \texttt{non-responder}). Responders were defined as those whose antibody titers increased by at least 120 mIU/mL from Day0 to Day21, reflecting a widely accepted threshold for protective immunity against measles \cite{chen1990measles}. This simplification was done to create a more straightforward prediction task. However, the complexity of the original four classifications will be considered for future modeling refinements.\\
+Figure~\ref{fig:titer_original_label} displays the antibody titer trajectories for each subject over the four measured time points, with lines colored according to these consolidated response categories. The x-axis represents the measurement day post-vaccination, while the y-axis indicates the antibody titer level. Each line follows the trajectory of an individual subject. The visualization highlights distinct dynamic patterns associated with these categories. Subjects classified as \texttt{responder} typically exhibit a pronounced increase in antibody titers following vaccination, primarily between Day 0 and Day 21, before a gradual decline. Conversely, the non-responder groups generally show more stable trajectories. The \texttt{no response - high ab} group maintains high titers throughout, while the \texttt{no response - low ab} group maintains low titers, neither showing the significant early boost characteristic of the responders. This visual distinction shows how pre-existing titers can influence the observed response pattern, where individuals with high baseline levels might not exhibit a noticeable increase even if they are protected.\\
+\\
+For the initial stages of predictive modeling in this thesis, we simplified the outcome variable to a binary classification: \texttt{responder} and \texttt{non-responder}. This simplification was made to create a more straightforward prediction task, focusing on the presence or absence of a successful boosting effect. Based on the visually distinct boosting pattern observed in Figure~\ref{fig:titer_original_label}, a subject was defined as a \texttt{responder} if their antibody titer increased by at least 120 mIU/mL from Day0 to Day21. This threshold reflects a widely accepted criterion for achieving protective immunity against measles \cite{chen1990measles} and corresponds to capturing the significant initial titer increase characteristic of the \texttt{responder} group in the figure. Subjects from both the \texttt{no response - high ab} and \texttt{no response - low ab} categories in Figure~\ref{fig:titer_original_label} were combined into the \texttt{non-responder} class for the binary prediction task, as neither group exhibited this defining boosting signature despite their different baseline states. The complexity and nuances captured by the original multi-class classifications will be considered for future modeling refinements or more detailed analyses.
 
-\section{Antibody Titer Trajectories}
 
-\subsection{By Response Label}
-\noindent
-Figure~\ref{fig:titer_response_label} shows the antibody titer trajectories over four time points, separated by each subject’s final response label (\texttt{response} or \texttt{no response}). On the x-axis, we have the days at which titers were measured (0, 21, 150, 365). The y-axis represents the titer level. Each line corresponds to a single subject’s progression across these time points. From this visualization, it is evident that “responders” generally exhibit a marked increase in titers between Day 0 and Day 21 (and sometimes up to Day 150), whereas “non-responders” show either a small rise or a plateau. This distinction validates the simplified two-class approach used for model building. In contrast, Figure~\ref{fig:titer_original_label} displays the antibody titer trajectories based on the original, more granular labels (i.e., \texttt{responder}, \texttt{no response - high ab}, and \texttt{no response - low ab}). 
 
-\begin{figure}[H]
-\centering
-\hspace*{-1cm}
-\includegraphics[width=1.1\textwidth]{images/Antibody_Titer_Trajectories_for_Measles_by_Response_Label.png}
-\caption[Antibody Titer Trajectories by Response Label]{Antibody titer trajectories for each subject, colored by final response label. Subjects labeled as \texttt{response} are shown in the plot on the left, while those labeled as \texttt{no response} are shown on the right.  The initial trajectory can be traced by following the color.}
-\label{fig:titer_response_label}
-\end{figure}
+
+
+
+
+
+
+
+
+
+
+
+
+% \begin{figure}[H]
+% \centering
+% \hspace*{-1cm}
+% \includegraphics[width=1.1\textwidth]{images/Antibody_Titer_Trajectories_for_Measles_by_Response_Label.png}
+% \caption[Antibody Titer Trajectories by Response Label]{Antibody titer trajectories for each subject, colored by final response label. Subjects labeled as \texttt{response} are shown in the plot on the left, while those labeled as \texttt{no response} are shown on the right.  The initial trajectory can be traced by following the color.}
+% \label{fig:titer_response_label}
+% \end{figure}
 
 \begin{figure}[H]
 \centering
@@ -247,17 +257,17 @@ Figure~\ref{fig:titer_response_label} shows the antibody titer trajectories over
 \label{fig:titer_original_label}
 \end{figure}
 
-\noindent
-The simplified \texttt{response\_label} variable is used throughout the thesis as the target for classification tasks. This choice reduces the interpretability concerns. While the dataset initially contained more nuanced labels (e.g., distinguishing \texttt{no response - high ab} from \texttt{no response - low ab}), combining them into a single \texttt{no response} category improves the feasibility of training robust machine learning models given the limited sample size.
+\section{Dataset Construction and Preprocessing}
+\todo{Explain the construction of TCR breadth and depth metrics, and describe the RNA data processing workflow. Ask @Fabio some questions about this!}
 
 \pagebreak
 
 \section{Correlation Analysis Within Individual Datasets}
 \label{sec:correlation_analysis_within_individual_datasets}
 \noindent
-In an exploratory phase to gain familiarity with the data, I played around with Principal Component Analysis (PCA) to the full feature set, particularly focusing on the cytokines dataset. Although this analysis was not a definitive or robust evaluation, it provided valuable insights by showing that the first 10 principal components captured the majority of the variance. This finding suggests that much of the dataset’s information can be summarized in fewer dimensions and indicates a high degree of redundancy among features. This observation led me to believe that similar correlations likely exist in the other datasets as well. Additionally, when I performed cross-validation using a Random Forest classifier on both the full and reduced feature sets, I observed that the balanced accuracy scores hovered near 50\%. The model tended to predict only the majority class, even though the overall accuracy appeared acceptable due to class predominance. These preliminary findings underscore the challenges of high dimensionality, multicollinearity, and class imbalance that need to be addressed in subsequent predictive modeling efforts.\\
+In an initial exploratory phase aimed at gaining familiarity with the data, preliminary analyses were conducted using Principal Component Analysis (PCA). This technique was applied to the full feature set, with a particular focus directed towards the cytokines dataset. Although this analysis was not a definitive or robust evaluation, it provided valuable insights by showing that the first 10 principal components captured the majority of the variance. This finding suggests that much of the dataset’s information can be summarized in fewer dimensions and indicates a high degree of redundancy among features. This observation led me to believe that similar correlations likely exist in the other datasets as well. Additionally, when I performed cross-validation using a Random Forest classifier on both the full and reduced feature sets, I observed that the balanced accuracy scores hovered near 50\%. The model tended to predict only the majority class, even though the overall accuracy appeared acceptable due to class predominance. These preliminary findings underscore the challenges of high dimensionality, multicollinearity, and class imbalance that need to be addressed in subsequent predictive modeling efforts.\\
 \\
-Following this, I delved deeper into understanding how the variables interrelate across the different data sources. As said earlier the study comprises five distinct datasets capturing various aspects of the immune response: cytokines, cytometry, clonal breadth (TCR metrics), clonal depth (TCR metrics), and RNA data. Since each dataset represents a unique facet of immunity, I first investigated correlations within each individual dataset. Next, I concatenated the datasets to perform an integrated correlation analysis. This strategy allowed me to uncover both within-modality and cross-modality relationships, facilitating effective clustering of the data and providing the models with informative, explanatory features.
+Following this, I delved deeper into understanding how the variables interrelate across the different data sources. As said earlier the study comprises five distinct datasets capturing various aspects of the immune response: cytokines, cytometry, clonal breadth (TCR metrics), clonal depth (TCR metrics), and RNA data. Since each dataset represents a unique facet of immunity, I investigated correlations within each individual dataset.  This strategy allowed me to uncover within-modality relationships, facilitating effective clustering of the data and providing the models with informative, explanatory features.
 \subsection{Methodology}
 
 \todo{Check if correct...}
@@ -335,7 +345,7 @@ The RNA dataset presented a greater challenge for correlation analysis due to th
 \end{figure}
 
 \noindent
-The same heatmap visualization technique as used before was applied to the RNA dataset, using a total of 36 cuts to correspond to the 36 different RNA modules identified through WGCNA hierarchical clustering. Selecting 36 cuts was challenging, but this number provided a reasonable balance between capturing distinct clusters and maintaining interpretability. The heatmap displays clear blocks of correlated features, with red indicating positive correlations and blue indicating negative correlations. 
+The same heatmap visualization technique as used before was applied to the RNA dataset, using a total of 36 cuts to correspond to the 36 different RNA modules identified through WGCNA hierarchical clustering. Selecting 36 cuts was challenging, but this number provided a reasonable balance between capturing distinct clusters and maintaining interpretability. The heatmap displays clear blocks of correlated features, with red indicating positive correlations and blue indicating negative correlations.
 \todo{@Fabio - Do I include a huge table of the clusters, because that does not seem that usefull.}
 
 \remark{I think you can put it in the supplemental}
@@ -351,16 +361,17 @@ The same heatmap visualization technique as used before was applied to the RNA d
 %\todo{Explain your pipeline for exploratory analysis, model building, and selection of stable predictive features, highlighting the specific challenges and how they were overcome.}
 \section{Consensus Model Approach}
 \noindent
-In the initial phase of the modeling process, I opted for a consensus model approach to leverage the complementary strengths of multiple predictive models. This technique involves training several distinct models independently on the different datasets and then concatenating their responses to form a unified prediction. The reason behind this approach is that different models may capture unique aspects of the data or be sensitive to different feature sets, thus enhancing the overall robustness and generalizability of the predictions.\\
+In the initial phase of the modeling process, this study opted for a consensus model approach to leverage the complementary strengths of multiple predictive models. This technique involves training several distinct models independently on the different datasets and then concatenating their responses to form a unified prediction. The reason behind this approach is that different models may capture unique aspects of the data or be sensitive to different feature sets, thus enhancing the overall robustness and generalizability of the predictions.\\
 \\
-\todo{today-: differ from conventional consensus model}
-By combining model outputs, the consensus approach aims to mitigate individual model biases and reduce the risk of overfitting, particularly given the high-dimensional nature and small size of the dataset. This method also allows for the identification of stable predictive features across models, providing insights into which features consistently contribute to predictive performance. However, the complexity introduced by this approach requires careful consideration of how model outputs are integrated and evaluated. 
+It is noteworthy that while many conventional consensus or ensemble learning strategies achieve diversity by applying different model algorithms or parameterizations primarily to a single dataset or variations thereof \cite{Rokach2010}, the approach adopted in this thesis introduces diversity fundamentally at the data level. Here, distinct modeling pipelines, each including internal model evaluation and selection, are applied independently to multiple, heterogeneous datasets (cytokines, cytometry, clonal breadth, clonal depth, RNA data), each representing a different biological viewpoint. Only after each pipeline generates its best prediction on the test set are these modality-specific outputs aggregated.\\
+\\
+By combining model outputs, the consensus approach aims to mitigate individual model biases and reduce the risk of overfitting, particularly given the high-dimensional nature and small size of the dataset. However, the complexity introduced by this approach requires careful consideration of how model outputs are integrated and evaluated.
 
 \begin{figure}[H]
   \centering
   \hspace*{-0.9cm}
   \includegraphics[width=1.1\textwidth]{images/Pipeline-1.png}
-  \caption[Consensus model pipeline diagram]{The diagram illustrates the multi-model pipeline used for prediction. Each individual model follows a standardized preprocessing workflow: handling missing data, compressing correlated features, encoding labels, splitting the dataset, upsampling the training set (e.g., using SMOTE or a variant), and scaling features. The trained models then produce predictions, which are evaluated based on training and testing accuracy. Additionally, validation is performed using p-value assessment and bootstrapping to ensure robustness. The final prediction is obtained through majority voting, aggregating predictions from all models to produce a consensus output.}
+  \caption[Consensus model pipeline diagram]{The diagram illustrates the multi-model pipeline used for prediction. Each individual model follows a standardized preprocessing workflow: handling missing data, compressing correlated features, encoding labels, splitting the dataset, upsampling the training set (e.g., using random upsampling or SMOTE), and scaling features. The trained models then produce predictions, which are evaluated based on training, validation and testing accuracy. Additional validation is performed using p-value assessment and bootstrapping to ensure robustness. The final prediction is obtained through majority voting, aggregating predictions from all models to produce a consensus output.}
   \label{fig:pipeline-1}
 \end{figure}
 
@@ -372,11 +383,7 @@ Cytokine measurements, Cytometry data, T-cell clonal breadth metrics, T-cell clo
 Although each pipeline starts with different data to capture unique biological insights, maintaining consistency across them is essential. Therefore, the same standardized workflow is applied to all five pipelines after loading their specific data. Using this uniform process ensures each distinct data type is handled the same before the final predictions are combined. As illustrated in Figure~\ref{fig:pipeline-1}, the standardized workflow applied to each dataset involves the following sequential steps:
 
 \subsubsection*{Handle missing data \hyperref[fig:pipeline-1]{(A)}}
-There was incomplete data in the T-cell clonal breadth and depth datasets. Unlike the cytokine, cytometry, and RNA datasets, which included records for the full cohort of 40 patients, these two datasets were missing records for entire patients. To enable consistent downstream analysis across all five pipelines using the same set of 40 samples, a procedure was employed to impute the complete feature vectors for these missing patient records.\\
-\\
-The core strategy leveraged the known response labels (e.g., responder/non-responder) for the complete patient cohort. First, patients absent from the clonal breadth or depth dataset but present in the full 40-sample cohort were identified. These missing patients were then conceptually grouped by their known response label. The rationale was that imputation for a missing patient should ideally reflect patterns observed in existing patients with the same outcome (e.g., imputing a missing 'responder' based on existing 'responders'). To perform the imputation, a SimpleImputer model using the mean imputation strategy was employed. This model was trained on the feature data from the available patients within the dataset and subsequently used to generate the feature values for the missing patients within their respective response groups.\\
-\\
-While this imputation method ensures a consistent sample size, several potential limitations must be acknowledged. Primarily, generating entire patient records introduces synthetic data that may not fully capture true biological variability or complex feature interdependencies. Furthermore, guiding the imputation by response label relies on the assumption that feature profiles differ sufficiently between response groups; if this assumption is weak, the approach could introduce bias. The reliability of the imputed values also depends fundamentally on the quality and representativeness of the existing data used to train the imputer. Consequently, incorporating these imputed samples into downstream analyses carries the risk of influencing results, potentially by altering feature distributions, reducing variance (a known effect of mean imputation), or even overestimating model performance if the imputation unintentionally increases correlations with the response variable. Therefore, the findings from these 2 models are interpreted with these limitations in mind.
+The initial step in the preprocessing pipeline involved a systematic check for missing values within the feature columns of each dataset. This is a standard procedure, as many machine learning algorithms require complete data matrices for training and prediction. Upon inspection of the datasets used in this study, no missing values were found within the feature columns relevant to the modeling process. Therefore, this step primarily served as a data integrity verification, and no imputation or sample removal actions due to missing feature values were necessary. (Handling of entire missing patient records for certain datasets was addressed during the data splitting phase as described in \textbf{{Split dataset(D)}}).
 
 \subsubsection*{Compress correlated features \hyperref[fig:pipeline-1]{(B)}}
 This pipeline step focuses on addressing highly correlated features within each dataset, based on the findings presented in Section~\ref{sec:correlation_analysis_within_individual_datasets}. To mitigate potential multicollinearity issues, these identified features were subsequently compressed into a single dimension using Principal Component Analysis (PCA), resulting in one principal component that represented them in the 'compressed' feature set.\\
@@ -395,6 +402,22 @@ The partitioning followed a 70\% / 15\% / 15\% ratio, allocating the data as fol
     \item \textbf{Validation Set (15\%):} This independent subset was crucial during the model development phase, specifically for selecting the optimal combination of model algorithm and data preprocessing choices. Since multiple distinct model types were evaluated in parallel across the pipelines, and different up-sampling techniques were considered (detailed in the next step), this validation set was used to compare their performance. The combination of model algorithm and up-sampling method yielding the best results on the validation set was selected for final evaluation. Performing the model and up-sampling selection using the validation set is critical to ensure that the test set remains completely untouched and unseen, thereby preserving its integrity for the final, unbiased assessment of generalization performance.
     \item \textbf{Test Set (15\%):} This subset was strictly held out until all model development and selection were finalized based on the training and validation sets. It was used only once at the very end to provide a final, unbiased estimate of how the chosen model configuration is expected to perform on new, unseen data.
 \end{itemize}
+\noindent
+The datasets presented a challenge in terms of sample size consistency: cytokine, cytometry, and RNA data were available for all 40 patients, whereas clonal breadth and depth data were limited to 27 patients. Despite this discrepancy, evaluating the performance of each pipeline and, critically, aggregating their predictions for the final consensus model requires that all analyses utilize the exact same held-out test set. Maintaining this test set consistency across all data modalities was therefore essential for the validity of the study's comparative evaluations and the subsequent consensus aggregation via majority voting.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.8\textwidth]{images/split-1.png}
+    \caption[Data Splits per Modality]{Visual summary of the Train/Validation/Test set splits applied to each data modality, showing sample counts and highlighting the consistent test set size (N=6).}
+  \label{fig:split_data}
+\end{figure}
+\noindent
+To achieve this, a global data partitioning strategy was defined based on the complete 40-patient cohort. A standard 70\% / 15\% / 15\% ratio was applied to this full cohort to designate specific individuals for the training (n=28), validation (n=6), and test (n=6) sets.\\
+\\
+This partitioning was applied directly to the complete datasets (cytokine, cytometry, RNA), resulting in the target split of 28/6/6. For the clonal depth and breadth datasets (N = 27), which represented subsets of the full cohort, a specific procedure ensured the consistency of the test set: the same 6 individuals designated globally for the test set were identified within the 27 available samples and assigned as the test set for these modalities. The remaining 21 samples specific to these datasets were then subsequently divided into training and validation sets, using an approximate 80\%/20\% split of this remainder, which resulted in 17 training samples and 4 validation samples for the clonal breadth and depth pipelines as can be seen in Figure~\ref{fig:split_data}.\\
+\\
+While this approach successfully maintained the crucial consistency of the test set across all analyses, it necessarily resulted in different effective sizes and ratios for the training and validation partitions in the clonal datasets (approx. 63\% Train / 15\% Val / 22\% Test) compared to the others (70\% Train / 15\% Val / 15\% Test). This variation was deemed an acceptable trade-off to preserve the integrity of the final, comparative evaluation on a common test cohort.
+
 
 \subsubsection*{Up-sample Train set \hyperref[fig:pipeline-1]{(E)}}
 A common challenge in biological datasets is class imbalance, where one response class (in this case, responders) may be significantly less prevalent than the other within the training data. This may cause the model to favor the majority class during training. To counteract this and evaluate different mitigation approaches, three distinct strategies for handling class imbalance were applied exclusively to the 70\% training set:
@@ -420,38 +443,43 @@ A common challenge in biological datasets is class imbalance, where one response
     \caption[Illustration of SMOTE weaknesses]{Conceptual illustration of potential weaknesses associated with SMOTE. The bottom row (a', b', c') depicts synthetic sample generation (pink) relative to regions shown in the top row (a, b, c). Potential issues illustrated include: (a/a') Generation influenced by potential noise or outliers (isolated minority sample). (b/b') Synthetic samples potentially overlapping with dense majority class regions due to disregard for majority sample proximity. (c/c') Generation possibly bridging distinct minority clusters, which could ignore underlying data structure or cause overgeneralization. Figure adapted from figure 4 presented in \cite{Truong2022SMOTEVariants}.}
     \label{fig:SMOTE_weaknesses} % Unique label
 \end{figure}
-% --- End Figures ---
 
-% --- Detailed SMOTE Discussion (Separate Paragraphs) ---
-\noindent % Start new paragraph
+\noindent
 SMOTE \cite{Chawla2002SMOTE}, visually explained in Figure~\ref{fig:SMOTE_explained}, generates synthetic minority samples rather than simply duplicating existing ones like ROS. It selects a minority instance, finds its k-nearest minority class neighbors, and creates new samples along the line segments joining the instance to some of these neighbors. This method can potentially create a more diverse minority representation and smoother decision boundaries.\\
 \\
-However, SMOTE also has known limitations (illustrated conceptually in Figure~\ref{fig:SMOTE_weaknesses}), as discussed in literature \cite{Truong2022SMOTEVariants}. Potential drawbacks include overgeneralization (creating samples that blur class distinctions or ignore sub-clusters), amplification of noise if based on outlier samples, and possible generation of samples too close to or overlapping with the majority class, as the original algorithm doesn't explicitly consider majority proximity. Despite these points, SMOTE was included for comparison as a prominent synthetic data generation technique.\\
+However, SMOTE also has known limitations (illustrated in Figure~\ref{fig:SMOTE_weaknesses}), as discussed in literature \cite{Truong2022SMOTEVariants}. Potential drawbacks include overgeneralization (creating samples that blur class distinctions or ignore sub-clusters), amplification of noise if based on outlier samples, and possible generation of samples too close to or overlapping with the majority class, as the original algorithm doesn't explicitly consider majority proximity. Despite these points, SMOTE was included for comparison as a prominent synthetic data generation technique.\\
 \\
-The relative effectiveness of these three imbalance-handling strategies (Class Weighting, ROS, SMOTE) was assessed empirically for each model pipeline. As established during data splitting (Section~\ref{sec:datasplit} - *ensure this label is correct*), the performance metrics achieved on the 15\% validation set were used to select the optimal strategy for each model before final assessment on the test set. It is crucial to reiterate that these imbalance adjustments were applied strictly to the training data partition to maintain the integrity of the validation and test sets.
-
-
-
-
-
-
-
+The relative effectiveness of these three imbalance-handling strategies (Class Weighting, ROS, SMOTE) was assessed empirically for each model pipeline. As established during data splitting, the performance metrics achieved on the 15\% validation set were used to select the optimal strategy for each model before final assessment on the test set. It is crucial to mention again that these imbalance adjustments were applied strictly to the training data to maintain the integrity of the validation and test sets.
 
 
 \subsubsection*{Scale the features \hyperref[fig:pipeline-1]{(F)}}
-\todo{today-...}
+Feature scaling was applied to standardize the range of the input features. This ensures that features with larger values do not disproportionately influence distance-based or gradient-based machine learning algorithms. Using scikit-learn's `StandardScaler`, the features in the training set were scaled to have zero mean and unit variance. The parameters learned from the training set were then used to transform the validation and test sets consistently, preventing data leakage.
+
 
 \subsubsection*{Train the models \hyperref[fig:pipeline-1]{(G)}}
-\todo{today-...}
+\noindent
+Following the comprehensive preprocessing stages (A-F) designed to prepare each dataset modality, the pipeline proceeds to the core modeling phase. The objective here is not necessarily to find a single universally best model through extensive tuning, but rather to train, rigorously evaluate, and select the most suitable baseline classification algorithm for each distinct pipeline configuration. That is, for each combination of initial dataset (e.g., cytokines, cytometry) and class imbalance handling strategy (weighting, ROS, or SMOTE). I also did an other run where i compressed the correlated features.\\
+\\
+A suite of five standard, well-established classification algorithms were employed as candidates within each pipeline:
+\begin{itemize}
+    \item Random Forest (RF)
+    \item Logistic Regression (LogReg)
+    \item Support Vector Machine (SVM with probability estimates enabled)
+    \item Decision Tree (DT)
+    \item Gaussian Naive Bayes (NB)
+\end{itemize}
+These models were generally used with default hyperparameters to provide a robust baseline comparison. If the class weighting strategy was selected in the preceding step (\ref{sec:upsampling}), balanced class weights were incorporated into the RF, LogReg, SVM, and DT algorithms during training.\\
+\\
+The process of identifying the best model for each configuration began with training each candidate algorithm on its corresponding partition of training data (70\%). Following this initial training, the intrinsic stability and statistical significance of the model were rigorously assessed using the training data itself. Performance stability was evaluated through repeated 5-fold stratified cross-validation (n = 1000 repetitions), a procedure illustrated in Figure~\ref{fig:Bootstrapping-1}. This yielded a mean performance score and confidence intervals, providing insight into the robustness of the model's performance against variations in the training data splits. The statistical significance of this performance, relative to chance, was then determined using permutation tests (n = 1000 permutations), as shown in Figure~\ref{fig:P-value_test-1}. This test resulted in a p-value, quantifying the likelihood that the observed cross-validation performance could have arisen simply due to random chance.\\
+\\
+Although these initial evaluations provided valuable insights into model characteristics on the training distribution, the definitive selection of the optimal model for the specific pipeline was driven by performance on the independent 15\% validation set. Each trained candidate model generated predictions for the validation set samples, and a composite score (derived from the weighted F1-score and balanced accuracy) was calculated. The algorithm that achieved the highest composite score on the validation set was selected as the preferred model for that configuration. In the event of ties in the composite score (partly due to the very low sample size.), the mean cross-validation score and subsequently the permutation test p-value (both derived from the training set evaluations) served as hierarchical tie-breakers.\\
+\\
+Once the best model algorithm was identified for a given configuration (e.g., SVM selected for Cytokine data processed with SMOTE and PCA), it underwent a final retraining step. This involved re-fitting the selected model architecture using an expanded dataset that combined the original 70\% training partition and the 15\% validation partition. By retraining on this larger (85\%) dataset, the final model could potentially learn a more refined parameterization before deployment on unseen data. Finally, this fully trained model was applied to the completely untouched 15\% test set to generate the ultimate predictions for that specific pipeline configuration. These test set predictions were used in the final step to combine results from all the different model pipelines.\\
+\\
+This entire process (preprocessing, training, evaluation, selection, retraining, prediction) was executed in parallel for all configurations being tested (e.g., for cytokines with weighting, cytokines with ROS, cytokines with SMOTE, potentially repeated with/without PCA, and similarly for cytometry, clonal breadth, etc.). This resulted in multiple sets of predictions for the same test set, each derived from the best model identified for a specific pathway. These multiple prediction sets then serve as the input for the final consensus aggregation step, described next.
 
-
-
-
-
-
-
-
-
+\subsubsection*{Consensus model\hyperref[fig:pipeline-1]{(H)}}
+Finally, to produce the single output prediction of the overall consensus model, the predictions generated for the test set by each of the parallel pipeline configurations were aggregated. This aggregation was performed using "Majority Voting". For every sample in the test set, the class label predicted most frequently across all contributing pipeline models was selected as the final consensus prediction.
 
 \begin{figure}[H]
   \centering
@@ -468,7 +496,125 @@ The relative effectiveness of these three imbalance-handling strategies (Class W
 \end{figure}
 
 
+\subsection{Findings for Consensus model}
+\noindent
+A primary observation was the marked heterogeneity in the optimal modeling strategies across the different data types, supporting the core premise of the multi-pipeline approach. When utilizing the original, uncompressed features, the best-performing configurations (selected based on validation set performance, with CV MEAN and p-value as tie breakers), are summarized below:
+\begin{table}[H]
+    \centering
+    \hspace*{-1cm}
+    \scalebox{0.8}{%
+    \begin{tabular}{l l l l l l l}
+        \toprule
+        Data Type & Oversampling & Best Model & Train Balanced Acc. & Train $p$-value & Val. F1 & Val. Balanced Acc. \\
+        \midrule
+        cytokines & smote & Logistic Regression & 0.712 & 0.010 & 0.815 & 0.750 \\
+        cytometry & smote & Logistic Regression & 0.724 & 0.045 & 0.815 & 0.750 \\
+        clonal breadth & random & Naive Bayes & 0.655 & 0.099 & 0.500 & 0.667 \\
+        clonal depth & smote & Decision Tree & 0.559 & 0.154 & 0.767 & 0.833 \\
+        RNA & smote & Random Forest & 0.810 & 0.000 & 0.514 & 0.500 \\
+        \bottomrule
+    \end{tabular}}
+    \caption[Optimal Modeling Configurations Uncompressed Features]{Optimal Modeling Configurations for Uncompressed Features}
+    \label{tab:optimal_configs_uncompressed}
+\end{table}
 
+\noindent
+The best-performing model for each data type generated the following predictions on their respective test sets: for cytokines, the prediction was $[1\ 1\ 1\ 0\ 0\ 0]$ with a test accuracy of 0.333; for cytometry, the prediction was $[1\ 0\ 0\ 0\ 0\ 0]$ with a test accuracy of 0.667; for clonal breadth, the prediction was $[1\ 0\ 0\ 1\ 0\ 0]$ with a test accuracy of 0.500; for clonal depth, the prediction was $[0\ 0\ 0\ 0\ 1\ 0]$ with a test accuracy of 1.0; and for RNA, the prediction was $[0\ 1\ 0\ 0\ 1\ 0]$ with a test accuracy of 0.833.\\
+\\
+A consensus prediction was derived by applying majority voting across these individual model outputs, resulting in a final prediction of $[1\ 0\ 0\ 0\ 0\ 0]$. This consensus prediction was then evaluated against the true labels which were $[0\ 0\ 0\ 0\ 1\ 0]$.\\
+\\
+The overall performance of the consensus prediction on the test set yielded an accuracy of 0.667 and a balanced accuracy of 0.400. A more detailed breakdown of the consensus performance is provided by the classification report:
+\begin{table}[h!]
+    \centering
+    \begin{tabular}{l c c c c}
+        \toprule
+        Class & Precision & Recall & F1-Score & Support \\
+        \midrule
+        0 & 0.80 & 0.80 & 0.80 & 5 \\
+        1 & 0.00 & 0.00 & 0.00 & 1 \\
+        \midrule
+        Accuracy &       &      & 0.67 & 6 \\
+        Macro Avg & 0.40 & 0.40 & 0.40 & 6 \\
+        Weighted Avg & 0.67 & 0.67 & 0.67 & 6 \\
+        \bottomrule
+    \end{tabular}
+    \caption[Consensus Classification Report Uncompressed Features]{Consensus Classification Report for Uncompressed Features}
+    \label{tab:consensus_report_uncompressed}
+\end{table}
+
+\noindent
+Further investigation involved applying PCA-based feature compression within each pipeline. This led to a different set of optimal configurations:
+\begin{table}[H]
+    \centering
+    \hspace*{-1cm}
+    \scalebox{0.8}{%
+    \begin{tabular}{l l l l l l l}
+        \toprule
+        Data Type & Oversampling & Best Model & Train Balanced Acc. & Train $p$-value & Val. F1 & Val. Balanced Acc. \\
+        \midrule
+        cytokines & random & Naive Bayes & 0.630 & 0.076 & 0.815 & 0.750 \\
+        cytometry & smote & Decision Tree & 0.725 & 0.009 & 0.815 & 0.750 \\
+        clonal breadth & random & Naive Bayes & 0.655 & 0.099 & 0.500 & 0.667 \\
+        clonal depth & smote & Decision Tree & 0.559 & 0.154 & 0.767 & 0.833 \\
+        RNA & smote & Logistic Regression & 0.789 & 0.011 & 0.667 & 0.625 \\
+        \bottomrule
+    \end{tabular}}
+    \caption[Optimal Modeling Configurations Compressed Features]{Optimal Modeling Configurations for Compressed Features}
+    \label{tab:optimal_configs_compressed}
+\end{table}
+\noindent
+The best-performing model for each data type generated the following predictions on their respective test sets: for cytokines, the prediction was $[0\ 0\ 0\ 0\ 0\ 0]$ with a test accuracy of 0.833; for cytometry, the prediction was $[1\ 0\ 0\ 0\ 0\ 0]$ with a test accuracy of 0.667; for clonal breadth, the prediction was $[1\ 0\ 0\ 1\ 0\ 0]$ with a test accuracy of 0.500; for clonal depth, the prediction was $[0\ 0\ 0\ 0\ 1\ 0]$ with a test accuracy of 1.0; and for RNA, the prediction was $[0\ 1\ 0\ 0\ 0\ 0]$ with a test accuracy of 0.667.\\
+\\
+A consensus prediction was derived by applying majority voting across these individual model outputs, resulting in a final prediction of $[0\ 0\ 0\ 0\ 0\ 0]$. This consensus prediction was then evaluated against the true labels which were $[0\ 0\ 0\ 0\ 1\ 0]$.\\
+\\
+The overall performance of the consensus prediction on the test set yielded an accuracy of 0.833 and a balanced accuracy of 0.500. A more detailed breakdown of the consensus performance is provided by the classification report:
+\begin{table}[h!]
+    \centering
+    \begin{tabular}{l c c c c}
+        \toprule
+        Class & Precision & Recall & F1-Score & Support \\
+        \midrule
+        0 & 0.83 & 1.00 & 0.91 & 5 \\
+        1 & 0.00 & 0.00 & 0.00 & 1 \\
+        \midrule
+        Accuracy &       &      & 0.83 & 6 \\
+        Macro Avg & 0.42 & 0.50 & 0.45 & 6 \\
+        Weighted Avg & 0.69 & 0.83 & 0.76 & 6 \\
+        \bottomrule
+    \end{tabular}
+    \caption[Consensus Classification Report Compressed Features]{Consensus Classification Report for Compressed Features}
+    \label{tab:consensus_report_compressed}
+\end{table}
+
+\noindent
+The consensus prediction based on majority voting of individual data-type specific models trained on the original, uncompressed features achieved an accuracy of 0.667 and a balanced accuracy of 0.400 on the test set.\\
+\\
+Applying PCA-based feature compression within each pipeline resulted in a different set of optimal configurations for some data types. The consensus prediction from these models, evaluated on the test set, showed an accuracy of 0.833 and a balanced accuracy of 0.500. These results indicate that for this dataset, the use of compressed features yielded better overall and balanced accuracy in the consensus prediction compared to the uncompressed feature approach.\\
+\\
+The optimal configurations identified across most data types consistently utilized either SMOTE or random oversampling techniques. This highlights the importance of addressing class imbalance to optimize the performance of the individual models. Oversampling likely helped the models to better capture the characteristics of the minority class, mitigating the tendency to predominantly predict the majority class.\\
+\\
+Several limitations should be acknowledged when interpreting The findings presented so far. The most significant constraint is the very small size of the test set ($n=6$), which severely limits the statistical power of the performance metrics and the generalizability of the results. The precision of an estimate of the performance outside the sample is heavily dependent on the absolute size of the validation or test set ($n$). This relationship is quantitatively expressed by the formula for the standard error of the measured accuracy: $\sqrt{p(1-p)/n}$, where $p$ is the true accuracy. A smaller standard error indicates that the measured accuracy is likely closer to the true accuracy.\\
+\\
+For a test set size of $n=6$, the uncertainty is substantial. Using the formula, the standard error is largest when $p=0.5$, resulting in a standard error of $\sqrt{0.5 \times 0.5 / 6} = \sqrt{0.25 / 6} \approx \sqrt{0.0417} \approx 0.204$. This translates to a standard error of roughly 20.4\%. Even at higher accuracies, such as $p=0.8$, the standard error remains considerably large: $\sqrt{0.8 \times 0.2 / 6} = \sqrt{0.16 / 6} \approx \sqrt{0.0267} \approx 0.163$, or about 16.3\%.\\
+\\
+This magnitude of standard error implies that any accuracy value calculated on this 6-sample test set is a very imprecise estimate of the model's true performance. If, for instance, the model achieved an accuracy of 0.667 (4 out of 6 correct), the true accuracy could plausibly be significantly higher or lower purely due to random chance in the selection of these 6 samples. Similarly, an accuracy of 0.833 (5 out of 6 correct) also carries a large margin of error. This contrasts sharply with scenarios requiring validation sets in the hundreds of thousands to achieve very small standard errors (e.g., 0.1\% or 1\%).\\
+\\
+Looking at this from another perspective, the small sample size directly impacts the width of confidence intervals, such as the Clopper-Pearson interval, which is commonly used for proportions based on small sample sizes. The Clopper-Pearson interval provides a range of plausible values for the true population proportion (accuracy in this case) based on the observed sample proportion. While the Clopper-Pearson method is based on binomial probabilities rather than a simple formula involving standard error, it is fundamentally driven by the same underlying sampling variability. Increasing the sample size ($n$) reduces this variability, leading to a smaller standard error and, consequently, a narrower Clopper-Pearson confidence interval. For our test set of $n=6$, the resulting confidence intervals for the observed accuracies are very wide. For an observed accuracy of 0.667 (4/6), the 95\% Clopper-Pearson confidence interval is approximately $[0.299, 0.925]$, a width of about 0.626. For an observed accuracy of 0.833 (5/6), the 95\% confidence interval is approximately $[0.359, 0.996]$, a width of about 0.637. This shows that even with a measured accuracy of 0.833, the true accuracy could plausibly be as low as around 36\% due to the limited sample size.\\
+\\
+Given that simple majority voting did not produce exceptional consensus results, further exploration of more sophisticated ensemble aggregation methods was not pursued in this study. Future work could investigate techniques such as weighted voting (where individual model contributions are weighted based on factors like validation performance or modality relevance), stacking (employing a meta-learner to combine predictions), or rank aggregation, which may potentially lead to more robust and balanced consensus predictions.
+
+
+
+
+%\section{SMOTE-Driven Oversampling and SHAP-Based Feature Interpretation Approach}
+\section{Feature Identification Methodology}
+Given the constraints imposed by the limited dataset ($N=40$), particularly the small number of samples available for independent testing, a primary objective of this study was to explore and identify potentially important features associated with the vaccine response. Standard approaches for model selection and rigorous performance evaluation typically rely on larger validation or test sets to provide reliable estimates of out-of-sample performance and prevent overfitting during the selection process. However, as discussed in the previous section, the extremely small size of our test set ($n=6$) introduces substantial uncertainty into any performance metric, as demonstrated by the large standard errors and wide Clopper-Pearson confidence intervals. While a test set size of $n=8$ offers a marginal improvement in reducing the width of the confidence interval compared to an even smaller sample like $n=6$, it still leaves a significant degree of uncertainty, rendering traditional rigorous model selection based on distinct validation/test splits highly problematic and potentially less informative than desired.\\
+\\
+Recognizing these severe data limitations, our approach to feature identification prioritizes exploration and hypothesis generation. We trained a variety of models across different data types, incorporating various SMOTE (Synthetic Minority Over-sampling Technique) oversampling variations to address the inherent class imbalance in the dataset. To understand the contribution of individual features within these models, we utilized SHAP (SHapley Additive exPlanations) values.\\
+\\
+Given the extreme data scarcity ($N=40$ total), the decision was made to partition the data into a training set ($n=32$) and a hold-out test set ($n=8$). Further splitting the training data to create a separate validation set would drastically reduce the number of samples available for model training, likely impairing the models' ability to learn meaningful patterns from the data. Furthermore, dividing the test set further would make the individual subsets too small to yield any statistically stable or meaningful performance estimates. Therefore, we made the pragmatic decision to use the performance observed \textit{only} on the hold-out test set ($n=8$) as a preliminary criterion for filtering models whose SHAP explanations would be further analyzed and aggregated.\\
+\\
+While conventionally using the test set for model selection is strongly discouraged due to the risk of test set overfitting and obtaining overly optimistic performance estimates, the extreme data scarcity in this study necessitates this deviation from standard practice. We utilized the performance on the $n=8$ test set not for precise model ranking or performance reporting, but primarily as a coarse filter: models that perform poorly even on this small test set are excluded, as their low scores, despite the uncertainty, suggest they are unlikely to generalize well. Conversely, models that achieve higher scores on this $n=8$ test set are retained. While the uncertainty on an $n=8$ sample means that a high score does not guarantee good true performance, these models still possess the potential to be good performers. Excluding them based on the high variance associated with the $n=8$ estimate would be overly conservative and might discard promising candidates for feature analysis. This approach is employed with the explicit understanding that it is a pragmatic compromise driven by data constraints, and the subsequent findings regarding feature importance derived from aggregating SHAP values of these filtered models are to be interpreted strictly as exploratory hypotheses rather than definitive conclusions. The goal is to identify features that appear consistently important across models that show some minimal indication of potential relevance on the limited unseen data, providing potential candidates for validation in future studies with larger datasets.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -476,9 +622,9 @@ The relative effectiveness of these three imbalance-handling strategies (Class W
 
 
 
-\chapter{Results for the Measles Pipeline}
+% \chapter{Results for the Measles Pipeline}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\todo{Present model performance, feature importance, and interpretation of findings from the measles data.}
+% \todo{Present model performance, feature importance, and interpretation of findings from the measles data.}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
