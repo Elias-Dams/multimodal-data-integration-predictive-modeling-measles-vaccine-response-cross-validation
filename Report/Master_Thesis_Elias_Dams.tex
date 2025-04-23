@@ -360,6 +360,7 @@ The same heatmap visualization technique as used before was applied to the RNA d
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %\todo{Explain your pipeline for exploratory analysis, model building, and selection of stable predictive features, highlighting the specific challenges and how they were overcome.}
 \section{Consensus Model Approach}
+\label{sec:consensus_model_approach}
 \noindent
 In the initial phase of the modeling process, this study opted for a consensus model approach to leverage the complementary strengths of multiple predictive models. This technique involves training several distinct models independently on the different datasets and then concatenating their responses to form a unified prediction. The reason behind this approach is that different models may capture unique aspects of the data or be sensitive to different feature sets, thus enhancing the overall robustness and generalizability of the predictions.\\
 \\
@@ -371,11 +372,12 @@ By combining model outputs, the consensus approach aims to mitigate individual m
   \centering
   \hspace*{-0.9cm}
   \includegraphics[width=1.1\textwidth]{images/Pipeline-1.png}
-  \caption[Consensus model pipeline diagram]{The diagram illustrates the multi-model pipeline used for prediction. Each individual model follows a standardized preprocessing workflow: handling missing data, compressing correlated features, encoding labels, splitting the dataset, upsampling the training set (e.g., using random upsampling or SMOTE), and scaling features. The trained models then produce predictions, which are evaluated based on training, validation and testing accuracy. Additional validation is performed using p-value assessment and bootstrapping to ensure robustness. The final prediction is obtained through majority voting, aggregating predictions from all models to produce a consensus output.}
+  \caption[Consensus model pipeline diagram]{The diagram illustrates the multi-model pipeline used for prediction. Each individual model follows a standardized preprocessing workflow: data loading, preprocessing (A: Missing data handling, B: Feature compression, C: Label encoding, F: Feature scaling), data splitting (D), upsampling the training set (e.g., using random upsampling or SMOTE) (E). The trained models then produce predictions, which are evaluated based on training, validation and testing accuracy. Additional validation is performed using p-value assessment and bootstrapping to ensure robustness (G). The final prediction is obtained through majority voting, aggregating predictions from all models to produce a consensus output (H).}
   \label{fig:pipeline-1}
 \end{figure}
 
 \subsection{Pipeline Structure for Heterogeneous Datasets}
+\label{subsec:pipeline_structure_for_heterogeneous_datasets}
 \noindent
 This section details the structure applied within the consensus modeling framework. Specifically, five parallel pipelines were executed, each dedicated to one of the following distinct data types:
 Cytokine measurements, Cytometry data, T-cell clonal breadth metrics, T-cell clonal depth metrics and RNA sequencing data.\\
@@ -408,7 +410,7 @@ The datasets presented a challenge in terms of sample size consistency: cytokine
 \begin{figure}[H]
   \centering
   \includegraphics[width=0.8\textwidth]{images/split-1.png}
-    \caption[Data Splits per Modality]{Visual summary of the Train/Validation/Test set splits applied to each data modality, showing sample counts and highlighting the consistent test set size (N=6).}
+    \caption[Data splits per modality]{Visual summary of the Train/Validation/Test set splits applied to each data modality, showing sample counts and highlighting the consistent test set size (N=6).}
   \label{fig:split_data}
 \end{figure}
 \noindent
@@ -420,6 +422,7 @@ While this approach successfully maintained the crucial consistency of the test 
 
 
 \subsubsection*{Up-sample Train set \hyperref[fig:pipeline-1]{(E)}}
+\label{subsubsec:up-sample_train_set}
 A common challenge in biological datasets is class imbalance, where one response class (in this case, responders) may be significantly less prevalent than the other within the training data. This may cause the model to favor the majority class during training. To counteract this and evaluate different mitigation approaches, three distinct strategies for handling class imbalance were applied exclusively to the 70\% training set:
 
 \begin{enumerate}
@@ -507,6 +510,7 @@ Finally, to produce the single output prediction of the overall consensus model,
 
 
 \subsection{Findings for Consensus model}
+\label{sec:findings_for_consensus_model}
 \noindent
 A primary observation was the marked heterogeneity in the optimal modeling strategies across the different data types, supporting the core premise of the multi-pipeline approach. When utilizing the original, uncompressed features, the best-performing configurations (selected based on validation set performance, with CV MEAN and p-value as tie breakers), are summarized below:
 \begin{table}[H]
@@ -618,14 +622,138 @@ Given that simple majority voting did not produce exceptional consensus results,
 
 %\section{SMOTE-Driven Oversampling and SHAP-Based Feature Interpretation Approach}
 \section{Feature Identification Methodology}
+\todo{In progress...}
 \noindent
 Given the constraints imposed by the limited dataset ($N=40$), particularly the small number of samples available for independent testing, a primary objective of this study was to explore and identify potentially important features associated with the vaccine response. Standard approaches for model selection and rigorous performance evaluation typically rely on larger validation or test sets to provide reliable estimates of out-of-sample performance and prevent overfitting during the selection process. However, as discussed in the previous section, the extremely small size of our test set ($n=6$) introduces substantial uncertainty into any performance metric, as demonstrated by the large standard errors and wide Clopper-Pearson confidence intervals. While a test set size of $n=8$ offers a marginal improvement in reducing the width of the confidence interval compared to an even smaller sample like $n=6$, it still leaves a significant degree of uncertainty, rendering traditional rigorous model selection based on distinct validation/test splits highly problematic and potentially less informative than desired.\\
 \\
-Recognizing these severe data limitations, our approach to feature identification prioritizes exploration and hypothesis generation. We trained a variety of models across different data types, incorporating various SMOTE (Synthetic Minority Over-sampling Technique) oversampling variations to address the inherent class imbalance in the dataset. To understand the contribution of individual features within these models, we utilized SHAP (SHapley Additive exPlanations) values.\\
+Recognizing these severe data limitations, my approach to feature identification prioritizes exploration and hypothesis generation. I trained a variety of models across different data types, incorporating various SMOTE (Synthetic Minority Over-sampling Technique) oversampling variations to address the inherent class imbalance in the dataset. To understand the contribution of individual features within these models, I utilized SHAP (SHapley Additive exPlanations \cite{ApprouchForModelPredictions}) values. It is a technique that explains the output of machine learning models by assigning each feature an importance value based on its contribution to the model’s predictions using game theory.
+
+\subsection{Pipeline Structure for Heterogeneous Datasets}
+To systematically implement the exploratory strategy outlined above a standardized computational pipeline was employed (very similar to the pipeline in Section~\ref{sec:consensus_model_approach}). This pipeline, visually detailed in Figure~\ref{fig:pipeline-2}, ensures consistency in data handling, model training, and the generation of performance metrics across all experimental conditions. It encompasses crucial steps from initial data preprocessing and targeted oversampling of the training data to model fitting and the assessment of performance on the hold-out test set. The models generated and evaluated through this workflow form the basis for the subsequent performance filtering and aggregation of SHAP values aimed at identifying potentially important features. The following sections describe each stage of this pipeline.
+
+\subsubsection{Preprocessing \hyperref[fig:pipeline-2]{(A, B, C, F)}}
+\noindent The initial data preparation steps, specifically handling missing data \hyperref[fig:pipeline-2]{(A)}, compressing correlated features \hyperref[fig:pipeline-2]{(B)}, and encoding class labels \hyperref[fig:pipeline-2]{(C)}, and later scaling the features \hyperref[fig:pipeline-2]{(F)}, were performed using the identical procedures as detailed in Section~\ref{sec:consensus_model_approach}.
+
+
+\pagebreak
+\begin{figure}[H]
+  \centering
+  \hspace*{-0.9cm} % Adjust spacing as needed
+  \includegraphics[width=1.1\textwidth]{images/Pipeline-2.png} % Ensure path is correct
+  \caption[Feature Identification models pipeline diagram]{ The diagram illustrates the multi-model pipeline used for constructing the models.  Each individual model follows a standardized preprocessing workflow: data loading, preprocessing (A: Missing data handling, B: Feature compression, C: Label encoding, F: Feature scaling), data splitting (D), training set oversampling using various SMOTE techniques (E), model training, and evaluation (G). Performance on train and test sets is measured by Balanced Accuracy, with 95\% bootstrap confidence intervals and p-value testing, repeated across datasets and SMOTE methods as illustrated.}
+  \label{fig:pipeline-2}
+\end{figure}
+
+\subsubsection*{Split dataset \hyperref[fig:pipeline-2]{(D)}}
+As mentioned earlier, due to the extreme data scarcity ($N=40$), the decision was made to partition the data into a training set comprising of 80\% of the samples ($n=32$) and a hold-out test set containing the remaining 20\% ($n=8$). Further splitting the training data to create a separate validation set would drastically reduce the number of samples available for model training, likely impairing the models' ability to learn meaningful patterns from the data. Furthermore, dividing the test set further would make the individual subsets too small to yield any statistically stable or meaningful performance estimates as discussed in the previous Section~\ref{sec:findings_for_consensus_model}. Therefore, I made the pragmatic decision to use the performance observed \textit{only} on the hold-out test set ($n=8$) as a preliminary criterion for filtering models whose SHAP explanations would be further analyzed and aggregated.\\
 \\
-Given the extreme data scarcity ($N=40$ total), the decision was made to partition the data into a training set ($n=32$) and a hold-out test set ($n=8$). Further splitting the training data to create a separate validation set would drastically reduce the number of samples available for model training, likely impairing the models' ability to learn meaningful patterns from the data. Furthermore, dividing the test set further would make the individual subsets too small to yield any statistically stable or meaningful performance estimates. Therefore, we made the pragmatic decision to use the performance observed \textit{only} on the hold-out test set ($n=8$) as a preliminary criterion for filtering models whose SHAP explanations would be further analyzed and aggregated.\\
+While conventionally using the test set for model selection is strongly discouraged due to the risk of test set overfitting and obtaining overly optimistic performance estimates, the extreme data scarcity in this study necessitates this deviation from standard practice. I utilized the performance on the $n=8$ test set not for precise model ranking or performance reporting, but primarily as a coarse filter: models that perform poorly even on this small test set are excluded, as their low scores, despite the uncertainty, suggest they are unlikely to generalize well. Conversely, models that achieve higher scores on this $n=8$ test set are retained. While the uncertainty on an $n=8$ sample means that a high score does not guarantee good true performance, these models still possess the potential to be good performers. Excluding them based on the high variance associated with the $n=8$ estimate would be overly conservative and might discard promising candidates for feature analysis. This approach is used with the explicit understanding that it is a pragmatic compromise driven by data constraints. The subsequent findings regarding feature importance derived from aggregating SHAP values of these filtered models are to be interpreted strictly as exploratory hypotheses rather than definitive conclusions. The goal is to identify features that appear consistently important across models that show some minimal indication of potential relevance on the limited unseen data, providing potential candidates for validation in future studies with larger datasets.
+
+\subsubsection*{Up-sample Train set \hyperref[fig:pipeline-2]{(E)}}
+It became evident that strategies involving data upsampling, such as random oversampling and particularly SMOTE, played a crucial role in improving model performance when dealing with small, imbalanced datasets. Motivated by these findings, I extended the analysis to investigate several variations of SMOTE. These methods aim to address class imbalance more effectively than standard SMOTE by refining the process of generating synthetic samples or combining it with data cleaning techniques, thereby allowing models to extract more useful patterns and generalize better from sparse data.\\
 \\
-While conventionally using the test set for model selection is strongly discouraged due to the risk of test set overfitting and obtaining overly optimistic performance estimates, the extreme data scarcity in this study necessitates this deviation from standard practice. We utilized the performance on the $n=8$ test set not for precise model ranking or performance reporting, but primarily as a coarse filter: models that perform poorly even on this small test set are excluded, as their low scores, despite the uncertainty, suggest they are unlikely to generalize well. Conversely, models that achieve higher scores on this $n=8$ test set are retained. While the uncertainty on an $n=8$ sample means that a high score does not guarantee good true performance, these models still possess the potential to be good performers. Excluding them based on the high variance associated with the $n=8$ estimate would be overly conservative and might discard promising candidates for feature analysis. This approach is employed with the explicit understanding that it is a pragmatic compromise driven by data constraints, and the subsequent findings regarding feature importance derived from aggregating SHAP values of these filtered models are to be interpreted strictly as exploratory hypotheses rather than definitive conclusions. The goal is to identify features that appear consistently important across models that show some minimal indication of potential relevance on the limited unseen data, providing potential candidates for validation in future studies with larger datasets.
+The first method used was standard SMOTE \cite{Chawla2002SMOTE}, which, as previously detailed in Subsection~\ref{subsec:pipeline_structure_for_heterogeneous_datasets} (Up-sample Train set), synthesizes new minority instances by generating samples along the lines connecting existing minority samples and their selected k-nearest minority neighbors (illustrated conceptually in Figure~\ref{fig:SMOTE_explained}). Standard SMOTE, while a foundational technique, has known weaknesses, as detailed in Subsection~\ref{subsec:pipeline_structure_for_heterogeneous_datasets} and conceptually illustrated in Figure~\ref{fig:SMOTE_weaknesses}. The variations of SMOTE included in this study were developed to mitigate these issues, either by focusing synthetic sample generation on more informative areas or by combining oversampling with data cleaning steps.\\
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=0.9\textwidth]{images/SMOTE-Borderline.png}
+  \caption[Illustration of Borderline-SMOTE Sample Generation]{Illustration of the Borderline-SMOTE synthetic sample generation process. Panel (a) shows minority class samples (green) categorized into 'Safe', 'Danger' (borderline), and 'Noise' zones based on the ratio of majority class neighbors (grey) among their k-nearest neighbors. Panel (b) demonstrates how synthetic minority samples (pink) are generated specifically in the 'Danger' zone. Figure adapted from figure 9 presented in \cite{Truong2022SMOTEVariants}.}
+  \label{fig:SMOTE-Borderline}
+\end{figure}
+\\
+\noindent
+As a prime example of a variation focusing on challenging areas, Borderline-SMOTE \cite{Han2005Borderline} was applied. Proposed by Han et al. in 2005, this variant is based on the reasoning that minority samples located in the borderline regions near the decision boundary are particularly difficult for classifiers to learn. By specifically adding more synthetic samples in these ambiguous regions, the method aims to help the classifier distinguish between classes better. The core idea of Borderline-SMOTE is to first identify minority samples that are in 'danger' of being misclassified. Using k-nearest neighbors (KNN), each minority sample is classified into a 'noise', 'safe' or 'danger' zone based on the ratio ($r$) of majority instances among its neighbors. A sample is considered 'noise' if all its neighbors are majority class ($r=1$), in a 'safe' zone if most neighbors are minority class ($r < 0.5$), and in the 'danger' (or 'borderline') zone if the mix is significant ($0.5 \leq r < 1$). Unlike standard SMOTE which oversamples all minority samples, Borderline-SMOTE focuses its synthetic sample generation only on those minority samples identified as being in the 'danger' zone, synthesizing new instances by interpolating between a danger-zone sample and its minority neighbors. This targeted approach aims to reinforce the decision boundary in regions considered critical for classification, as illustrated in Figure~\ref{fig:SMOTE-Borderline}.\\
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=0.9\textwidth]{images/SMOTE-ADASYN.png}
+  \caption[Illustration of ADASYN Sample Generation]{Illustration of the ADASYN synthetic sample generation process. The left panel shows original minority samples. The right panel shows synthetic minority samples (pink) generated by ADASYN, demonstrating the addition of small random variations that cause the synthetic points to be slightly scattered around the interpolation lines between neighbors. Figure made in same style as images presented in \cite{Truong2022SMOTEVariants}.}
+  \label{fig:SMOTE-ADASYN}
+\end{figure}
+\\
+\noindent
+Another approach included was ADASYN (Adaptive Synthetic Sampling) \cite{He2008ADASYN}. Presented as an improved version of standard SMOTE, ADASYN incorporates a modification to the synthetic sample generation process. After creating synthetic points via interpolation similar to SMOTE, ADASYN adds small random values $\lambda \in [0, 1]$ to these generated points. This addition introduces a degree of variance, resulting in synthetic samples that are slightly scattered around the interpolating line rather than being strictly linearly correlated with the original samples, as illustrated in Figure~\ref{fig:SMOTE-ADASYN}. This aims to make the generated data distribution more realistic and potentially help models generalize better.\\
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=0.9\textwidth]{images/SMOTE-Tomek.png}
+  \caption[Illustration of SMOTE-Tomek Process]{Illustration of the SMOTE-Tomek process. Panel (a) conceptually shows a Tomek link, defined as a pair of instances from different classes that are mutual nearest neighbors. Panel (b) depicts a dataset after standard SMOTE oversampling, including original (green and grey) and synthetic (pink) samples. Panel (b') shows the result after the removal of Tomek links, which helps to clean the decision boundary by eliminating ambiguous points near the interface between classes. Figure adapted from figure 5 presented in \cite{Truong2022SMOTEVariants}.}
+  \label{fig:SMOTE-Tomek} % Corrected label spelling
+\end{figure}
+\\
+\noindent
+Furthermore, hybrid techniques combining SMOTE oversampling with data cleaning were also included in the analysis pipeline. SMOTE-Tomek \cite{Batista2004Study} implements a two-stage process. It first applies standard SMOTE to oversample the minority class, and then utilizes the concept of Tomek links to perform a cleaning step. A Tomek link is defined as a pair of instances $(x_i, x_j)$ from different classes that are mutual closest neighbors, meaning $x_i$ is the nearest neighbor of $x_j$, and $x_j$ is the nearest neighbor of $x_i$. As conceptually illustrated in Figure~\ref{fig:SMOTE-Tomek}(a), these pairs often represent ambiguous points located at the borderline between classes, where misclassification is likely to occur. The idea behind the Tomek link removal in SMOTE-Tomek is to make the training dataset cleaner by eliminating these ambiguous points at the borderlines. After the initial SMOTE oversampling, all Tomek links involving either original or newly synthesized samples are identified. Then, one or both instances forming each Tomek link are removed. This removal process helps to eliminate noise and clarify the separation between classes, particularly near the decision boundary, as illustrated in Figure~\ref{fig:SMOTE-Tomek}(b and b').\\
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=0.9\textwidth]{images/SMOTE-EEN.png}
+  \caption[Illustration of SMOTE-ENN Process]{Illustration of the SMOTE-ENN process, focusing on the Edited Nearest Neighbours (ENN) cleaning step. Panels (a) and (a') show an example where a minority sample's (green, highlighted) neighbors are examined, and in (a'), the sample is removed because its class label disagrees with the majority of its k-nearest neighbors. Panels (b) and (b') show a similar example for a majority sample (grey, highlighted) that is removed in (b') based on the same ENN rule. Panels (c) and (c') depict a dataset after SMOTE oversampling (original green/grey, synthetic pink) in (c'), samples inconsistent with their local neighborhood majority, as determined by the ENN rule, have been removed. This cleaning step helps to eliminate noise and ambiguous points, resulting in more clearly defined class boundaries. Figure adapted from figure 7 presented in \cite{Truong2022SMOTEVariants}.}
+  \label{fig:SMOTE-ENN} % Corrected label spelling
+\end{figure}
+\\
+\noindent
+Similarly, SMOTE-ENN (Edited Nearest Neighbours) \cite{Batista2004Study} is another hybrid technique that follows SMOTE oversampling with a cleaning step based on Wilson’s Edited Nearest Neighbour (ENN) rules. In the ENN component, applied after the initial SMOTE oversampling, the dataset is cleaned based on the local neighborhood consistency of each sample $S_i$. For each sample $S_i$ (which can be original or synthetic), its $k$-nearest neighbors (kNN) are identified, and the ratio ($r$) of majority class instances among these KNN is calculated. The ENN cleaning rule then applies as follows:
+\begin{itemize}
+    \item If a sample $S_i$ belongs to the minority class and the ratio $r$ of majority instances among its KNN is greater than 0.5 ($r > 0.5$), then the majority instances among its KNN are removed. This scenario is conceptually illustrated in Figure~\ref{fig:SMOTE-ENN}(a and a').
+    \item If a sample $S_i$ belongs to the majority class and the ratio $r$ of majority instances among its KNN is less than 0.5 ($r < 0.5$), then the sample $S_i$ itself is removed. This scenario is conceptually illustrated in Figure~\ref{fig:SMOTE-ENN}(b and b').
+\end{itemize}
+This rule is applied to aggressively clean the dataset by removing instances (original or synthetic) that appear to be mislabeled or that create ambiguity by being inconsistent with their local neighborhood's dominant class. The application of ENN cleaning after SMOTE oversampling results in the removal of inconsistent samples, leading to more clearly defined class clusters, as shown in Figure~\ref{fig:SMOTE-ENN}(c and c'). Compared to Tomek link removal, the ENN cleaning process typically removes more samples, potentially resulting in a more significant clarification of boundaries but also carrying a higher risk of removing potentially informative instances near the true decision boundary.\\
+\\
+By training separate models for each dataset using training data generated by each of these methods (including 'None' for no oversampling), the analysis allowed for a comprehensive exploration of the impact of different imbalance correction strategies on model performance and subsequent feature importance analysis.
+
+\subsubsection*{Train and Evaluate Models \hyperref[fig:pipeline-2]{(G)}}
+In this final stage of the pipeline, the various classification models outlined in Table~\ref{tab:ml_models} were trained and subsequently evaluated. For each dataset and each applied oversampling strategy (including the 'None' case), instances of these models were trained using the respective preprocessed training data partition ($n=32$). Following training, each model's performance was assessed on the untouched hold-out test set ($n=8$).\\
+\\
+Given the inherent class imbalance of the dataset, Balanced Accuracy was selected as the primary performance metric for evaluating the models in this study, providing a more robust measure than standard accuracy by accounting for the performance on both minority and majority classes. To complement the evaluation on the small test set, additional analyses related to model performance characteristics were conducted on the training data. Specifically, 95\% confidence intervals for the Balanced Accuracy were calculated based on a bootstrapping procedure applied to the training data. This bootstrapping technique, used for reasons related to limited data as discussed in Subsection~\ref{subsec:pipeline_structure_for_heterogeneous_datasets}, is illustrated and explained in detail in Figure~\ref{fig:Bootstrapping-1}.\\
+\\
+Furthermore, statistical significance was assessed using permutation tests applied to the training data. The permutation test technique, also used for reasons related to limited data as discussed in Subsection~\ref{subsec:pipeline_structure_for_heterogeneous_datasets}, is illustrated and explained in detail in Figure~\ref{fig:P-value_test-1}. This involved repeatedly permuting the true class labels of the training data and recalculating the Balanced Accuracy to determine the likelihood of achieving the observed training performance by chance.\\
+\\
+The Balanced Accuracy score, its 95\% bootstrapped confidence interval, and the p-value from the permutation test were computed for each trained model under every oversampling condition for each dataset. These performance parameters were then saved. these saved evaluation metrics served as the basis for the subsequent filtering and selection of "best" performing model configurations prior to the SHAP analysis for feature importance identification.
+
+\subsection{Feature Importance Assessment using SHAP}
+% \todo{
+% \begin{itemize}
+%     \item \textbf{Introduction and Purpose:} Explain why feature importance is relevant and introduce SHAP as the chosen method, highlighting its advantages and what SHAP values represent.
+%     \item \textbf{Rationale for Using SHAP Across Multiple Models:} Explain the reasoning behind using SHAP on multiple models (e.g., robustness) rather than a single model.
+%     \item \textbf{Model Selection for SHAP Analysis:} Clearly describe how the performance metrics from the previous evaluation step were used to select the specific models included in the SHAP analysis.
+%     \item \textbf{SHAP Calculation Details:} Describe which data instances were used for SHAP calculation and mention the specific SHAP explainer(s) employed.
+% \end{itemize}
+% }
+\noindent
+Understanding which factors contribute to a model's prediction is crucial, particularly in complex biological contexts where machine learning is used to uncover insights into underlying mechanisms. In this study, identifying the features that significantly influence the prediction of vaccine response is key to understanding the potential biological or clinical associations involved. Feature importance methods aim to quantify the contribution of each input feature to the model's output.\\
+\\
+To assess feature importance and provide interpretable explanations for our models, we employed SHAP (SHapley Additive exPlanations) \cite{ApprouchForModelPredictions}. SHAP is a unified framework rooted in cooperative game theory, using Shapley values to attribute the contribution of each feature to the difference between an individual prediction and the average prediction. Formally, the SHAP value of a feature for a specific instance represents the average marginal contribution of that feature's value to the prediction, considering all possible combinations of features. A fundamental property of SHAP values is their additivity, which provides a clear link between feature contributions and the model's output. For any given instance $x$, the SHAP values ($\phi_i$) for all features $i=1, \dots, M$ sum up to the difference between the model's output for that instance, $f(x)$, and the expected base value (average output) over the dataset, $E[f(x)]$. This relationship can be formally expressed as:
+$$ f(x) = E[f(x)] + \sum_{i=1}^M \phi_i $$
+Here, $E[f(x)]$ represents the base value of the prediction, which is typically the average prediction over the training data or a representative background dataset. The SHAP value $\phi_i$ for feature $i$ quantifies the feature's contribution to pushing the prediction from this base value $E[f(x)]$ to the final output $f(x)$. A feature with a positive SHAP value ($\phi_i > 0$) increases the model's output relative to the base value, while a negative SHAP value ($\phi_i < 0$) decreases it, as illustrated in Figure~\ref{fig:SHAP-individual-explained}. For binary classification models, SHAP values are typically on the log-odds scale.\\
+% images based on https://shap.readthedocs.io/en/latest/example_notebooks/overviews/An%20introduction%20to%20explainable%20AI%20with%20Shapley%20values.html
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=0.9\textwidth]{images/SHAP-explained-individual.png}
+  \caption[Example SHAP Individual Explanation Plot]{An example SHAP individual explanation plot for a single instance (sample x). This plot illustrates how each feature's value contributes to the model's prediction for this specific instance, moving from the expected base value ($E[f(x)] = 2.215$) to the final predicted output ($f(x) = 2.846$). Each arrow represents a feature's SHAP value ($\phi_i$); red arrows indicate positive contributions that increase the output, while blue arrows indicate negative contributions that decrease the output. The width of each arrow corresponds to the magnitude of the feature's impact. Features are listed on the left along with their actual values for this instance.}
+  \label{fig:SHAP-individual-explained} % Corrected label for clarity
+\end{figure}
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=0.9\textwidth]{images/SHAP-explained.png}
+  \caption[Example SHAP Summary Plot]{An example SHAP summary plot. This visualization shows the overall importance of features and how their values impact the model's output across a dataset. Features are ranked by importance on the y-axis, the x-axis represents the impact (SHAP value), and the color indicates the feature value (low to high). Points on the left push the prediction towards the negative class, while points on the right push it towards the positive class. Points corresponding to the SHAP values from an individual explanation (as shown in Figure~\ref{fig:SHAP-individual-explained}) are highlighted in green for context.}
+  \label{fig:SHAP-plot-explained}
+\end{figure}
+\noindent
+A common and informative visualization of SHAP values across an entire dataset (or a representative subset) is the SHAP summary plot, an example of which is shown in Figure~\ref{fig:SHAP-plot-explained}. This  plot is essentially an aggregation of the individual SHAP explanation plots (like Figure~\ref{fig:SHAP-individual-explained}) for many instances and provides a rich overview of feature importance and the relationship between feature values and their impact on model predictions. Interpreting the SHAP summary plot involves understanding its key components:
+\pagebreak
+\begin{itemize}
+    \item \textbf{Y-axis:} Features are listed on the vertical axis, ordered by their overall importance from top to bottom. A feature's overall importance is typically measured by the average of the absolute SHAP values for that feature across all instances in the plot. Features higher on the list have a greater average impact on the magnitude of the model's output difference from the average prediction.
+    \item \textbf{X-axis:} The horizontal axis represents the SHAP value ($\phi_i$) (impact on model output). For a binary classification model trained to predict Label 1 (the positive class) versus Label 0 (the negative class), positive SHAP values ($>0$) indicate that the feature's value increases the model's output, pushing the prediction towards the positive class (Label 1). Conversely, negative SHAP values ($<0$) indicate that the feature's value decreases the model's output, pushing the prediction towards the negative class (Label 0). The position of a point along the x-axis shows the magnitude and direction of a specific feature's impact for a particular instance.
+    \item \textbf{Color:} Each point on the plot is colored according to the actual value of the feature it represents for that specific data instance. The color bar shown on the right (as in Figure~\ref{fig:SHAP-plot-explained}), maps the color to the feature value scale (e.g., red indicates a high feature value, and blue indicates a low feature value). This allows for examining how the value of a feature relates to the direction and magnitude of its impact.
+    \item \textbf{Each point:} Represents the SHAP value ($\phi_i$) for a single data instance. For each feature (row on the y-axis), the plot displays a distribution of points along the x-axis. The horizontal spread and density of points for a single feature illustrate the variability in its impact across different data points.
+\end{itemize}
+By examining the distribution of points for each feature, their spread along the x-axis and their corresponding colors, one can infer detailed insights into the model's behavior. For instance, if for a feature, points that are red (high feature value) tend to cluster on the right side (positive SHAP values), it suggests that higher values of that feature increase the model's output and thus increase the predicted probability (or log-odds) of the positive class (Label 1). Conversely, if blue points (low feature value) are predominantly on the left side (negative SHAP values), it indicates that lower values of that feature decrease the model's output, pushing the prediction towards the negative class (Label 0). The SHAP summary plot thus serves as a powerful tool for understanding global feature importance and their directional relationships with the prediction outcome.
+
+\todo{explain KernelSHAP and TreeSHAP }
+
+
+
+\subsection{Aggregation of SHAP Values for Global Importance}
+
+\subsection{Interpretation and Conclusion of Feature Identification}
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
