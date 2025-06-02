@@ -67,7 +67,6 @@ def handle_missing_values(df, dataset_name, complete_samples, strategy='mean'):
         # Prepare training subset
         train_subset = prepare_training_subset(label, df)
 
-        # Ensure all columns in train_subset exist in the group
         features = group[['Vaccinee', 'response_label']].copy()  # Keep 'Vaccinee' and 'response_label' intact
         for col in train_subset.columns:
             if col not in features.columns:
@@ -100,13 +99,6 @@ def handle_missing_values(df, dataset_name, complete_samples, strategy='mean'):
 def compress_correlated_features(data, groups):
     """
     Compress groups of highly correlated features into a single principal component for each group.
-
-    Parameters:
-    - data (pd.DataFrame): The input dataframe containing the features.
-    - groups (dict): A dictionary where keys are group names and values are lists of correlated features.
-
-    Returns:
-    - data (pd.DataFrame): The dataframe with compressed features added and original features removed.
     """
     skipped = []
 
@@ -116,7 +108,7 @@ def compress_correlated_features(data, groups):
                 skipped.extend(features)
                 print(
                     f"Warning: Feature '{f}' not found in DataFrame. Skipping compression for '{new_feature_name}' as at least one feature is missing.")
-                return data.copy()  # Return original data (or a copy) if any feature is missing
+                return data.copy()
 
         # Standardize the features
         scaler = StandardScaler()
@@ -339,7 +331,6 @@ def custom_train_test_split(data, labels, test_size=0.2, random_state=42):
     # Calculate the total number of samples for the test set based on the proportion
     total_test_samples = int(len(data) * test_size)
 
-
     # Calculate the number of samples needed PER CLASS for the test set
     base_test_size_per_class = total_test_samples // 2
 
@@ -351,16 +342,15 @@ def custom_train_test_split(data, labels, test_size=0.2, random_state=42):
         # Get the counts of each class to determine the larger one
         class_counts = labels.value_counts()
         if class_counts[unique_classes[0]] > class_counts[unique_classes[1]]:
-            test_size_class_0 += 1  # Add one to the count for class 0
+            test_size_class_0 += 1
         else:
-            test_size_class_1 += 1  # Add one to the count for class 1
+            test_size_class_1 += 1
 
-        # Separate indices by class based on the labels Series
+    # Separate indices by class based on the labels Series
     indices_class_0 = labels[labels == unique_classes[0]].index
     indices_class_1 = labels[labels == unique_classes[1]].index
 
     # Check if the calculated test_size_per_class is feasible given the class sizes
-    # --- Check if the calculated test sizes per class are feasible ---
     if test_size_class_0 > len(indices_class_0):
         raise ValueError(
             f"Calculated test size for class {unique_classes[0]} ({test_size_class_0}) "
@@ -373,7 +363,7 @@ def custom_train_test_split(data, labels, test_size=0.2, random_state=42):
         )
 
     # Randomly sample 'test_size_per_class' indices from each class for the test set
-    rng = np.random.RandomState(random_state)  # Use RandomState for consistent random numbers
+    rng = np.random.RandomState(random_state)
     test_indices_class_0 = rng.choice(indices_class_0, size=test_size_class_0, replace=False)
     test_indices_class_1 = rng.choice(indices_class_1, size=test_size_class_1, replace=False)
 
@@ -394,9 +384,6 @@ def train_val_test_split_exception(data, labels, exceptions_data, exceptions_lab
     """
     Splits data into train, validation, and test sets, ensuring the test set has
     1 positive and 5 negative samples from the exception set.
-
-    Returns:
-    - train_data, val_data, train_data_exceptions, val_data_exceptions, test_data, test_labels
     """
     random.seed(random_state)
     np.random.seed(random_state)
@@ -572,13 +559,6 @@ def scale_features(X_train, X_test, X_val = None):
 def plot_boot_scores_with_ci(boot_scores, confidence_level=0.95):
     """
     Plots the distribution of boot_scores with confidence interval (CI).
-
-    Parameters:
-    - boot_scores: List or array of bootstrapped scores.
-    - confidence_level: The desired confidence level for the CI (default is 0.95).
-
-    Returns:
-    - Lower and upper bounds of the confidence interval.
     """
     # Calculate the percentiles for the confidence interval
     lower_percentile = (1 - confidence_level) / 2 * 100
@@ -622,30 +602,16 @@ def permutation_test(model, X_train, y_train, X_test, y_test, n_permutations=100
     Performs a permutation test by training the model on the training set (with permuted labels)
     and evaluating it on the test set. Calculates the p-value based on the distribution of
     balanced accuracies from the permuted datasets.
-
-    Parameters:
-    - model: The machine learning model to evaluate.
-    - X_train: Features of the training set.
-    - y_train: Labels of the training set.
-    - X_test: Features of the test set.
-    - y_test: Labels of the test set.
-    - n_permutations: Number of permutations to perform.
-    - random_state: Seed for reproducibility.
-
-    Returns:
-    - p_value: The p-value from the permutation test.
-    - observed_score: The observed balanced accuracy with true labels.
-    - permuted_scores: Array of balanced accuracies from permuted labels.
     """
     rng = np.random.RandomState(random_state)
 
-    # Step 1: Compute the observed performance using the true labels
+    # Compute the observed performance using the true labels
     model_clone = clone(model)
     model_clone.fit(X_train, y_train)
     y_pred = model_clone.predict(X_test)
     observed_score = balanced_accuracy_score(y_test, y_pred)
 
-    # Step 2: Permutation testing
+    # Permutation testing
     permuted_scores = []
     for _ in tqdm(range(n_permutations), desc="Permutation test"):
         # Shuffle the labels (y_train)
@@ -664,7 +630,7 @@ def permutation_test(model, X_train, y_train, X_test, y_test, n_permutations=100
 
     permuted_scores = np.array(permuted_scores)
 
-    # Step 3: Calculate the p-value
+    # Calculate the p-value
     p_value = np.mean(permuted_scores >= observed_score)
 
     return p_value, observed_score, permuted_scores
@@ -673,9 +639,6 @@ def bootstrap_confidence_intervals(model, X_train, y_train, X_test, y_test, n_bo
     """
     Computes percentile-based bootstrap confidence intervals for both train and test balanced accuracy.
     Uses custom_stratified_metrics (i.e. stratified CV) to compute the training balanced accuracy.
-
-    Returns a dictionary with:
-      'train IC lower', 'train IC upper', 'test IC lower', 'test IC upper'
     """
     rng = np.random.RandomState(random_state)
     train_scores = []
@@ -735,9 +698,6 @@ def remove_random_state(model):
 def repeated_cv_confidence_intervals(model, X_train, y_train, n_repeats=1000, n_folds=5, ci=0.95):
     """
     Perform repeated cross-validation to estimate confidence intervals.
-
-    Returns:
-    - Dictionary with lower and upper bounds of the confidence interval
     """
     cv_scores = []
 
@@ -788,7 +748,7 @@ def correct_permutation_test(model, X_train, y_train, n_folds=5, n_permutations=
     skf = StratifiedKFold(n_splits=n_folds, shuffle=True, random_state=rng.randint(0, 2**32))
     observed_scores = []
 
-    # Step 1: Compute the observed performance using inner CV
+    # Compute the observed performance using inner CV
     for train_idx, val_idx in skf.split(X_train, y_train):
         model_clone = clone(model)
         model_clone.fit(X_train.iloc[train_idx], y_train.iloc[train_idx])
@@ -797,7 +757,7 @@ def correct_permutation_test(model, X_train, y_train, n_folds=5, n_permutations=
 
     observed_score = np.mean(observed_scores)
 
-    # Step 2: Permutation Testing
+    # Permutation Testing
     permuted_scores = []
     for _ in tqdm(range(n_permutations), desc="Permutation Test"):
         y_permuted = shuffle(y_train, random_state=rng.randint(0, 2**32)).reset_index(drop=True)  # Shuffle labels
@@ -813,7 +773,7 @@ def correct_permutation_test(model, X_train, y_train, n_folds=5, n_permutations=
 
     permuted_scores = np.array(permuted_scores)
 
-    # Step 3: Calculate p-value
+    # Calculate p-value
     p_value = np.mean(permuted_scores >= observed_score)
 
     return p_value, observed_score, permuted_scores

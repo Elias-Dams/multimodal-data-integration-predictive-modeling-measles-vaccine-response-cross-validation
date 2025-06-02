@@ -219,9 +219,7 @@ HEPATITIS_PATHS = {
 
 def get_response_label_hepatitis(row):
     """
-    Determine the antibody response category by checking if the titres on Day 60,
-    Day 180, and Day 365 are all above 12. If they are, label as 'responder';
-    otherwise, label as 'no response - low ab'.
+    Determine the antibody response category
     """
     # if (row['day60'] > 12) and (row['day180'] > 12) and (row['day365'] > 12):
     #     return 'responder'

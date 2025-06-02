@@ -58,7 +58,7 @@ def shap_analysis(model, X_data, explainer=None, background_data=None):
     # Transpose to reorder the axes as needed.
     # found it on(https://stackoverflow.com/questions/65549588/shap-treeexplainer-for-randomforest-multiclass-what-is-shap-valuesi)
     shap_values_ = shap_values.transpose((2, 0, 1))  # Shape: (classes, samples, features)
-    shap_values__ = shap_values_.transpose((1, 0, 2))  # Shape: (samples, classes, features)
+    # shap_values__ = shap_values_.transpose((1, 0, 2))  # Shape: (samples, classes, features)
 
     return shap_values_
 
@@ -66,9 +66,6 @@ def shap_analysis(model, X_data, explainer=None, background_data=None):
 def plot_metrics(metrics_list, average_metric):
     """
     Plot accuracy, F1-macro avg, and F1-weighted avg per fold.
-
-    Parameters:
-    metrics_list: list of dicts - A list where each dict contains 'accuracy', 'f1-macro avg', and 'f1-weighted avg' for each fold.
     """
     # Extract individual metrics across folds
     accuracies = [metrics['accuracy'] for metrics in metrics_list]
@@ -132,18 +129,13 @@ def interpret_conf_matrix(conf_matrix):
 def visualize_class_distribution(y, title="Class Distribution"):
     """
     Visualize the distribution of the target classes in the dataset.
-
-    Parameters:
-    y: pd.Series, np.array, or list - Target variable(s). Can be a list of arrays/series for cross-validation folds.
-    title: str - Title for the plot.
     """
-    # Check if y is a list of labels (e.g., for cross-validation folds)
     if isinstance(y, list):
         # Dictionary to store class distributions and the corresponding fold numbers
         unique_distributions = {}
 
         for i, y_fold in enumerate(y):
-            class_counts = pd.Series(y_fold).value_counts().sort_index()  # Ensure the counts are ordered by class label
+            class_counts = pd.Series(y_fold).value_counts().sort_index()
             class_counts_tuple = tuple(class_counts)  # Convert the class counts to a tuple to use as a key
 
             if class_counts_tuple in unique_distributions:
@@ -156,7 +148,7 @@ def visualize_class_distribution(y, title="Class Distribution"):
         # Now plot the unique distributions
         n_plots = len(unique_distributions)
         fig, axes = plt.subplots(1, n_plots, figsize=(3 * n_plots, 4), sharey=True)
-        axes = axes if n_plots > 1 else [axes]  # Ensure axes is iterable even if there is only one plot
+        axes = axes if n_plots > 1 else [axes]
 
         for (class_counts_tuple, folds), ax in zip(unique_distributions.items(), axes):
             class_labels = range(len(class_counts_tuple))  # Class labels are inferred from the number of counts
@@ -175,8 +167,8 @@ def visualize_class_distribution(y, title="Class Distribution"):
             for bar in bars:
                 height = bar.get_height()
                 ax.annotate(f'{int(height)}',
-                            xy=(bar.get_x() + bar.get_width() / 2, height - 2),  # Position at the top of the bar
-                            xytext=(0, 3),  # 3 points vertical offset
+                            xy=(bar.get_x() + bar.get_width() / 2, height - 2),
+                            xytext=(0, 3),
                             textcoords="offset points",
                             ha='center', va='bottom')
 
@@ -201,8 +193,8 @@ def visualize_class_distribution(y, title="Class Distribution"):
         for bar in bars:
             height = bar.get_height()
             plt.annotate(f'{int(height)}',
-                         xy=(bar.get_x() + bar.get_width() / 2, height-2),  # Position at the top of the bar
-                         xytext=(0, 3),  # 3 points vertical offset
+                         xy=(bar.get_x() + bar.get_width() / 2, height-2),
+                         xytext=(0, 3),
                          textcoords="offset points",
                          ha='center', va='bottom')
 
@@ -212,21 +204,6 @@ def visualize_class_distribution(y, title="Class Distribution"):
 def model_with_shap(X, y, crossval="", n_splits=None, random_state=42, smote=True, model=None, shap_explainer=None, verbose=True):
     """
     Trains a model with optional cross-validation, performs SHAP analysis, and returns performance metrics.
-
-    Parameters:
-    X: pd.DataFrame - Features dataset.
-    y: pd.Series - Target variable.
-    crossval: str - Type of cross-validation ("K-fold" or "Leave-One-Out").
-    n_splits: int - Number of folds for K-fold cross-validation. Default is None.
-    random_state: int - Random state for reproducibility. Default is 42.
-    smote: bool - Whether to apply SMOTE to balance the classes. Default is True.
-    model: model object - Machine learning model to train.
-    shap_explainer: SHAP explainer class - SHAP explainer to use (e.g., shap.KernelExplainer).
-    background_data: pd.DataFrame - Background data for SHAP explainer.
-    verbose: bool - If False, suppresses print statements and only returns metrics.
-
-    Returns:
-    - Dictionary of performance metrics: accuracy, f1-score, precision, and confusion matrix.
     """
 
     results = {}
@@ -324,7 +301,7 @@ def model_with_shap(X, y, crossval="", n_splits=None, random_state=42, smote=Tru
             shap_values = shap_analysis(rf_model, X_test, explainer=shap_explainer, background_data= X_train_resampled)
             shap_values_all_folds.append(shap_values[1])
 
-        # Visualize the class distribution after SMOTE (if applicable)
+        # Visualize the class distribution after SMOTE
         if verbose:
             if smote:
                 visualize_class_distribution(train_labels_per_folds, title="Class Distribution After SMOTE")
