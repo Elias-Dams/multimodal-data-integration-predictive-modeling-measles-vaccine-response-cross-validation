@@ -19,7 +19,6 @@ recall_1_threshold = 0.5
 precision_1_threshold = 0.5
 
 # --- Define column names ---
-# Ensure these names match *exactly* the column headers in your CSV
 test_ba_col = 'Test Balanced_Accuracy'
 p_value_col = 'p-value'
 classification_report_col = 'Test Classification Report' # Column containing the classification report string

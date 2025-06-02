@@ -8,10 +8,6 @@ def plot_evaluation_results(evaluation_results, smote_method):
     """
     Plots a grouped bar plot of Train and Test Balanced Accuracy (with error bars)
     and annotates each model with its p-value. The title includes the oversampling method.
-
-    Parameters:
-    - evaluation_results: List of dictionaries with evaluation metrics.
-    - smote_method: String indicating the oversampling method (e.g., 'smote', 'smote-borderline', etc.)
     """
     # Convert the list of dictionaries into a DataFrame.
     df_eval = pd.DataFrame(evaluation_results)
@@ -77,7 +73,6 @@ def plot_evaluation_results(evaluation_results, smote_method):
     plt.tight_layout()
     plt.show()
 
-    # Optionally, print additional evaluation metrics for each model.
     for idx, row in df_eval.iterrows():
         print(f"\nModel: {row['Model']}")
         print(f"  Train Balanced Accuracy: {row['Train Balanced Accuracy']}")
@@ -96,10 +91,6 @@ def plot_evaluation_results_by_smote(csv_file, output_dir):
     and produces a grouped bar plot for each oversampling method showing:
       - Train and Test Balanced Accuracy (with 95% CI error bars)
       - p-value annotations above the bars.
-
-    Parameters:
-    - csv_file: Path to the CSV file with evaluation results.
-    - output_dir: Directory where the plots will be saved.
     """
     # Read the CSV file
     df = pd.read_csv(csv_file)
@@ -164,7 +155,6 @@ def plot_evaluation_results_by_smote(csv_file, output_dir):
 
 
 
-# Define your folder path(s) for each dataset's evaluation results
 csv_files = [
     "../data_created/SMOTE/Measles/TEST_UNCOMPRESSED_UNBALANCED_TEST_clonal_breadth_data.csv",
     "../data_created/SMOTE/Measles/TEST_UNCOMPRESSED_UNBALANCED_TEST_clonal_depth_data.csv",
@@ -173,7 +163,6 @@ csv_files = [
     "../data_created/SMOTE/Measles/TEST_UNCOMPRESSED_UNBALANCED_TEST_RNa_data_data.csv",
 ]
 
-# Define the output directory where you want to save the plots
 output_dir = "../data_created/SMOTE/Measles/uncompressed_plots_unbalanced"
 os.makedirs(output_dir, exist_ok=True)
 

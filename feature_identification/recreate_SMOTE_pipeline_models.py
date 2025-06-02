@@ -417,7 +417,6 @@ def plot_combined_shap(all_runs_data, TOP_N = 20):
         scaled_array = np.array([p[1] for p in data_list]) / 100.0  # map [0..100] => [0..1]
 
         # create vertical jitter
-        # y_values = [0] * len(shap_vals_array)
         seen = {}
         y_values = []
         for val in shap_vals_array:
