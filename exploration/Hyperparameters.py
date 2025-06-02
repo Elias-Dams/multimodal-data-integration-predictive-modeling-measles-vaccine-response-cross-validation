@@ -165,7 +165,6 @@ def train_and_predict_best_model(X_train, y_train, X_test, y_test, data_name):
             "min_samples_leaf": [1, 2, 4]
         },
         "Naive Bayes": {
-            # GaussianNB has few hyperparameters, but you might consider:
             "var_smoothing": [1e-9, 1e-8, 1e-7]
         }
     }
@@ -196,7 +195,7 @@ def train_and_predict_best_model(X_train, y_train, X_test, y_test, data_name):
             n_permutations=1000, random_state=42
         )
 
-        # Step 2: Remove the random state before training
+        # Remove the random state before training
         result = repeated_cv_confidence_intervals(clone(best_model), X_train, y_train, n_repeats=1000, n_folds=5, ci=0.95)
         print("95% Confidence Interval for Train Score:", result)
 

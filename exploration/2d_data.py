@@ -39,15 +39,13 @@ def plot_pca_with_labels(data_df: pd.DataFrame, dataset_name: str):
     plt.figure(figsize=(10, 8))
     sns.scatterplot(x='Principal Component 1', y='Principal Component 2', hue='Response', data=pca_df)
 
-
-
     # Add text labels for each point (using the 'Sample' column which contains Vaccinee numbers)
     for i in range(pca_df.shape[0]):
         plt.text(pca_df['Principal Component 1'].iloc[i],
                  pca_df['Principal Component 2'].iloc[i],
-                 pca_df['Sample'].iloc[i],  # The text label is the Vaccinee number
+                 pca_df['Sample'].iloc[i],
                  fontsize=9,
-                 ha='right')  # Horizontal alignment (adjust as needed for label placement)
+                 ha='right')  # Horizontal alignment
 
     plt.title(f'PCA of {dataset_name} Data with Sample Labels and Response Coloring')
     plt.xlabel(f'Principal Component 1 ({pca.explained_variance_ratio_[0]:.1%} variance)')
@@ -60,6 +58,4 @@ datasets_merged, abtiters = get_measles_data()
 # Loop through each dataset and plot PCA
 for dataset in datasets_merged.items():
     print(f"Generating PCA plot for: {dataset[0]}")
-    # Ensure the sample names Series index matches the data_df index if needed
-    # For simplicity here, we assume they align or are the same set of samples
     plot_pca_with_labels(dataset[1][f'df'], dataset[0])

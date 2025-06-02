@@ -14,8 +14,6 @@ combined_path = "../data/Combined/module_scores_model_input_all_self_made.csv"
 df_hep = pd.read_csv(hep_path)
 df_measles = pd.read_csv(measles_path)
 
-
-
 # Select only numeric columns from each dataset
 hep_numeric = df_hep.select_dtypes(include=[np.number])
 measles_numeric = df_measles.select_dtypes(include=[np.number])
@@ -52,7 +50,6 @@ plt.title("Comparison of Selected Features Between Hepatitis B and Measles")
 plt.tight_layout()
 plt.show()
 
-# Optionally, check for any columns with NaN values:
 for col in selected_cols:
     if melted[melted["feature"] == col]["value"].isnull().any():
         print(f"Column '{col}' has NaN values.")

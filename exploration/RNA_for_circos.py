@@ -5,10 +5,10 @@ from sklearn.preprocessing import StandardScaler
 
 VACCINE = "Measles"
 
-# Step 1: Read the module scores CSV
+# Read the module scores CSV
 df = pd.read_csv(f"../data/{VACCINE}/module_scores_model_input_all_self_made.csv")
 
-# Step 2: Filter columns: keep "Vaccinee" and columns that end with "EXP0"
+# Filter columns: keep "Vaccinee" and columns that end with "EXP0"
 cols_to_keep = [col for col in df.columns if col == "Vaccinee" or col.endswith("EXP0")]
 df_filtered = df[cols_to_keep].copy()
 
@@ -16,7 +16,7 @@ string_ = "cell cycle"
 count_ = df_filtered.columns.str.contains(string_, case=False).sum()
 print(f"Number of column names containing '{string_}':", count_)
 
-# Step 3: Create a mapping from original names to new names
+# Create a mapping from original names to new names
 # For columns (excluding "Vaccinee") of the form "M15.99.Protein modification_EXP0",
 # we want to get "Protein modification_0" for the first occurrence, "Protein modification_1" for the second, etc.
 mapping = {}
@@ -51,7 +51,7 @@ for col in df_filtered.columns:
 
 print(f"Number of distinct functionalities: '{len(names)}'")
 
-# # Remove columns whose new names contain "TBD"
+# Remove columns whose new names contain "TBD"
 cols_to_keep_final = [col for col in df_filtered.columns if "TBD" not in new_col_names[col]]
 df_filtered = df_filtered[cols_to_keep_final].copy()
 
@@ -77,8 +77,7 @@ def get_base_name(col):
     else:
         return col
 
-
-# 2) Group columns by their base name
+# Group columns by their base name
 grouped_columns = {}
 for col in data_only.columns:
     base = get_base_name(col)
@@ -86,8 +85,8 @@ for col in data_only.columns:
         grouped_columns[base] = []
     grouped_columns[base].append(col)
 
-# 3) For each group of columns with the same base name, do PCA => 1 component
-#    We'll also standardize each group before PCA, so each column has mean=0, var=1
+# For each group of columns with the same base name, do PCA => 1 component
+# We'll also standardize each group before PCA, so each column has mean=0, var=1
 compressed_data = pd.DataFrame(index=data_only.index)  # same rows (subjects) as original
 
 for base_name, cols in grouped_columns.items():

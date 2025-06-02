@@ -56,9 +56,9 @@ if COMPRESS_CORRELATED:
 ###########################################################################
 # SCALE THE FEATURES INDIVIDUALLY
 ###########################################################################
-# When working with multiple datasets measured on different scales , it’s
-# best to normalize each dataset individually before concatenating them.
-# This approach ensures that each set of features is scaled appropriately
+# When working with multiple datasets measured on different scales , I think
+# it’s best to normalize each dataset individually before concatenating them.
+# This ensures that each set of features is scaled appropriately
 # relative to its own distribution, so that no single dataset dominates
 # due to differences in units or variability.
 
