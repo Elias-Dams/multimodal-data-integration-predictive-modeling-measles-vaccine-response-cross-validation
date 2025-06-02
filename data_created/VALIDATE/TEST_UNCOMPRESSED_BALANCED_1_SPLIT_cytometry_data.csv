@@ -1,0 +1,18 @@
+Model,Validation Accuracy,Validation Balanced_Accuracy,Compress_Correlated,Oversampling_Method
+Random Forest,0.47058823529411764,0.5421245421245421,False,smote
+Logistic Regression,0.38235294117647056,0.4413919413919414,False,smote
+SVM,0.38235294117647056,0.4413919413919414,False,smote
+Naive Bayes,0.47058823529411764,0.5567765567765568,False,smote
+Random Forest,0.47058823529411764,0.5421245421245421,False,smote-borderline
+Logistic Regression,0.38235294117647056,0.4413919413919414,False,smote-borderline
+SVM,0.38235294117647056,0.4413919413919414,False,smote-borderline
+Naive Bayes,0.47058823529411764,0.5567765567765568,False,smote-borderline
+Random Forest,0.4117647058823529,0.4945054945054945,False,smote-adasyn
+Logistic Regression,0.35294117647058826,0.40293040293040294,False,smote-adasyn
+SVM,0.38235294117647056,0.4267399267399268,False,smote-adasyn
+Decision Tree,0.4411764705882353,0.5183150183150182,False,smote-adasyn
+Naive Bayes,0.4411764705882353,0.5183150183150182,False,smote-adasyn
+Random Forest,0.5294117647058824,0.5897435897435898,False,smote-smotetomek
+Logistic Regression,0.35294117647058826,0.40293040293040294,False,smote-smotetomek
+SVM,0.38235294117647056,0.4267399267399268,False,smote-smotetomek
+Naive Bayes,0.4411764705882353,0.5183150183150182,False,smote-smotetomek
