@@ -1,8 +1,21 @@
 \addvspace {10\p@ }
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {2.1}{\ignorespaces Diagram of Innate and Adaptive Immunity}}{10}{}%
+\contentsline {figure}{\numberline {2.1}{\ignorespaces Diagram of Innate and Adaptive Immunity}}{4}{figure.caption.1}%
+\contentsline {figure}{\numberline {2.2}{\ignorespaces TCR sequencing Workflow}}{5}{figure.caption.2}%
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {3.1}{\ignorespaces Antibody Titer Trajectories by Response Label}}{14}{}%
-\contentsline {figure}{\numberline {3.2}{\ignorespaces Antibody Titer Trajectories by Original Label (Quadrant)}}{14}{}%
-\contentsline {figure}{\numberline {3.3}{\ignorespaces Correlation heatmap of the cytokine data using Ward.D2 clustering.}}{16}{}%
-\contentsline {figure}{\numberline {3.4}{\ignorespaces Correlation heatmap of the cytometry data using Ward.D2 clustering.}}{17}{}%
+\contentsline {figure}{\numberline {3.1}{\ignorespaces Antibody Titer Trajectories by Response Label}}{8}{figure.caption.3}%
+\contentsline {figure}{\numberline {3.2}{\ignorespaces Antibody Titer Trajectories by Original Label (Quadrant)}}{9}{figure.caption.4}%
+\contentsline {figure}{\numberline {3.3}{\ignorespaces cytokines data correlations}}{11}{figure.caption.5}%
+\contentsline {figure}{\numberline {3.4}{\ignorespaces cytometry data correlations}}{12}{figure.caption.7}%
+\contentsline {figure}{\numberline {3.5}{\ignorespaces RNA data correlations circular}}{13}{figure.caption.9}%
+\contentsline {figure}{\numberline {3.6}{\ignorespaces RNA data correlations}}{14}{figure.caption.10}%
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {4.1}{\ignorespaces Consensus model pipeline diagram}}{16}{figure.caption.11}%
+\contentsline {figure}{\numberline {4.2}{\ignorespaces Illustration of the SMOTE mechanism}}{19}{figure.caption.12}%
+\contentsline {figure}{\numberline {4.3}{\ignorespaces Illustration of SMOTE weaknesses}}{20}{figure.caption.13}%
+\contentsline {figure}{\numberline {4.4}{\ignorespaces Confidence interval estimation diagram using repeated stratified 5-fold cross-validation}}{22}{figure.caption.14}%
+\contentsline {figure}{\numberline {4.5}{\ignorespaces Evaluating model significance via permutation testing and p-value calculation diagram}}{23}{figure.caption.15}%
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\addvspace {10\p@ }
+\addvspace {10\p@ }

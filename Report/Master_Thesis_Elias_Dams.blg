@@ -3,47 +3,44 @@ Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
 The top-level auxiliary file: Master_Thesis_Elias_Dams.aux
 The style file: plain.bst
 Database file #1: references.bib
-Warning--to sort, need author, editor, or key in smoking2014
-Warning--empty author and editor in smoking2014
-You've used 3 entries,
+You've used 11 entries,
             2118 wiz_defined-function locations,
-            516 strings with 4594 characters,
-and the built_in function-call counts, 866 in all, are:
-= -- 81
-> -- 37
+            584 strings with 6600 characters,
+and the built_in function-call counts, 4254 in all, are:
+= -- 403
+> -- 263
 < -- 0
-+ -- 16
-- -- 12
-* -- 61
-:= -- 147
-add.period$ -- 10
-call.type$ -- 3
-change.case$ -- 13
++ -- 106
+- -- 94
+* -- 360
+:= -- 744
+add.period$ -- 39
+call.type$ -- 11
+change.case$ -- 78
 chr.to.int$ -- 0
-cite$ -- 5
-duplicate$ -- 36
-empty$ -- 74
-format.name$ -- 12
-if$ -- 178
+cite$ -- 11
+duplicate$ -- 119
+empty$ -- 284
+format.name$ -- 94
+if$ -- 833
 int.to.chr$ -- 0
-int.to.str$ -- 3
-missing$ -- 4
-newline$ -- 19
-num.names$ -- 4
-pop$ -- 18
+int.to.str$ -- 11
+missing$ -- 12
+newline$ -- 64
+num.names$ -- 22
+pop$ -- 69
 preamble$ -- 1
-purify$ -- 12
+purify$ -- 69
 quote$ -- 0
-skip$ -- 20
+skip$ -- 75
 stack$ -- 0
-substring$ -- 41
-swap$ -- 3
+substring$ -- 258
+swap$ -- 11
 text.length$ -- 0
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 8
-warning$ -- 2
-while$ -- 6
-width$ -- 4
-write$ -- 36
-(There were 2 warnings)
+type$ -- 40
+warning$ -- 0
+while$ -- 37
+width$ -- 13
+write$ -- 133

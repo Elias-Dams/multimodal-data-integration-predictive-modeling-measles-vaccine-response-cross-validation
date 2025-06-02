@@ -51,12 +51,12 @@ produce_cytokine_modules <- function(data, plotTitle, plotsDir){
        cex.lab = 1.5, cex.axis = 1.5, cex.main = 2)
   dev.off()
   
-  row_clusters <- cutree(row_dendrogram, k = 14)
+  row_clusters <- cutree(row_dendrogram, k = 10)
   
-  png(paste0(plotsDir, glue("{plotTitle}_features_clustering_cut.png")), width = 1400, height = 1000, res = 150) # width = 1400, height = 1000,
+  png(paste0(plotsDir, glue("{plotTitle}_features_clustering_cut.png")), width = 2400, height = 1000, res = 150) # width = 1400, height = 1000,
   plot(as.dendrogram(row_dendrogram), main = glue("{plotTitle} Feature Clustering"), sub = "", xlab = "", 
        cex.lab = 1.5, cex.axis = 1.5, cex.main = 2)
-  rect.hclust(row_dendrogram, k = 14, border = "red")
+  rect.hclust(row_dendrogram, k = 10, border = "red")
   dev.off()
   
   png(paste0(plotsDir, glue("{plotTitle}_features_clustering_cut_colors.png")), width = 1400, height = 1000, res = 150) # width = 2800, height = 2000,
@@ -65,9 +65,13 @@ produce_cytokine_modules <- function(data, plotTitle, plotsDir){
   # Plot dendrogram
   plotDendroAndColors(
     dendro = row_dendrogram,
-    colors = clusterColors,         
-    groupLabels = "Clusters",       
-    main = glue("{plotTitle} Feature Clustering")
+    colors = clusterColors,
+    groupLabels = "Clusters",
+    main = glue("{plotTitle} Feature Clustering"),
+    cex.main = 1.5,         # Main title size (adjust as needed)
+    cex.lab = 0.9,          # Group label size ("Clusters") (adjust as needed)
+    cex.dendroLabels = 0.5 # Size for dendrogram leaf labels (feature names) - adjust this
+    # WGCNA functions might also have cex.axis or similar depending on the version/specific plot
   )
   dev.off()
   
@@ -102,9 +106,9 @@ correlation_heatmap <- function(data, plotTitle, plotsDir){
   
 }
 
-test = read.csv("School/Master 2/Thesis/Thesis/data/Measles/________test.csv")
+test = read.csv("/Users/eliasdams/School/Master 2/Thesis/Thesis/data/cytokines_data_copy.csv")
 # Remove the 'Vaccinee' and 'response_label' columns
 test <- test[, !names(test) %in% c("Vaccinee", "response_label")]
 
-produce_cytokine_modules(as.data.frame(test), "________test", "School/Master 2/Thesis/Thesis/R_code/plots/")
+produce_cytokine_modules(as.data.frame(test), "Cytokines", "School/Master 2/Thesis/Thesis/R_code/dendograms/")
 #correlation_heatmap(as.data.frame(test), "Cytometry", "School/Master 2/Thesis/Thesis/R_code/plots/")

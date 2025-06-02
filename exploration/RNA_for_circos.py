@@ -3,9 +3,7 @@ import re
 from sklearn.decomposition import PCA
 from sklearn.preprocessing import StandardScaler
 
-from exploration.SMOTE_models_pipeline import VACCINE
-
-VACCINE = "Combined"
+VACCINE = "Measles"
 
 # Step 1: Read the module scores CSV
 df = pd.read_csv(f"../data/{VACCINE}/module_scores_model_input_all_self_made.csv")
@@ -54,8 +52,8 @@ for col in df_filtered.columns:
 print(f"Number of distinct functionalities: '{len(names)}'")
 
 # # Remove columns whose new names contain "TBD"
-# cols_to_keep_final = [col for col in df_filtered.columns if "TBD" not in new_col_names[col]]
-# df_filtered = df_filtered[cols_to_keep_final].copy()
+cols_to_keep_final = [col for col in df_filtered.columns if "TBD" not in new_col_names[col]]
+df_filtered = df_filtered[cols_to_keep_final].copy()
 
 # Rename the columns in the filtered DataFrame
 df_filtered.rename(columns=new_col_names, inplace=True)
