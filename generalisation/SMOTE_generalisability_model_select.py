@@ -19,7 +19,6 @@ recall_1_threshold = 0.5
 precision_1_threshold = 0.5
 
 # --- Define column names ---
-# Ensure these names match *exactly* the column headers in your CSV
 test_ba_col = 'Test Balanced_Accuracy'
 classification_report_col = 'Test Classification Report' # Column containing the classification report string
 model_col = 'Model'
@@ -30,7 +29,6 @@ random_seed_col = 'Split seed' # Random_seed used for split
 
 num_distinct_seeds_to_consider = 5000
 
-# --- Script Logic ---
 try:
     df_results = pd.read_csv(results_file_path)
 
@@ -42,9 +40,7 @@ try:
         print(f"Error: The CSV file '{results_file_path}' is missing required columns: {', '.join(missing)}")
         exit()
 
-
-
-    # 1. Get the first X distinct random seeds in the order they appear
+    # Get the first X distinct random seeds in the order they appear
     if random_seed_col not in df_results.columns:
         print(f"Error: The random seed column '{random_seed_col}' is not found in the CSV.")
         exit()
@@ -66,7 +62,7 @@ try:
         # Take only the first X distinct seeds
         first_x_distinct_seeds = distinct_seeds_in_order[:num_distinct_seeds_to_consider]
 
-    # 2. Filter the DataFrame to include only rows with these specific seeds
+    # Filter the DataFrame to include only rows with these specific seeds
     df_filtered_by_seeds = df_results[df_results[random_seed_col].isin(first_x_distinct_seeds)].copy()
 
     df_results = df_filtered_by_seeds

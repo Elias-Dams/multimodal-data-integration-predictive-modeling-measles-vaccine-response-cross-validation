@@ -1328,8 +1328,8 @@ def plot_feature_trajectories(feature_trajectories, iterations, title):
     plt.xlabel("Number of Iterations (Splits)")
     plt.ylabel("Median of Mean SHAP Values")
     plt.grid(True, linestyle='--', alpha=0.7)
-    step = max(1, len(iterations) // 21)  # Display roughly 5 labels, adjust 5 as needed
-    plt.xticks(iterations[::step], rotation=45, ha='right')  # Rotate for better readability if needed
+    step = max(1, len(iterations) // 21)
+    plt.xticks(iterations[::step], rotation=45, ha='right')
 
     plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left', borderaxespad=0.)
     plt.tight_layout()
