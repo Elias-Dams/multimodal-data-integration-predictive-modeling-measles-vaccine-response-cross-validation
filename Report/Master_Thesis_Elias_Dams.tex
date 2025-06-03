@@ -180,7 +180,7 @@ The initial measles dataset used is derived from the study by Bartholomeus et al
 In this study, adult volunteers (23 females and 17 males, aged between 19 and 29 years, all of whom were previously primed with \gls{mmr} vaccines in childhood) received a booster dose of Priorix$^{\mbox{\scriptsize\textregistered}}$ and were monitored at four time points (Day 0, Day 21, Day 150, and Day 365) to measure antibody titers and gene expression profiles. In this thesis, the focus will be concentrated specifically on the measles-related data from this dataset. \\
 % Limitations
 \\
-Nevertheless, several challenges must be addressed to realize the full potential of predictive modeling. One challenge in this research is that the dataset comprises only 40 samples. This small sample size limits statistical power and increases the risk of overfitting, making it difficult to generalize the model to a broader population. In addition, the project involves integrating heterogeneous data types, such as cytokine levels, cytometry data, T cell receptor sequences, and \acrshort{rna} profiles. These different modalities come with varying scales and units, which adds complexity to data normalization and feature selection. In addition, any noise or missing values in a small dataset can have a large impact on the model’s performance, potentially leading to biased results. The high number of features (in the \acrshort{rna} data) relative to the number of samples may require careful feature selection or dimensionality reduction to prevent the models from becoming too complex and overfitted. Finally, the objective of performing cross-vaccine marker validation introduces a specific challenge related to potential data leakage during feature selection. Methodologies must carefully ensure that information from the Hepatitis B dataset (e.g., test set performance or labels) does not influence feature selection or model training conducted primarily on the measles dataset (and vice versa). Such leakage could artificially inflate performance metrics and reduce the reliability of identified cross-vaccine markers.
+Nevertheless, several challenges must be addressed to realize the full potential of predictive modeling. One challenge in this research is that the dataset comprises only 40 samples. This small sample size limits statistical power and increases the risk of overfitting, making it difficult to generalize the model to a broader population. In addition, the project involves integrating heterogeneous data types, such as cytokine levels, cytometry data, T cell receptor sequences, and \acrshort{rna} profiles. These different modalities come with varying scales and units, which adds complexity to data normalization and feature selection. In addition, any noise or missing values in a small dataset can have a large impact on the model’s performance, potentially leading to biased results. The high number of features (in the \acrshort{rna} data) relative to the number of samples may require careful feature selection or dimensionality reduction to prevent the models from becoming too complex and overfitted. Finally, the objective of performing cross-vaccine marker validation introduces a specific challenge related to potential data leakage during feature selection. Methodologies must carefully ensure that information from the Measles dataset (e.g., test set performance or labels) does not influence feature selection or model training conducted primarily on the Hepatitis B dataset (and vice versa). Such leakage could artificially inflate performance metrics and reduce the reliability of identified cross-vaccine markers.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
@@ -229,21 +229,75 @@ Together, these three pillars provide a robust defence system that is able to su
 As mentioned above, antibody titers provide a quantitative measure of the concentration of specific antibodies in the blood, making them a reliable indicator of the immune system’s functional response against a pathogen \cite{plotkin2010correlates}. In essence, they reflect the “signal strength” of the response, with high titers indicating robust protection and low titers suggesting a weaker response. In this thesis, antibody titers serve as a crucial biomarker for classifying vaccine responses into strong and weak responders.
 
 \pagebreak
-\section{Background in Computer science}
-\todo{info about the used computer science techniques.
-- Classification\\
-- Classifiers\\
-- Verification of Classifiers\\
-- Balanced Accuracy\\
-- Precision / Recall\\
-}
-\pagebreak
+\section{Background in Computer Science}
+\noindent
+In this thesis, several key computer science concepts, primarily from machine learning, are employed to analyze and interpret multimodal biological data in predicting vaccine responses. Methodologies for addressing class imbalance, such as the \acrfull{smote}, and for understanding model predictions, like \acrfull{shap}, are more central to this work and will be detailed further in the methodology sections (Chapter~\ref{chap:methodology}) of this thesis.
+
+\subsection{Classification}
+Classification is a type of machine learning where the goal is to assign a label or category to a sample, also called an instance or observation, which typically corresponds to one row in a dataset. In this thesis, a sample might represent the biological data of one vaccinated individual. Each sample is described by multiple features (such as gene expression values or immune cell counts), and together these features place the sample in a high-dimensional space, where each axis corresponds to a specific feature of that sample.\\
+\\
+In the simplest case, we deal with binary classification, where there are only two possible outcomes. In this study, those outcomes are: either the person responded to the vaccine (a responder), or they did not (a non-responder). The goal of the classification model is to learn from known examples, where the response is already labeled, and then use that knowledge to make predictions about new, unseen examples.\\
+\\
+In this case you can think of classification as teaching a model to recognize biological patterns. For example, the model is trained on data like immune cell counts or gene expression from individuals whose vaccine response is already known. Over time, it learns to associate certain patterns in this data with responders or non-responders. Once trained, it can predict the response for new individuals based on their biological measurements.\\
+\\
+However, one important risk in training such models is called overfitting. Overfitting happens when a model becomes too good at memorizing the training data, including small details or noise that don’t apply generally. This means it might perform very well on the training set but fail to make accurate predictions on new, unseen data. Instead of learning general patterns, it has simply memorized specific examples. A well-designed classification model aims to avoid this by focusing on patterns that are likely to hold true across different datasets, not just the one it was trained on.
+
+\subsection{Classifiers}
+Classifiers are algorithms or models used to implement classification tasks. This thesis utilizes several classifiers, each selected for their unique strengths and applicability to biological data:
+\begin{itemize}
+    \item \textbf{Logistic Regression}: A statistical model used for binary classification that estimates the probability of a sample belonging to a class using a sigmoid function. This model may perform poorly when the true relationship between features and the target is highly non-linear or complex.
+    \item \textbf{Decision Trees}: Intuitive models that split data into subsets based on feature values, forming a tree of decision rules. They are easy to interpret and visualize, and handle both numerical and categorical data. However, they are prone to overfitting, especially with deep trees or noisy data.
+    \item \textbf{Random Forest}: An ensemble method that constructs multiple decision trees and combines their predictions to improve generalization. This makes them more robust and accurate than a single decision tree and less sensitive to overfitting. A disadvantage is that they are less interpretable and more computationally intensive than individual trees.
+    \item \textbf{Support Vector Machine (SVM)}: A classifier that finds the optimal boundary (hyperplane) that maximally separates different classes. SVMs are effective in high-dimensional spaces and with clear margins of separation. On the other hand, they can be slow to train and are also less effective when classes are not well-separated.
+    \item \textbf{Gaussian Naive Bayes}: A probabilistic classifier based on Bayes’ theorem that models continuous features using Gaussian distributions and assumes feature independence. It is highly efficient and performs well on small datasets or when the independence assumption is approximately valid. However, its performance can degrade when features are strongly correlated.
+\end{itemize}
+
+\subsection{Verification of Classifiers}
+Verification of classifiers involves assessment of their predictive capabilities on unseen data to ensure reliability and generalization, thus avoiding overfitting. Techniques used include:
+\begin{itemize}
+\item \textbf{Cross-Validation}: This technique repeatedly partitions the dataset into subsets, training models on a majority of subsets and validating performance on the remaining subset. It robustly estimates how models perform on unseen data.
+\item \textbf{Permutation Testing}: A statistical method where the labels of the dataset are randomly shuffled multiple times, and the model performance is evaluated on these permuted datasets. It determines if the model's observed predictive performance is significantly better than random chance.
+\end{itemize}
+
+\subsection{Performance Metrics}
+Performance evaluation metrics are crucial for understanding and quantifying classifier effectiveness. These metrics rely on counts of correct and incorrect predictions, categorized as follows:
+\begin{itemize}
+\item \textbf{True Positives (TP)}: Correctly identified positive cases.
+\item \textbf{True Negatives (TN)}: Correctly identified negative cases.
+\item \textbf{False Positives (FP)}: Incorrectly identified negative cases as positive (Type I error).
+\item \textbf{False Negatives (FN)}: Incorrectly identified positive cases as negative (Type II error).
+\end{itemize}
+\noindent
+\textbf{Precision} measures the accuracy of positive predictions, critical when false positives are costly:
+\[
+\textbf{Precision} = \frac{\text{TP}}{\text{TP} + \text{FP}}
+\]
+\noindent
+\textbf{Recall} (or sensitivity) assesses how effectively actual positives are identified, essential when missing positives is especially detrimental:
+\[
+\textbf{Recall} = \frac{\text{TP}}{\text{TP} + \text{FN}}
+\]
+\noindent
+\textbf{Accuracy} is one of the most basic evaluation metrics in classification and measures the overall proportion of correctly predicted samples. It is calculated as:
+\[
+\textbf{Accuracy} = \frac{\text{TP} + \text{TN}}{\text{TP} + \text{TN} +  \text{FP} + \text{FN}}
+\]
+While easy to interpret, accuracy can be misleading in datasets where the classes are imbalanced. For example, if 90\% of samples belong to one class, a model that always predicts that majority class will achieve 90\% accuracy, even if it completely fails to recognize the minority class.\\
+\\
+\noindent
+\textbf{Balanced Accuracy} offers a more informative view in such scenarios. It equally weights performance across classes by averaging recall for each class:
+\[
+\textbf{Balanced Accuracy} = \frac{1}{2} \left(\frac{\text{TP}}{\text{TP} + \text{FN}} + \frac{\text{TN}}{\text{TN} + \text{FP}}\right)
+\]
+This metric ensures that the evaluation accurately reflects the classifier’s ability to correctly identify instances across both majority and minority classes, making it highly relevant for the imbalanced biological data analyzed in this thesis.
+
+\subsection{\acrfull{pca}}
+\acrfull{pca} is a dimensionality reduction technique used to simplify complex datasets. \acrshort{pca} works by transforming a set of potentially correlated variables into a new set of uncorrelated variables called \textbf{principal components}. These principal components represent linear combinations of the original features and are ordered such that the first principal component captures the largest possible variance from the dataset. Each subsequent component captures progressively less variance and remains orthogonal (uncorrelated) to all preceding components. Thus, when \acrshort{pca} is applied to a dataset with $n$ features, it generates $n$ principal components, each accounting for a decreasing proportion of the dataset's total variance.\\
+\\
+In the context of this thesis, \acrshort{pca} serves multiple critical purposes. First, it reduces redundancy in the data by projecting correlated features into a smaller number of uncorrelated principal components. This transformation simplifies the dataset and can improve predictive performance by mitigating issues such as multicollinearity. Second, \acrshort{pca} facilitates visualization by projecting high-dimensional data onto two dimensions using the principal components capturing the most significant variance. Such visualization helps to reveal inherent patterns, clusters, and potential outliers, thus providing clearer insights into the dataset’s underlying structure, which would otherwise be difficult to discern in high-dimensional feature spaces.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-
-
-
-
+\pagebreak
 \chapter{Data Description and Preprocessing}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \noindent
@@ -259,7 +313,9 @@ Defining a successful immune response following vaccination can be complex, part
 The original source study \cite{bartholomeus2020transcriptomic} employed a hierarchical clustering method (using Euclidean distance and Ward's linkage on longitudinal IgG titers) based on these antibody titer evolution patterns to classify subjects into more granular response groups, effectively avoiding potentially biased arbitrary cut-off values. The study identified four primary response clusters: High Ab, Low Ab, Long response, and Peak response.
 For visualization purposes, these original classifications were consolidated into three categories displayed in Figure~\ref{fig:titer_original_label}: \texttt{responder}, \texttt{no response - high ab} (representing individuals with high baseline antibody levels who did not show a significant increase), and \texttt{no response - low ab} (representing individuals with low baseline levels who also did not show a significant increase).\\
 \\
-Figure~\ref{fig:titer_original_label} displays the antibody titer trajectories for each subject over the four measured time points, with lines colored according to these response categories. The x-axis displays the time points at which measurements were taken: Day 0 (post-vaccination), Day 21, Day 150, and Day 365.The y-axis indicates the antibody titer level. Each line follows the trajectory of an individual subject. The visualization highlights distinct dynamic patterns associated with these categories. Subjects classified as \texttt{responder} typically exhibit a pronounced increase in antibody titers following vaccination, primarily between Day 0 and Day 21, before a gradual decline. Conversely, the non-responder groups generally show more stable trajectories. The \texttt{no response - high ab} group maintains high titers throughout, while the \texttt{no response - low ab} group maintains low titers, neither showing the significant early boost characteristic of the responders. This visual distinction shows how pre-existing titers can influence the observed response pattern, where individuals with high baseline levels may not show a significant increase upon re-vaccination as their immune system is already primed and maintaining high antibody production.\\
+Figure~\ref{fig:titer_original_label} displays the antibody titer trajectories for each subject over the four measured time points, with lines colored according to these response categories. The x-axis displays the time points at which measurements were taken: Day 0 (post-vaccination), Day 21, Day 150, and Day 365.The y-axis indicates the antibody titer level. Each line follows the trajectory of an individual subject. Subplots A–C each show per-subject trajectories for one response group: (A) responders, (B) no response – low ab, and (C) no response – high ab. Panel D combines all three groups for comparison.\\
+\\
+The visualization highlights distinct dynamic patterns associated with these categories. Subjects classified as \texttt{responder} typically exhibit a pronounced increase in antibody titers following vaccination, primarily between Day 0 and Day 21, before a gradual decline. Conversely, the non-responder groups generally show more stable trajectories. The \texttt{no response - high ab} group maintains high titers throughout, while the \texttt{no response - low ab} group maintains low titers, neither showing the significant early boost characteristic of the responders. This visual distinction shows how pre-existing titers can influence the observed response pattern, where individuals with high baseline levels may not show a significant increase upon re-vaccination as their immune system is already primed and maintaining high antibody production.\\
 \begin{figure}[h!]
   \centering
   \hspace*{-0.5cm}
@@ -303,6 +359,7 @@ To identify \gls{tcr} clones likely involved in this Measles-specific response, 
 Together, breadth and depth, provide a comprehensive view of the T cell immune response, characterizing both the diversity of the responding clones and the magnitude of their expansion.
 
 \subsection{\acrshort{rna} Data}
+\label{subsec:rna_data_construction}
 The \acrshort{rna} data utilized in this study was constructed from two primary sources. The first source comprised raw \acrshort{rna} read counts, provided in a matrix format where rows represented individual patients and columns corresponded to detected genes. The second source was a curated list of gene modules. These modules, known as BloodGen3 \cite{Altman2021BloodGen3}, group genes based on co-expression patterns identified across 985 unique blood transcriptome profiles from studies of diverse immune conditions. Each module also has an assigned biological function.\\
 \\
 To transform the raw gene-level read counts into a more interpretable and lower-dimensional representation, module scores were calculated. This process involved iterating through each defined gene module. For a given module, the read count data for its member genes were extracted across all patients. Before calculating module scores, the raw \acrshort{rna} read counts were first normalized using DESeq2 to account for library size and \acrshort{rna} composition differences between samples. Using these normalized gene expression values helps ensure that differences in gene-level expression scales do not disproportionately influence the module score. For further information on the DESeq2 normalization method, see the vignette PDF \cite{DESeq2Manual2025}. Subsequently, a single representative score for each module in each patient was derived by calculating the first principal component of the standardized expression values for the genes within that module using \gls{pca}. The resulting module score encapsulates the overall activity or expression pattern of the gene set comprising the module within each patient sample. This transformation yields a dataset where each row represents a patient and each column represents the calculated score for a specific gene module.
@@ -326,7 +383,7 @@ In my analysis, I group highly correlated features using hierarchical clustering
   \label{fig:cytokine_heatmap}
 \end{figure}
 \noindent
-The following cytokine clusters were obtained from the WGCNA hierarchical clustering analysis. The clustering reveals groups of cytokines with high inter-correlation, suggesting potential co-regulation or shared functional pathways. (For the corresponding dendrogram, refer to Figure~\ref{fig:Cytokines_features_clustering_cut_colors} in Appendix~\ref{chap:dendrograms_and_feature_interpretations}).
+The following cytokine clusters were obtained from the WGCNA hierarchical clustering analysis. The clustering reveals groups of cytokines with high inter-correlation, suggesting potential co-regulation or shared functional pathways. (For the corresponding dendrogram, refer to Figure~\ref{fig:Cytokines_features_clustering_cut_colors} in Appendix~\ref{appendix:cytokine_features_clusterings}).
 
 \begin{table}[h!]
     \centering
@@ -354,7 +411,7 @@ The following cytokine clusters were obtained from the WGCNA hierarchical cluste
   \label{fig:cytometry_heatmap}
 \end{figure}
 \noindent
-At Day~0, the heatmap reveals high correlation coefficients (e.g., 0.89--0.99) among \acrshort{rbc}, \acrshort{hgb}, and \acrshort{hct}, and similar correlation patterns emerge at Day~0, Day~21, Day~180, and Day~365, reinforcing their consistent co-variation over time. Even when only Day~0 is considered. (For the corresponding dendrogram, refer to Figure~\ref{fig:Cytometry_features_clustering_cut_colors} in Appendix~\ref{chap:dendrograms_and_feature_interpretations}).
+At Day~0, the heatmap reveals high correlation coefficients (e.g., 0.89--0.99) among \acrshort{rbc}, \acrshort{hgb}, and \acrshort{hct}, and similar correlation patterns emerge at Day~0, Day~21, Day~180, and Day~365, reinforcing their consistent co-variation over time. Even when only Day~0 is considered. (For the corresponding dendrogram, refer to Figure~\ref{fig:Cytometry_features_clustering_cut_colors} in Appendix~\ref{appendix:cytometry_features_clusterings}).
 \begin{table}[h!]
     \centering
     \begin{tabular}{ll}
@@ -386,7 +443,7 @@ The \acrshort{rna} dataset presented a greater challenge for correlation analysi
 \end{figure}
 
 \noindent
-The same heatmap visualization technique (as used for Figures~\ref{fig:cytokine_heatmap} and~\ref{fig:cytometry_heatmap}) was applied to the \acrshort{rna} dataset, using a total of 36 cuts to correspond to the 36 different \acrshort{rna} modules identified through hierarchical clustering. Selecting 36 cuts was challenging, but this number provided a reasonable balance between capturing distinct clusters and maintaining interpretability. The heatmap effectively highlights clear blocks of positively (red) and negatively (blue) correlated features. The precise cut point within the hierarchical tree that resulted in these 36 modules is visually represented in Figure~\ref{fig:RNA_features_clustering_cut_colors} (Appendix~\ref{chap:dendrograms_and_feature_interpretations}). For further details of the features comprising each of the 36 identified RNA modules, please refer to Table~\ref{tab:clustered_terms_RNA}, located in the Supplemental Material.
+The same heatmap visualization technique (as used for Figures~\ref{fig:cytokine_heatmap} and~\ref{fig:cytometry_heatmap}) was applied to the \acrshort{rna} dataset, using a total of 36 cuts to correspond to the 36 different \acrshort{rna} modules identified through hierarchical clustering. Selecting 36 cuts was challenging, but this number provided a reasonable balance between capturing distinct clusters and maintaining interpretability. The heatmap effectively highlights clear blocks of positively (red) and negatively (blue) correlated features. The precise cut point within the hierarchical tree that resulted in these 36 modules is visually represented in Figure~\ref{fig:RNA_features_clustering_cut_colors} (Appendix~\ref{appendix:rna_features_clusterings}). For further details of the features comprising each of the 36 identified RNA modules, please refer to Table~\ref{tab:clustered_terms_RNA}, located in the Supplemental Material.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
@@ -394,6 +451,7 @@ The same heatmap visualization technique (as used for Figures~\ref{fig:cytokine_
 
 
 \chapter{Methodology: Modeling and Feature Selection for Measles}
+\label{chap:methodology}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %\todo{Explain your pipeline for exploratory analysis, model building, and selection of stable predictive features, highlighting the specific challenges and how they were overcome.}
 \section{Consensus Model Approach}
@@ -576,6 +634,7 @@ A consensus prediction was derived by applying majority voting across these indi
 The overall performance of the consensus prediction on the test set yielded an accuracy of 0.667 and a balanced accuracy of 0.400. A more detailed breakdown of the consensus performance is provided by the classification report:
 \begin{table}[h!]
     \centering
+    \scalebox{0.8}{%
     \begin{tabular}{l c c c c}
         \toprule
         Class & Precision & Recall & F1-Score & Support \\
@@ -587,7 +646,7 @@ The overall performance of the consensus prediction on the test set yielded an a
         Macro Avg & 0.40 & 0.40 & 0.40 & 6 \\
         Weighted Avg & 0.67 & 0.67 & 0.67 & 6 \\
         \bottomrule
-    \end{tabular}
+    \end{tabular}}
     \caption[Consensus Classification Report Uncompressed Features]{Consensus Classification Report for Uncompressed Features}
     \label{tab:consensus_report_uncompressed}
 \end{table}
@@ -620,6 +679,7 @@ A consensus prediction was derived by applying majority voting across these indi
 The overall performance of the consensus prediction on the test set yielded an accuracy of 0.833 and a balanced accuracy of 0.500. A more detailed breakdown of the consensus performance is provided by the classification report:
 \begin{table}[h!]
     \centering
+    \scalebox{0.8}{%
     \begin{tabular}{l c c c c}
         \toprule
         Class & Precision & Recall & F1-Score & Support \\
@@ -631,7 +691,7 @@ The overall performance of the consensus prediction on the test set yielded an a
         Macro Avg & 0.42 & 0.50 & 0.45 & 6 \\
         Weighted Avg & 0.69 & 0.83 & 0.76 & 6 \\
         \bottomrule
-    \end{tabular}
+    \end{tabular}}
     \caption[Consensus Classification Report Compressed Features]{Consensus Classification Report for Compressed Features}
     \label{tab:consensus_report_compressed}
 \end{table}
@@ -668,7 +728,7 @@ Given that simple majority voting did not produce exceptional consensus results,
 
 
 %\section{SMOTE-Driven Oversampling and SHAP-Based Feature Interpretation Approach}
-\pagebreak
+
 \section{Feature Identification Methodology}
 \noindent
 Given the constraints imposed by the limited dataset ($N=40$), particularly the small number of samples available for independent testing, a primary objective of this study was to explore and identify potentially important features associated with the vaccine response. Standard approaches for model selection and rigorous performance evaluation typically rely on larger validation or test sets to provide reliable estimates of out-of-sample performance and prevent overfitting during the selection process. However, as discussed in the previous section, the extremely small size of our test set ($n=6$) introduces substantial uncertainty into any performance metric, as demonstrated by the large standard errors and wide Clopper-Pearson confidence intervals. While a test set size of $n=8$ offers a marginal improvement in reducing the width of the confidence interval compared to an even smaller sample like $n=6$, it still leaves a significant degree of uncertainty, rendering traditional rigorous model selection based on distinct validation/test splits highly problematic and potentially less informative than desired.\\
@@ -679,11 +739,6 @@ Recognizing these severe data limitations, my approach to feature identification
 \label{subsec:pipeline_structure_for_Heterogeneous_datasets}
 To systematically implement the exploratory strategy outlined above a standardized computational pipeline was employed (very similar to the pipeline in Section~\ref{sec:consensus_model_approach}). This pipeline, visually detailed in Figure~\ref{fig:pipeline-2}, ensures consistency in data handling, model training, and the generation of performance metrics across all experimental conditions. It encompasses crucial steps from initial data preprocessing and targeted oversampling of the training data to model fitting and the assessment of performance on the hold-out test set. The models generated and evaluated through this workflow form the basis for the subsequent performance filtering and aggregation of \gls{shap} values aimed at identifying potentially important features. The following sections describe each stage of this pipeline.
 
-\subsubsection{Preprocessing \hyperref[fig:pipeline-2]{(A, B, C, F)}}
-\noindent The initial data preparation steps, specifically handling missing data \hyperref[fig:pipeline-2]{(A)}, compressing correlated features \hyperref[fig:pipeline-2]{(B)}, and encoding class labels \hyperref[fig:pipeline-2]{(C)}, and later scaling the features \hyperref[fig:pipeline-2]{(F)}, were performed using the identical procedures as detailed in Section~\ref{sec:consensus_model_approach}.
-
-
-\pagebreak
 \begin{figure}[H]
   \centering
   \hspace*{-0.9cm} % Adjust spacing as needed
@@ -691,6 +746,9 @@ To systematically implement the exploratory strategy outlined above a standardiz
   \caption[Feature Identification models pipeline diagram]{ The diagram illustrates the multi-model pipeline used for constructing the models.  Each individual model follows a standardized preprocessing workflow: data loading, preprocessing (A: Missing data handling, B: Feature compression, C: Label encoding, F: Feature scaling), data splitting (D), training set oversampling using various \gls{smote} techniques (E), model training, and evaluation (G). Performance on train and test sets is measured by Balanced Accuracy, with 95\% bootstrap confidence intervals and p-value testing, repeated across datasets and \gls{smote} methods as illustrated.}
   \label{fig:pipeline-2}
 \end{figure}
+
+\subsubsection{Preprocessing \hyperref[fig:pipeline-2]{(A, B, C, F)}}
+\noindent The initial data preparation steps, specifically handling missing data \hyperref[fig:pipeline-2]{(A)}, compressing correlated features \hyperref[fig:pipeline-2]{(B)}, and encoding class labels \hyperref[fig:pipeline-2]{(C)}, and later scaling the features \hyperref[fig:pipeline-2]{(F)}, were performed using the identical procedures as detailed in Section~\ref{sec:consensus_model_approach}.
 
 \subsubsection*{Split dataset \hyperref[fig:pipeline-2]{(D)}}
 As mentioned earlier, due to the extreme data scarcity ($N=40$), the decision was made to partition the data into a training set comprising of 80\% of the samples ($n=32$) and a hold-out test set containing the remaining 20\% ($n=8$). Further splitting the training data to create a separate validation set would drastically reduce the number of samples available for model training, likely impairing the models' ability to learn meaningful patterns from the data. Furthermore, dividing the test set further would make the individual subsets too small to yield any statistically stable or meaningful performance estimates as discussed in the previous Section~\ref{sec:findings_for_consensus_model}. Therefore, I made the pragmatic decision to use the performance observed \textit{only} on the hold-out test set ($n=8$) as a preliminary criterion for filtering models whose \gls{shap} explanations would be further analyzed and aggregated.\\
@@ -769,7 +827,9 @@ Knowing which factors contribute to a model's prediction is essential, especiall
 \\
 To assess feature importance and provide interpretable explanations for the models, \gls{shap} \cite{ApprouchForModelPredictions} was used. \gls{shap} is a unified framework rooted in cooperative game theory, using Shapley values to assess the contribution of each feature to the difference between an individual prediction and the average prediction. Formally, the \gls{shap} value of a feature for a specific instance represents the average marginal contribution of that feature's value to the prediction, considering all possible combinations of features. A fundamental property of \gls{shap} values is their additivity, which provides a clear link between feature contributions and the model's output. For any given instance $x$, the \gls{shap} values ($\phi_i$) for all features $i=1, \dots, M$ sum up to the difference between the model's output for that instance, $f(x)$, and the expected base value (average output) over the dataset, $E[f(x)]$. This relationship can be formally expressed as:
 $$ f(x) = E[f(x)] + \sum_{i=1}^M \phi_i $$
+\noindent
 Here, $E[f(x)]$ represents the base value of the prediction, which is typically the average prediction over the training data or a representative background dataset. The \gls{shap} value $\phi_i$ for feature $i$ quantifies the feature's contribution to pushing the prediction from this base value $E[f(x)]$ to the final output $f(x)$. A feature with a positive \gls{shap} value ($\phi_i > 0$) increases the model's output relative to the base value, while a negative \gls{shap} value ($\phi_i < 0$) decreases it, as illustrated in Figure~\ref{fig:SHAP-individual-explained}. For binary classification models, \gls{shap} values are typically on the log-odds scale.\\
+
 % images based on https://shap.readthedocs.io/en/latest/example_notebooks/overviews/An%20introduction%20to%20explainable%20AI%20with%20Shapley%20values.html
 \begin{figure}[h!]
   \centering
@@ -777,15 +837,7 @@ Here, $E[f(x)]$ represents the base value of the prediction, which is typically 
   \caption[Example \gls{shap} Individual Explanation Plot]{An example \gls{shap} individual explanation plot for a single instance (sample x). This plot illustrates how each feature's value contributes to the model's prediction for this specific instance, moving from the expected base value ($E[f(x)] = 2.215$) to the final predicted output ($f(x) = 2.846$). Each arrow represents a feature's \gls{shap} value ($\phi_i$); red arrows indicate positive contributions that increase the output, while blue arrows indicate negative contributions that decrease the output. The width of each arrow corresponds to the magnitude of the feature's impact. Features are listed on the left along with their actual values for this instance.}
   \label{fig:SHAP-individual-explained} % Corrected label for clarity
 \end{figure}
-
-\begin{figure}[h!]
-  \centering
-  \includegraphics[width=0.9\textwidth]{images/SHAP-explained.png}
-  \caption[Example \gls{shap} Summary Plot]{An example \gls{shap} summary plot. This visualization shows the overall importance of features and how their values impact the model's output across a dataset. Features are ranked by importance on the y-axis, the x-axis represents the impact (\gls{shap} value), and the color indicates the feature value (low to high). Points on the left push the prediction towards the negative class, while points on the right push it towards the positive class. Points corresponding to the \gls{shap} values from an individual explanation (as shown in Figure~\ref{fig:SHAP-individual-explained}) are highlighted in green for context.}
-  \label{fig:SHAP-plot-explained}
-\end{figure}
-\noindent
-A common and informative visualization of \gls{shap} values across an entire dataset (or a representative subset) is the \gls{shap} summary plot, an example of which is shown in Figure~\ref{fig:SHAP-plot-explained}. This  plot is essentially an aggregation of the individual \gls{shap} explanation plots (like Figure~\ref{fig:SHAP-individual-explained}) for many instances and provides a rich overview of feature importance and the relationship between feature values and their impact on model predictions. Interpreting the \gls{shap} summary plot involves understanding its key components:
+\noindent A common and informative visualization of \gls{shap} values across an entire dataset (or a representative subset) is the \gls{shap} summary plot, an example of which is shown in Figure~\ref{fig:SHAP-plot-explained}. This  plot is essentially an aggregation of the individual \gls{shap} explanation plots (like Figure~\ref{fig:SHAP-individual-explained}) for many instances and provides a rich overview of feature importance and the relationship between feature values and their impact on model predictions. Interpreting the \gls{shap} summary plot involves understanding its key components:
 \pagebreak
 \begin{itemize}
     \item \textbf{Y-axis:} Features are listed on the vertical axis, ordered by their overall importance from top to bottom. A feature's overall importance is typically measured by the average of the absolute \gls{shap} values for that feature across all instances in the plot. Features higher on the list have a greater average impact on the magnitude of the model's output difference from the average prediction.
@@ -793,6 +845,13 @@ A common and informative visualization of \gls{shap} values across an entire dat
     \item \textbf{Color:} Each point on the plot is colored according to the actual value of the feature it represents for that specific data instance. The color bar shown on the right (as in Figure~\ref{fig:SHAP-plot-explained}), maps the color to the feature value scale (e.g., red indicates a high feature value, and blue indicates a low feature value). This allows for examining how the value of a feature relates to the direction and magnitude of its impact.
     \item \textbf{Each point:} Represents the \gls{shap} value ($\phi_i$) for a single data instance. For each feature (row on the y-axis), the plot displays a distribution of points along the x-axis. The horizontal spread and density of points for a single feature illustrate the variability in its impact across different data points.
 \end{itemize}
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=0.9\textwidth]{images/SHAP-explained.png}
+  \caption[Example \gls{shap} Summary Plot]{An example \gls{shap} summary plot. This visualization shows the overall importance of features and how their values impact the model's output across a dataset. Features are ranked by importance on the y-axis, the x-axis represents the impact (\gls{shap} value), and the color indicates the feature value (low to high). Points on the left push the prediction towards the negative class, while points on the right push it towards the positive class. Points corresponding to the \gls{shap} values from an individual explanation (as shown in Figure~\ref{fig:SHAP-individual-explained}) are highlighted in green for context.}
+  \label{fig:SHAP-plot-explained}
+\end{figure}
+\noindent
 Calculating exact Shapley values is computationally intensive for most models. Therefore, estimation methods are used to approximate them. KernelSHAP \cite{ApprouchForModelPredictions} is model-agnostic, so the approach is designed to estimate \gls{shap} values for any type of machine learning model. It approximates the Shapley values by fitting a weighted linear regression model. The process involves sampling numerous coalitions of features, where a coalition is simply a subset of the original features. For each sampled coalition, a corresponding data instance is created (typically by using the feature values from the instance being explained for features in the coalition, and replacing the values of absent features with values from a background dataset). The original machine learning model then makes a prediction for each of these created instances. These predictions serve as the target variable in a linear regression model, where the input features are binary indicators representing whether each original feature was present in the coalition. This regression is weighted using the \gls{shap} kernel, which is designed to give specific weights to different coalition sizes to ensure that the coefficients of the linear model approximate the Shapley values. The coefficients ($\beta_i$) of this fitted weighted linear model are the estimated \gls{shap} values ($\phi_i$). While general and theoretically connected to Shapley values, KernelSHAP can be computationally slow due to the sampling and regression steps.\\
 \\
 In contrast to model-agnostic methods, TreeSHAP \cite{Lundberg2019TreeSHAP} is a \gls{shap} variant specifically optimized for tree-based machine learning models, including Decision Trees and Random Forest models. TreeSHAP significantly reduces the computational complexity compared to general methods like KernelSHAP by efficiently leveraging the inherent structure of decision trees to compute \gls{shap} values. For individual decision trees, TreeSHAP can compute exact \gls{shap} values (or very good approximations) much faster than KernelSHAP. For ensembles of trees, such as Random Forests, the final \gls{shap} value for a feature is typically the average of the \gls{shap} values computed for that feature in each individual tree in the ensemble. TreeSHAP provides a much more efficient approach for interpreting this important class of models.\\
@@ -809,21 +868,11 @@ By examining the distribution of points for each feature, their spread along the
 % }
 While \gls{shap} is capable of providing global feature importance for a single model, identifying features that are truly and robustly influential across different modeling approaches is crucial in this study. Due to the inherent limitations of the dataset, including its relatively small size and potential complexity, individual models trained under various conditions might not achieve consistently high or "perfect" accuracy. In such scenarios, relying solely on the global feature importance derived from a single model could potentially lead to conclusions that are overly specific to that model or the particular data balancing strategy used.\\
 \\
-Therefore, to obtain a more robust and generalizable assessment of feature importance, a strategy was adopted that involved calculating and aggregating \gls{shap} values across a selection of models trained with diverse algorithms and various \gls{smote}-based oversampling techniques. By analyzing the \gls{shap} explanations from multiple models that demonstrated promising performance on the evaluation criteria outlined in Subsection~\ref{subsec:pipeline_structure_for_heterogeneous_datasets} (referencing the model evaluation step), the aim was to find consensus among these models regarding which features were most influential. This aggregation strategy provides a more confident assessment of feature importance, highlighting features whose impact appears consistent and significant despite variations in the model architecture and the data preparation method. This approach seeks to identify features that are more likely to represent true and stable associations with vaccine response, thereby providing a more robust explanation of the underlying data patterns.\\
-\begin{figure}[h!]
-  \centering
-  \hspace*{-1.5cm}
-  \includegraphics[width=1.2\textwidth]{images/SHAP-aggregate.png}
-  \caption[Aggregation of \gls{shap} Values Across Multiple Models]{Illustration of the process for aggregating \gls{shap} values across multiple trained models to derive robust global feature importance. For each individual model included in the analysis (Models 1-5 shown as examples), standard SHAP summary plots (left panels) visualize feature importance and impact distribution for that specific model. The overall importance of each feature within the model is further quantified by normalized mean absolute \gls{shap} values (middle panels). These per-model normalized importance measures were then aggregated by calculating the median normalized mean absolute \gls{shap} value for each feature across all models (indicated by text and calculations on the right), which determined the global ranking of features. The final panel on the far right, the Combined \gls{shap} Dot Plot, visualizes all individual \gls{shap} values from all contributing models for each feature on a single, shared X-axis, with features sorted vertically by their aggregated median importance. Points are colored by the feature's original value. This combined plot provides a consolidated view of the distribution and consistency of feature impacts across diverse models and data balancing strategies, serving as a more robust representation of global feature importance than individual model explanations alone.}
-  \label{fig:SHAP-aggregate-explained}
-\end{figure}
+Therefore, to obtain a more robust and generalizable assessment of feature importance, a strategy was adopted that involved calculating and aggregating \gls{shap} values across a selection of models trained with diverse algorithms and various \gls{smote}-based oversampling techniques. By analyzing the \gls{shap} explanations from multiple models that demonstrated promising performance on the evaluation criteria outlined in Subsection~\ref{subsec:pipeline_structure_for_heterogeneous_datasets} (referencing the model evaluation step), the aim was to find consensus among these models regarding which features were most influential. This aggregation strategy enables a more robust assessment of feature importance by identifying features with consistent impact across models and data preparation methods, suggesting stable associations with vaccine response.\\
 \\
-\noindent
-To determine a robust global ranking of feature importance across the multiple models evaluated, \gls{shap} values from the selected models were aggregated. For each individual model included in the analysis, the overall importance of each feature within that model was first quantified by calculating the mean absolute \gls{shap} value for that feature across all the explained instances for that model. These per-model mean absolute \gls{shap} values were then normalized. This normalization step was performed to ensure that each model contributed approximately equally to the subsequent aggregation, preventing models with generally larger or smaller \gls{shap} value scales from dominating the combined importance ranking.\\
+For each individual model included in the analysis, the overall importance of each feature within that model was first quantified by calculating the mean absolute \gls{shap} value for that feature across all the explained instances for that model. These per-model mean absolute \gls{shap} values were then normalized. This normalization step was performed to ensure that each model contributed approximately equally to the subsequent aggregation, preventing models with generally larger or smaller \gls{shap} value scales from dominating the combined importance ranking.\\
 \\
-To derive a single, aggregated measure of importance for each feature across all the selected models, the normalized mean absolute \gls{shap} values for that feature were collected from every model in which it was present. The median of these per-model normalized mean absolute \gls{shap} values was then calculated for each feature. Using the median helps to reduce the influence of potentially extreme importance scores from any single model or noise. Features were subsequently ranked in descending order based on these calculated median aggregated normalized mean absolute \gls{shap} values, which determined their vertical order in the combined summary plot, as illustrated in Figure~\ref{fig:SHAP-aggregate-explained}.
-
-\pagebreak
+To derive a single, aggregated measure of importance for each feature across all the selected models, the normalized mean absolute \gls{shap} values for that feature were collected from every model in which it was present. The median of these per-model normalized mean absolute \gls{shap} values was then calculated for each feature. Using the median helps to reduce the influence of potentially extreme importance scores from any single model or noise. Features were subsequently ranked in descending order based on these calculated median aggregated normalized mean absolute \gls{shap} values, which determined their vertical order in the combined summary plot, as illustrated in Appendix~\ref{appendix:shap_aggregation}, Figure~\ref{fig:SHAP-aggregate-explained}.
 
 \subsection{Limitations of \gls{smote}-\gls{enn}}
 \noindent
@@ -831,7 +880,7 @@ While various oversampling and undersampling techniques were explored to address
 \\
 \gls{smote}-\gls{enn} combines the \acrfull{smote}, which generates synthetic samples for the minority class, with \acrfull{enn}, a technique that removes samples (both synthetic and original) considered "noisy" if their class label differs from the majority of their neighbors as seen in Figure~\ref{fig:SMOTE-ENN}. In practice, particularly with potentially noisy biological data, this combined approach was found to be excessively aggressive. It led to the generation of a significant number of synthetic samples while simultaneously removing a substantial portion of the original data points from the training set. This process resulted in training datasets that were not representative of the true underlying data distribution, potentially introducing bias and hindering the model's ability to generalize to unseen data.\\
 \\
-The consequence of this aggressive resampling was observed in the inconsistent and often unreliable performance of models trained with \gls{smote}-\gls{enn} on the unseen test set. Despite achieving seemingly good performance on the modified training data (as be indicated by cross-validation scores), the models' performance on the original, unmodified test set varied significantly, sometimes appearing high potentially due to chance or overfitting to the distorted training distribution, and other times being very poor. This unpredictability raised concerns about the reliability of any model trained using this method for downstream interpretation.\\
+The consequence of this aggressive resampling was observed in the inconsistent and often unreliable performance of models trained with \gls{smote}-\gls{enn} on the unseen test set. Despite achieving seemingly good performance on the modified training data (as indicated by cross-validation scores), the models' performance on the original, unmodified test set varied significantly. Sometimes appearing high potentially due to chance or overfitting to the distorted training distribution, and other times being very poor. This unpredictability raised concerns about the reliability of any model trained using this method for downstream interpretation.\\
 \begin{figure}[h!]
     \centering
 
@@ -914,7 +963,7 @@ The consequence of this aggressive resampling was observed in the inconsistent a
 \end{figure}
 
 \noindent
-To visually demonstrate the impact of \gls{smote}-\gls{enn}'s aggressive sampling on the data distribution, we utilized \acrfull{pca} for dimensionality reduction, projecting the training data into a 2-dimensional space. Figure~\ref{fig:smote-enn-example-1} illustrates the effect of applying \gls{smote}-\gls{enn} to the Cytokines dataset. Figure~\ref{fig:smote-enn-example-1}a shows a summary of Balanced Accuracy scores on the training and test sets for various models trained with \gls{smote}-\gls{enn}. Figure~\ref{fig:smote-enn-example-1}b visualizes the \gls{pca}-reduced training space after \gls{smote}-\gls{enn} application for a representative model (e.g., an SVM, chosen for visualization clarity), highlighting the synthetic samples generated by \gls{smote} (e.g., circled in red) and the original samples that were removed by the \gls{enn} step (e.g., marked with a cross). Figures~\ref{fig:smote-enn-example-1}c and \ref{fig:smote-enn-example-1}d further show the decision boundary learned by the representative model in this distorted \gls{pca} space, illustrating what the model is learning from the modified data.\\
+To visually demonstrate the impact of \gls{smote}-\gls{enn}'s aggressive sampling on the data distribution, \acrfull{pca} was utilized for dimensionality reduction, projecting the training data into a 2-dimensional space. Figure~\ref{fig:smote-enn-example-1} illustrates the effect of applying \gls{smote}-\gls{enn} to the Cytokines dataset. Figure~\ref{fig:smote-enn-example-1}a shows a summary of Balanced Accuracy scores on the training and test sets for various models trained with \gls{smote}-\gls{enn}. Figure~\ref{fig:smote-enn-example-1}b visualizes the \gls{pca}-reduced training space after \gls{smote}-\gls{enn} application for a representative model (e.g., an SVM, chosen for visualization clarity), highlighting the synthetic samples generated by \gls{smote} (e.g., circled in red) and the original samples that were removed by the \gls{enn} step (e.g., marked with a cross). Figures~\ref{fig:smote-enn-example-1}c and \ref{fig:smote-enn-example-1}d further show the decision boundary learned by the representative model form the distorted data distribution in the \gls{pca} space, illustrating what the model is learning from this modified data.\\
 \\
 A similar visualization was performed for the Cytometry dataset (Figure~\ref{fig:smote-enn-example-2}), using a different representative model (e.g., a Naive Bayes classifier, also chosen for visualization clarity). Figure~\ref{fig:smote-enn-example-2}a presents the Balanced Accuracy scores for models trained with \gls{smote}-\gls{enn} on this dataset. Figure~\ref{fig:smote-enn-example-2}b visualizes the \gls{pca}-reduced training space, clearly showing the generated synthetic samples and the removed original samples. In the case of the Cytometry dataset with \gls{smote}-\gls{enn}, it was observed that the training set for the minority class contained very few original samples, with the vast majority being synthetic. This severe distortion of the original data distribution made it questionable whether any model trained on such a set could reliably capture the true underlying patterns relevant to predicting outcomes on real, unseen data, even if it happened to score well on the small test set (potentially due to chance or severe overfitting).\\
 \\
@@ -967,19 +1016,26 @@ For the Cytokines dataset, applying the selection criteria resulted in the follo
 \end{table}
 \begin{figure}[h!]
     \centering
+    \includegraphics[width=0.9\textwidth]{images/elbow_plot_cytokines_uncompressed.png}
+    \caption[Elbow plot for Cytokines]{Elbow plot showing the ranked trajectory of aggregated \gls{shap} values for the Cytokines dataset. These values are identical to those visualized in the aggregated SHAP summary plot in Figure~\ref{fig:cytokines_aggregated_shap}, and are used here to determine a feature selection cutoff point.}
+    \label{fig:elbow_plot_cytokines_uncompressed}
+\end{figure}
+\begin{figure}[h!]
+    \centering
     \includegraphics[width=0.9\linewidth]{images/Aggregated_SHAP_cytokines_uncompressed.png}
     \caption[Aggregated SHAP plot for Cytokines]{Aggregated SHAP summary plot for the Cytokines dataset.}
     \label{fig:cytokines_aggregated_shap}
 \end{figure}
 
+
 \noindent
-Given the number of features in the dataset, identifying a clear numerical threshold for feature importance can be challenging, as importance is relative and context-dependent. Therefore, the \textbf{elbow method}, commonly used in contexts like clustering (e.g., to determine the optimal number of clusters) or Principal Component Analysis (e.g., to select the number of components based on explained variance), was employed as a data-driven approach to help distinguish features with a more substantial impact from those with diminishing returns in importance.\\
+Given the number of features in the dataset, identifying a clear numerical threshold for feature importance can be challenging, as importance is relative and context-dependent. Therefore, the elbow method, commonly used in contexts like clustering (e.g., to determine the optimal number of clusters) or Principal Component Analysis (e.g., to select the number of components based on explained variance), was employed as a data-driven approach to help distinguish features with a more substantial impact from those with diminishing returns in importance.\\
 \\
-This method involves plotting aggregated feature importance values (in this case, \gls{shap} values) in descending order and identifying the point where the rate of decline changes most sharply—the "elbow." This point serves as a natural cutoff, separating key features from those with minimal added value. To identify the elbow point objectively, the \texttt{KneeLocator} function from the \texttt{kneed} Python package was used.\\
+This method involves plotting aggregated feature importance values (in this case, \gls{shap} values) in descending order and identifying the point where the rate of decline changes most sharply, the "elbow." This point serves as a natural cutoff, separating key features from those with minimal added value. To identify the elbow point objectively, the \texttt{KneeLocator} function from the \texttt{kneed} Python package was used, as illustrated in Figure~\ref{fig:elbow_plot_cytokines_uncompressed}.\\
 \\
 Figure~\ref{fig:cytokines_aggregated_shap} presents the aggregated \gls{shap} summary plot for the Cytokines dataset, with features sorted by their aggregated importance. Based on the elbow method applied to these importance values (indicated visually by the dotted line in Figure~\ref{fig:cytokines_aggregated_shap}), the features identified as most influential for predicting vaccine response are those ranked above the elbow point. These features are: VEGF (1.000), IL-8 (0.8140), Eotaxin (0.6792) and Fractalkine (0.3907).\\
 \\
-Examining the aggregated \gls{shap} plot for these top features reveals patterns in how their values influence model output. For features like IL-8 and Eotaxin, higher values (red points) are linked to positive \gls{shap} values, pushing predictions toward the positive class, while lower values (blue points) tend to reduce the output. In contrast, features like VEGF and Fractalkine show the opposite trend: higher values are associated with negative \gls{shap} values, steering the model toward the negative class, and lower values push it toward the positive class.
+Examining the aggregated \gls{shap} plot for these top features reveals patterns in how their values influence model output. For features like IL-8 and Eotaxin, higher feature values (red points) are linked to positive \gls{shap} values, pushing predictions toward the positive class, while lower values (blue points) are often linked to neutral or negative SHAP values, contributing less or pushing predictions toward the negative class. In contrast, features like VEGF and Fractalkine show the opposite trend: higher feature values are associated with negative \gls{shap} values, steering the model toward the negative class, and lower feature values push it toward the positive class.
 
 \subsubsection*{Cytometry Dataset Results}
 For the Cytometry dataset, applying the same selection criteria resulted in the following models being chosen for aggregated \gls{shap} analysis (see Table~\ref{tab:cytometry_selected_models_uncompressed}):\\
@@ -1021,15 +1077,16 @@ For the Cytometry dataset, applying the same selection criteria resulted in the 
 \begin{figure}[h!]
     \centering
     \includegraphics[width=0.9\linewidth]{images/Aggregated_SHAP_cytometry_uncompressed.png}
-    \caption[Aggregated SHAP plot for Cytometry]{Aggregated \gls{shap} summary plot for the Cytometry dataset.}
+    \caption[Aggregated SHAP plot for Cytometry]{Aggregated \gls{shap} summary plot for the Cytometry dataset. The same SHAP values are used in the elbow plot shown in Appendix~\ref{appendix:elbow_plots}, Figure~\ref{fig:elbow_plot_cytomery_uncompressed}, where the cutoff is visualised.}
     \label{fig:cytometry_aggregated_shap}
 \end{figure}
+
 \noindent
 Figure~\ref{fig:cytometry_aggregated_shap} illustrates the ranked importance of features based on their aggregated \gls{shap} values for the Cytometry dataset. At the forefront of importance is \gls{wbc}, with an aggregated importance score of 0.8599. The \gls{shap} value distribution for \gls{wbc} reveals a clear pattern: higher \gls{wbc} values (indicated by red points) correspond to negative \gls{shap} values, pushing the model's prediction towards the negative class (e.g., non-responder), while lower \gls{wbc} values (blue points) correspond to positive \gls{shap} values, pushing the model's prediction towards the positive class (e.g., responder).\\
 \\
 This inverse trend, where higher feature values push towards the negative class and lower values push towards the positive class, is also visible for \%\acrshort{gra} (Granulocytes percentage). Although \%\acrshort{gra} was not selected as one of the primary influential features by the elbow method, its consistent pattern makes it an interesting observation.\\
 \\
-In contrast,\%\acrshort{lym} (Lymphocyte percentage), with an importance of 0.7187, exhibits a direct relationship. Here, higher \%\acrshort{lym} values (red points) contribute positively to the model's output (positive \gls{shap} values), while lower values (blue points) reduce it (negative \gls{shap} values). This suggests that higher lymphocyte percentages are predictive of a stronger modeled vaccine response.\\
+In contrast,\%\acrshort{lym} (Lymphocyte percentage), with an importance of 0.7187, exhibits a direct relationship. Here, higher \%\acrshort{lym} values contribute positively to the model's output (positive \gls{shap} values), while lower values reduce it (negative \gls{shap} values). This suggests that higher lymphocyte percentages are predictive of a stronger modeled vaccine response.\\
 \\
 Based on the elbow method, the most influential features for predicting vaccine response from the Cytometry dataset are: \gls{wbc} (0.8599), \acrshort{rbc} (0.7431), \%\acrshort{lym} (0.7187), and \acrshort{hgb} (0.4698). While the specific \gls{shap} value distributions for \acrshort{rbc} and \acrshort{hgb} are not explicitly detailed, their inclusion based on the elbow method highlights their overall importance in the model's predictive framework.
 
@@ -1068,7 +1125,7 @@ For the \acrshort{rna} dataset, which comprises 382 features, the application of
 \begin{figure}[h!]
     \centering
     \includegraphics[width=0.85\linewidth]{images/Aggregated_SHAP_RNA_uncompressed.png}
-    \caption[Aggregated SHAP plot for SHAP]{Aggregated SHAP summary plot for the SHAP dataset.}
+    \caption[Aggregated SHAP plot for SHAP]{Aggregated SHAP summary plot for the SHAP dataset. The same SHAP values are used in the elbow plot shown in Appendix~\ref{appendix:elbow_plots}, Figure~\ref{fig:elbow_plot_rna_uncompressed}, where the cutoff is visualised.}
     \label{fig:rna_aggregated_shap}
 \end{figure}
 
@@ -1077,7 +1134,7 @@ Given the large number of features in the \acrshort{rna} dataset (382), the aggr
 \\
 Based on the elbow point indicated by the dotted line in Figure~\ref{fig:rna_aggregated_shap}, the most influential features for predicting vaccine response are those ranked above this threshold. These top features include: Gene transcription.30 (0.7434), Protein modification.18 (0.7260), Protein synthesis.9 (0.6968), Antigen presentation.1 (0.6863), Erythroid cells.14 (0.4386), Protein phosphorylation (0.4357), Cell cycle.2 (0.3480), Plasma cells (0.3405), Monocytes.4 (0.3244), Protein modification.9 (0.2933), Monocytes.3 (0.2901), and Gene transcription.7 (0.2499).\\
 \\
-Examining the aggregated \gls{shap} plot for these 12 features reveals consistent patterns in their influence on model output. For features such as Gene transcription.30, Antigen presentation.1, and Gene transcription.7, higher values (red points) are associated with positive \gls{shap} values, pushing predictions toward the positive class, while lower values (blue points) reduce the model's output. In contrast, features like Protein modification.18, Protein synthesis.9, Erythroid cells.14, Monocytes.4 and Monocytes.3 show the opposite pattern: higher values correspond to negative \gls{shap} values, steering predictions toward the negative class, while lower values have a positive effect.
+Examining the aggregated \gls{shap} plot for these 12 features reveals consistent patterns in their influence on model output. For features such as Gene transcription.30, Antigen presentation.1, and Gene transcription.7, higher values are associated with positive \gls{shap} values, pushing predictions toward the positive class, while lower values reduce the model's output. In contrast, features like Protein modification.18, Protein synthesis.9, Erythroid cells.14, Monocytes.4 and Monocytes.3 show the opposite pattern: higher values correspond to negative \gls{shap} values, steering predictions toward the negative class, while lower values have a positive effect.
 
 \subsubsection*{Clonal Depth and Breadth Dataset Results}
 For the Clonal Depth dataset, the application of the selection criteria resulted in the models listed in Table~\ref{tab:clonal_depth_models} being chosen for aggregated \gls{shap} analysis. These models actually scored very good with a test accuracy of 100\%.\\
@@ -1298,8 +1355,7 @@ Some features show a median mean \gls{shap} value of 0, both in compressed and u
     \label{fig:feature_trajectories_plots3}
 \end{figure}
 \pagebreak
-\noindent
-The empirical assessment of feature importance stability across numerous iterations and data partitions leads to several critical conclusions regarding the reliability of our model interpretations.\\
+\noindent The empirical assessment of feature importance stability across numerous iterations and data partitions leads to several critical conclusions regarding the reliability of our model interpretations.\\
 \\
 Firstly, a highly robust finding across all datasets is the consistent directional influence of features. Regardless of compression applied or fluctuations in their absolute importance ranking, if a feature's higher values consistently pushed predictions towards a specific class in one split, this qualitative relationship was preserved across all iterations. This consistent directional impact provides a reliable and biologically interpretable basis for understanding feature effects, even when quantitative importance scores vary.\\
 \\
@@ -1384,25 +1440,36 @@ To gain an initial understanding of the overall data structure and to assess pot
     \caption[\gls{pca} of Multimodal Data from Measles and Hepatitis B Studies]{Subfigure (a) displays the \gls{pca} of Cytometry data, where samples from both studies largely overlap after normalization. In contrast, Subfigure (b) shows the \gls{pca} of \acrshort{rna} data, where samples from the Measles and Hepatitis B studies clearly cluster separately.}
     \label{fig:m&h_pca_both}
 \end{figure}
-
 \noindent
-The observations from this analysis are visually presented in Figure \ref{fig:m&h_pca_both}. For the cytometry data, samples from both studies largely overlapped after normalization, suggesting that study-specific (batch) effects were minimal in this modality, indicating good comparability.\\
+The observations from this analysis are visually presented in Figure \ref{fig:m&h_pca_both}. For the cytometry data, samples from both studies largely overlapped after normalization, suggesting that technical (batch) effects were minimal. We therefore assumed that any remaining differences would primarily reflect underlying biological variability between cohorts.\\
 \\
-Crucially, however, for the \acrshort{rna} dataset, the \gls{pca} revealed a pronounced separation, with samples from the Measles study and the Hepatitis B study forming distinct, separate clusters. This clear clustering indicates a significant study-specific (batch) effect dominating the primary variance in the \acrshort{rna} data. Such a separation suggests underlying technical differences in data generation or inherent biological differences between the two cohorts that extend beyond the specific vaccine responses being studied.\\
+In contrast, the \acrshort{rna} data revealed a pronounced separation along the first principal component, with samples from the Measles and Hepatitis B cohorts forming two distinct clusters. This strong separation is likely attributable to a substantial technical artifact introduced by the RNA sequencing process, which is known to be a very sensitive experiment and thus highly susceptible to batch effects.\\
 \\
-It was precisely this pronounced and confounded separation in the \acrshort{rna} data that led to the decision not to proceed with standard batch effect removal. This decision was based on our findings and thoughts about how the experimental setup mixed study-specific differences with real biological variations.\\
+In principle, batch effect removal would be appropriate to improve comparability across cohorts. However, in this case, the batch effect is strongly entangled with biological signal. While the dominant source of variation appears to stem from technical aspects of the experimental setup, these are confounded with biologically meaningful features, such as vaccine-specific immune signatures. As discussed by Leek et al. (2010)~\cite{Leek2010Tackling}, batch effects become most problematic when they are confounded with the outcome of interest, as this makes it difficult or impossible to disentangle technical variation from genuine biological signal.\\
 \\
-Firstly, despite normalization, the initial exploratory data analysis using \acrfull{pca} on the cytometry data revealed only minimal inter-study batch effects. This suggested that the data was relatively clean. However, even with this cleaner dataset, attempts at cross-dataset model transfer were unsuccessful. Specifically, models trained on the Measles data performed poorly when used to predict the Hepatitis B response. The accuracy remained consistently low and often approximated random chance. This strongly indicated that the main obstacle to generalization was not just technical batch variation. Instead, it pointed to fundamental biological differences. These differences likely reflect distinct vaccine response mechanisms or predictive patterns between the Measles and Hepatitis B cohorts.\\
+Correcting for such a prominent effect could therefore risk stripping away relevant biology along with the unwanted noise. Given this risk and in light of practical time constraints, we decided against applying standard batch correction methods to the RNA data. The goal was to preserve the integrity of biologically meaningful patterns, even at the cost of leaving technical artifacts uncorrected. Instead, subsequent modeling and interpretation efforts focus on the cytometry data, which did not exhibit strong technical batch effects and is thus better suited for cross-study comparison and generalizability analysis.
+
+\section{Batch Effect Removal Strategies}
+\noindent
+Although batch effect removal was not applied in this study, several commonly used correction techniques are outlined below for context. Additionally, the section specifies briefly where such methods could have been integrated into the analysis.\\
 \\
-Secondly, the high-dimensional nature of the \acrshort{rna} data (comprising 382 features), combined with the \gls{pca}-observed separation, highlighted a dominant "batch effect" between the Measles and Hepatitis B study samples. However, the interpretation of this separation is complex due to the inherent confounding in the study design. As discussed by Leek et al. (2010) \cite{Leek2010Tackling}, batch effects become a major concern when they are correlated (confounded) with an outcome of interest. In this scenario, the "batch" variable (i.e., whether the sample originated from the Measles study or the Hepatitis B study) is perfectly confounded with the specific biological context of the vaccine response itself (Measles-induced immunity versus Hepatitis B-induced immunity). This means that the observed differences between the two study clusters are an inseparable mix of purely technical variations (e.g., differences in lab protocols, reagents, instrument calibration) and genuine biological distinctions in how the immune system responds to each vaccine.\\
+A foundational approach to mitigating batch effects is data normalization, which adjusts measurements to remove non-biological variability between samples. For example, quantile normalization aligns the distribution of gene expression intensities across microarray samples~\cite{bolstad2003normalization}, and scaling methods like the trimmed mean of M-values (TMM) perform a similar role for RNA-seq count data~\cite{robinson2010tmm}.\\
 \\
-Given this level of correlation, correcting for such a strong "batch effect" posed a serious methodological risk. Most batch correction methods operate under the assumption that the variation they remove is purely technical. They assume it is unrelated to the biological signal we care about. But in this case, the "batch effect" appeared to overlap with real biological differences. These differences likely reflect study-specific immune responses to each vaccine. If that's true, then applying standard batch correction could do more harm than good. It might strip away meaningful biological variation along with the noise. Over-normalizing the data could erase important immune signatures that are unique to each vaccine. Instead of clarifying the biology, it could blur the distinct patterns we need to understand. Given these considerations, removing the batch effect was not expected to improve the generalizability of the models. On the contrary, it might reduce our ability to detect valuable, context-specific insights into how each vaccine works. Therefore, the cross-study generalizability assessment and feature importance validation for predictive modeling will be primarily focused on the cytometry dataset.
+Beyond normalization, more specific methods have been developed to correct for batch effects. One commonly used approach is the ComBat algorithm~\cite{johnson2007combat}, which adjusts the data by estimating and removing batch-related differences using a statistical technique called empirical Bayes. It works well even when some batches contain only a small number of samples. Another widely used method is based on linear modeling, as implemented in the limma package~\cite{ritchie2015limma}. Instead of directly changing the data, limma includes the batch information in its statistical model, so that the effect of batch can be accounted for when analyzing gene expression differences. This helps separate the biological variation of interest from technical noise and is especially useful when working with many genes but only a few samples per group.\\
+\\
+In single-cell and other multi-omics contexts, where multiple datasets or modalities must be combined, data integration techniques serve to correct batch effects while aligning shared biological structures. The mutual nearest neighbors (MNN) algorithm \cite{haghverdi2018mnn} identifies pairs of cells that are mutual nearest neighbors across batches in high-dimensional space, using these pairings to calculate correction vectors and align single-cell datasets. Close to this, the Seurat v3 \cite{stuart2019seurat} integration method employs an anchor-based strategy, anchoring biologically similar cells across different datasets to enable joint analysis of single-cell data across experiments or even across modalities. This process works by identifying cells that represent shared biological states (anchors) despite technical variations between datasets, effectively serving as 'bridges' to align the data. Once these anchors are identified, the method learns a transformation to correct for batch effects, allowing cells from different sources or technologies to be co-analyzed in a unified, biologically meaningful space. Another tool, Harmony \cite{korsunsky2019harmony} iteratively adjusts for batch differences while accounting for multiple experimental factors, enabling integrated analysis of large multi-batch single-cell or multi-omics datasets. In essence, Harmony works by repeatedly identifying groups of similar cells across different datasets within a pre-reduced low-dimensional space (typically derived from an initial dimensionality reduction to manage complexity). It then iteratively adjusts their positions in this space until these groups are consistently positioned based on biological similarity rather than batch origin.\\
+\\
+In single-cell and other multi-omics studies, different datasets often need to be combined. To help with this, several integration methods have been developed that reduce batch effects while keeping the biological signals aligned. One example is the mutual nearest neighbors (MNN) algorithm~\cite{haghverdi2018mnn}, which finds cells from different batches that are most similar to each other and uses these pairings to adjust the data so that the batches line up better. Similarly, the Seurat v3 method~\cite{stuart2019seurat} looks for “anchors”, cells that are biologically similar across datasets, and uses them to guide the alignment. This helps to combine data from different experiments or technologies into one shared space. Another method, Harmony~\cite{korsunsky2019harmony}, adjusts the positions of cells in a low-dimensional space so that cells with similar biology are grouped together, even if they came from different batches. These integration tools are especially useful in single-cell studies.\\
+\\
+Although no such correction was performed in the current study, if batch effects were to be addressed, this would be done after normalization but before the PCA-based module scoring described in Section~\ref{subsec:rna_data_construction}. In that case, ComBat or the limma package would be appropriate choices, given their robustness in moderate sample sizes and compatibility with normalized count data.
+
+
 
 \section{Cross-Study Prediction Methodology}
 \noindent
 To evaluate the generalizability of the insights derived from the Measles vaccine response data, a cross-study prediction assessment was performed. This involved applying models trained exclusively on the Measles dataset to an entirely independent cohort stimulated with the Hepatitis B vaccine, using the same set of features (from the cytometry data). The primary objective was to determine whether predictive patterns learned in one vaccine response context (Measles) could effectively transfer and predict outcomes in another (Hepatitis B).\\
 \\
-It is important to note that the extensive 500-iteration analysis was essential for establishing the robustness and stability of feature importance by averaging out split-dependent variability. However, this approach does not yield a single, consolidated model suitable for direct application or visualization. Therefore, to demonstrate specific model performance and to visualize decision boundaries, the selected representative models from the initial training-test split that met the predefined performance criteria where used (see Section~\ref{subsec:feature_identification}). The features identified as important in these single-split models closely align with those consistently highlighted across the 500-iteration analysis, suggesting that these models reflect robust patterns rather than chance performance.\\
+It is important to note that the extensive 500-iteration analysis was essential for establishing the robustness and stability of feature importance by averaging out split-dependent variability. However, this approach does not yield a single, consolidated model suitable for direct application or visualization. Therefore, to demonstrate specific model performance and to visualize decision boundaries, the selected representative models from the initial training-test split that met the predefined performance criteria were used (see Section~\ref{subsec:feature_identification}). The features identified as important in these single-split models closely align with those consistently highlighted across the 500-iteration analysis, suggesting that these models reflect robust patterns rather than chance performance.\\
 \\
 The overall outcome of the cross-study prediction was modest. Models trained on the Measles dataset exhibited low accuracy when applied to the Hepatitis B validation data. As shown in Table \ref{tab:cytometry_selected_models_Validated}, the balanced accuracy ranged from 0.40 to 0.58, and overall accuracy from 0.35 to 0.53. This generally low performance indicates limited direct transferability of predictive models between these two distinct vaccine response contexts.\\
 
@@ -1501,13 +1568,12 @@ As seen in the figure, both models capture some separation within the Measles da
 \noindent
 Since the direct transferability was limited, the next step was to apply iterative analysis of the full modeling pipeline independently to the Hepatitis B dataset, following the same approach used for the Measles data in Section~\ref{subsec:stability_of_model_interpretations_across_splits}. This analysis aimed to assess the convergence of feature importance values by determining if the features identified as important for Hepatitis B vaccine response, and critically, the directions in which their values influence the final predictions (e.g., higher values pushing towards a positive outcome), remained consistent and stable across numerous Hepatitis B-specific data splits. This process was designed to build a robust, internally validated understanding of the key predictive features within the Hepatitis B vaccine response context, allowing for a direct comparison with the features deemed important in the Measles study, and thus assessing the generalizability of these feature-level insights across different vaccine responses. The findings from this analysis are presented in the following section.
 
-\pagebreak
 \section{Hepatitis B Analysis and Feature Generalizability}
 \noindent
 After seeing that models trained on Measles data didn’t transfer well to Hepatitis B, an analysis was done on the Hepatitis B dataset to explore its own feature importance landscape. Early modeling attempts showed that high predictive performance, such as training accuracy above 0.8, was rarely achieved. This suggested that the signal in this dataset is more difficult to capture. To build a stable picture of feature importance, the train accuracy threshold for selecting models was lowered to 0.70. This change was a practical trade-off. It allowed enough models to be included for reliable estimation of median SHAP values, even though each model performed only moderately well. To make sure these feature importance values were stable and not just due to randomness, the pipeline was run 5000 times. Each run used a different random train-test split. Over time, the SHAP values for key features stabilized, indicating that the estimates had converged.\\
 \\
 This iterative analysis revealed a distinct set of consistently important features for Hepatitis B vaccine response, as shown in Figure \ref{fig:stable_features_cytometry_hepatitis}. A finding from this Hepatitis B analysis is that the specific features deemed important for Hepatitis B vaccine response are largely different from those consistently identified for Measles vaccine response (see Figure~\ref{fig:stable_features_cytometry}). This dissimilarity in key predictive features directly explains why models trained on Measles data generally performed poorly when directly applied to the Hepatitis B cohort.
-\begin{figure}[H]
+\begin{figure}[h!]
     \centering
 
     \begin{subfigure}[b]{0.48\textwidth}
@@ -1559,10 +1625,11 @@ In conclusion, the multimodal data integration pipeline developed in this study 
 
 \appendix
 
-\chapter{Dendrograms and Feature clusters}
+\chapter{Supplementary Figures and Methods}
 \label{chap:dendrograms_and_feature_interpretations}
 
 \section{Cytokine Features Clustering}
+\label{appendix:cytokine_features_clusterings}
 
 \begin{figure}[H]
     \centering
@@ -1572,6 +1639,7 @@ In conclusion, the multimodal data integration pipeline developed in this study 
 \end{figure}
 
 \section{Cytometry Features Clustering}
+\label{appendix:cytometry_features_clusterings}
 \begin{figure}[H]
     \centering
     \includegraphics[width=\linewidth]{images/Cytometry_features_clustering_cut_colors.png}
@@ -1580,6 +1648,7 @@ In conclusion, the multimodal data integration pipeline developed in this study 
 \end{figure}
 
 \section{RNA Features Clustering}
+\label{appendix:rna_features_clusterings}
 \begin{figure}[h!]
     \centering
     \includegraphics[width=1.4\linewidth, angle=270]{images/RNA_features_clustering_cut_colors.png}
@@ -1683,13 +1752,35 @@ In conclusion, the multimodal data integration pipeline developed in this study 
 \textbf{cluster37} & TBD, TBD.1, TBD.2, TBD.3, TBD.4, TBD.5,  ... , TBD.174\\
 \end{longtable}
 
+\pagebreak
 
+\section{SHAP Value Aggregation Across Models}
+\label{appendix:shap_aggregation}
 
+\begin{figure}[h!]
+  \centering
+  \hspace*{-1.5cm}
+  \includegraphics[width=1.2\textwidth]{images/SHAP-aggregate.png}
+  \caption[Aggregation of \gls{shap} Values Across Multiple Models]{Illustration of the process for aggregating \gls{shap} values across multiple trained models to derive robust global feature importance. For each individual model included in the analysis (Models 1-5 shown as examples), standard SHAP summary plots (left panels) visualize feature importance and impact distribution for that specific model. The overall importance of each feature within the model is further quantified by normalized mean absolute \gls{shap} values (middle panels). These per-model normalized importance measures were then aggregated by calculating the median normalized mean absolute \gls{shap} value for each feature across all models (indicated by text and calculations on the right), which determined the global ranking of features. The final panel on the far right, the Combined \gls{shap} Dot Plot, visualizes all individual \gls{shap} values from all contributing models for each feature on a single, shared X-axis, with features sorted vertically by their aggregated median importance. Points are colored by the feature's original value. This combined plot provides a consolidated view of the distribution and consistency of feature impacts across diverse models and data balancing strategies, serving as a more robust representation of global feature importance than individual model explanations alone.}
+  \label{fig:SHAP-aggregate-explained}
+\end{figure}
 
+\subsection{Elbow Plots for Feature Selection}
+\label{appendix:elbow_plots}
 
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=\textwidth]{images/elbow_plot_cytometry_uncompressed.png}
+    \caption[Elbow plot for Cytometry]{Elbow plot showing the ranked trajectory of aggregated \gls{shap} values for the Cytometry dataset. These values are identical to those visualized in the aggregated SHAP summary plot in Figure~\ref{fig:cytometry_aggregated_shap}, and are used here to determine a feature selection cutoff point.}
+    \label{fig:elbow_plot_cytomery_uncompressed}
+\end{figure}
 
-
-
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=\textwidth]{images/elbow_plot_rna_uncompressed.png}
+    \caption[Elbow plot for RNA]{Elbow plot showing the ranked trajectory of aggregated \gls{shap} values for the RNA dataset. These values are identical to those visualized in the aggregated SHAP summary plot in Figure~\ref{fig:cytometry_aggregated_shap}, and are used here to determine a feature selection cutoff point.}
+    \label{fig:elbow_plot_rna_uncompressed}
+\end{figure}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
