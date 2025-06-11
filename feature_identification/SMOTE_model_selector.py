@@ -4,8 +4,8 @@ import os
 
 # --- Define your criteria ---
 dataname = "RNa_data"
-compression = "COMPRESSED" # Or "COMPRESSED" as needed
-results_file_path = f'../data_created/SMOTE/Measles/TEST_{compression}_BALANCED_1_{dataname}_data.csv'
+compression = "UNCOMPRESSED" # Or "COMPRESSED" as needed
+results_file_path = f'../data_created/SMOTE/Measles/TEST_{compression}_BALANCED_1_SPLIT_{dataname}_data.csv'
 
 # Overall performance criteria
 test_ba_threshold = 0.5
