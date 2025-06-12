@@ -250,7 +250,7 @@ Together, these three pillars provide a robust defence system that is able to su
 
 \subsection{Antibody Titers}
 \label{sec:antibody_titers}
-As mentioned above, antibody titers provide a quantitative measure of the concentration in the blood antibodies with a certain specificity, making them a reliable indicator of the immune system’s functional response against a pathogen \cite{plotkin2010correlates}. In essence, they reflect the “signal strength” of the response, with high titers indicating robust protection and low titers suggesting a weaker response. Antibody titers thus serve as a crucial biomarker for classifying vaccine responses into strong and weak responders. 
+As mentioned above, antibody titers provide a quantitative measure of the concentration in the blood antibodies with a certain specificity, making them a reliable indicator of the immune system’s functional response against a pathogen \cite{plotkin2010correlates}. In essence, they reflect the “signal strength” of the response, with high titers indicating robust protection and low titers suggesting a weaker response. Antibody titers thus serve as a crucial biomarker for classifying vaccine responses into strong and weak responders.
 
 \pagebreak
 \section{Background in Computer Science}
@@ -353,7 +353,7 @@ Therefore, while the use of \acrshort{smote} and \acrshort{shap} is slowly gaini
 \chapter{Data Description and Preprocessing}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \noindent
-In this chapter, I provide an overview of the measles dataset used in this study and outline the preprocessing steps required to prepare the data for analysis. The dataset integrates multiple biological modalities (including cytokine profiles, cytometry measurements, antigen-specific clonal breadth and depth of T cell receptors, and \acrshort{rna} sequencing data) to capture various aspects of the immune response to the measles vaccine. Additionally, I explain how response labels were assigned based on antibody titer trajectories, which serve as a key indicator of vaccine effectiveness. 
+In this chapter, I provide an overview of the measles dataset used in this study and outline the preprocessing steps required to prepare the data for analysis. The dataset integrates multiple biological modalities (including cytokine profiles, cytometry measurements, antigen-specific clonal breadth and depth of T cell receptors, and \acrshort{rna} sequencing data) to capture various aspects of the immune response to the measles vaccine. Additionally, I explain how response labels were assigned based on antibody titer trajectories, which serve as a key indicator of vaccine effectiveness.
 
 \section{Label Assignment Strategy}
 \noindent
@@ -373,7 +373,7 @@ The visualization highlights distinct dynamic patterns associated with these cat
 \end{figure}
 \\
 \noindent
-For the initial stages of predictive modeling in this thesis, we simplified the outcome variable to a binary classification: \texttt{responder} and \texttt{non-responder}. This simplification was made to create a more straightforward prediction task, focusing on the presence or absence of a successful boosting effect. Based on the visually distinct boosting pattern observed in Figure~\ref{fig:titer_original_label}, a subject was defined as a \texttt{responder} if their antibody titer increased by at least 120 mIU/mL from Day0 to Day21. This threshold reflects a widely accepted criterion for achieving protective immunity against measles \cite{chen1990measles} and corresponds to capturing the significant initial titer increase characteristic of the \texttt{responder} group in the figure. Subjects from both the \texttt{no response - high ab} and \texttt{no response - low ab} categories in Figure~\ref{fig:titer_original_label} were combined into the \texttt{non-responder} class for the binary prediction task, as neither group exhibited this defining boosting signature despite their different baseline states. 
+For the initial stages of predictive modeling in this thesis, we simplified the outcome variable to a binary classification: \texttt{responder} and \texttt{non-responder}. This simplification was made to create a more straightforward prediction task, focusing on the presence or absence of a successful boosting effect. Based on the visually distinct boosting pattern observed in Figure~\ref{fig:titer_original_label}, a subject was defined as a \texttt{responder} if their antibody titer increased by at least 120 mIU/mL from Day0 to Day21. This threshold reflects a widely accepted criterion for achieving protective immunity against measles \cite{chen1990measles} and corresponds to capturing the significant initial titer increase characteristic of the \texttt{responder} group in the figure. Subjects from both the \texttt{no response - high ab} and \texttt{no response - low ab} categories in Figure~\ref{fig:titer_original_label} were combined into the \texttt{non-responder} class for the binary prediction task, as neither group exhibited this defining boosting signature despite their different baseline states.
 
 \section{Dataset Construction and Preprocessing}
 \subsection{Cytokines}
@@ -496,7 +496,7 @@ In the initial phase of the modeling process, this study opted for a consensus m
 \\
 It is noteworthy that while many conventional consensus or ensemble learning strategies achieve diversity by applying different model algorithms or parameterizations primarily to a single dataset or variations thereof \cite{Rokach2010}, the approach adopted in this thesis introduces diversity fundamentally at the data level. Here, distinct modeling pipelines, each including internal model evaluation and selection, are applied independently to multiple, heterogeneous datasets (cytokines, cytometry, clonal breadth, clonal depth, \acrshort{rna} data), each representing a different biological viewpoint. Only after each pipeline generates its best prediction on the validation set are these modality-specific test set outputs aggregated.\\
 \\
-By combining model outputs, the consensus approach aims to mitigate individual model biases and reduce the risk of overfitting, particularly given the high-dimensional nature and small size of the dataset. However, the complexity introduced by this approach requires careful consideration of how model outputs are integrated and evaluated. 
+By combining model outputs, the consensus approach aims to mitigate individual model biases and reduce the risk of overfitting, particularly given the high-dimensional nature and small size of the dataset. However, the complexity introduced by this approach requires careful consideration of how model outputs are integrated and evaluated.
 
 \begin{figure}[H]
   \centering
@@ -589,13 +589,13 @@ Feature scaling was applied to standardize the range of the input features. This
 
 
 \subsubsection*{Train the models \hyperref[fig:pipeline-1]{(G)}}
-\noindent 
+\noindent
 Following the comprehensive preprocessing stages (A-F) designed to prepare each dataset modality, the pipeline proceeds to the core modeling phase. The objective here is not necessarily to find a single universally best model through extensive tuning, but rather to train, rigorously evaluate, and select the most suitable baseline classification algorithm for each distinct pipeline configuration. That is, for each combination of initial dataset (e.g., cytokines, cytometry) and class imbalance handling strategy (weighting, \gls{ros}, or \gls{smote}). Feature compression was considered in a parallel run.\\
 \\
 A suite of five standard, well-established classification algorithms were employed as candidates within each pipeline shown in Table~\ref{tab:ml_models}. These models were generally used with default hyperparameters to provide a robust baseline comparison. If the class weighting strategy was selected in the preceding step, balanced class weights were incorporated into the algorithms during training.\\
 \begin{table}[h!]
     \centering
-    \scalebox{0.8}{% 
+    \scalebox{0.8}{%
     \begin{tabular}{lllll}
         \toprule
         Model & Configurations & & \\
@@ -666,7 +666,7 @@ The best-performing model for each data type generated the following predictions
 \\
 A consensus prediction was derived by applying majority voting across these individual model outputs, resulting in a final prediction of $[1\ 0\ 0\ 0\ 0\ 0]$. This consensus prediction was then evaluated against the true labels which were $[0\ 0\ 0\ 0\ 1\ 0]$.\\
 \\
-The overall performance of the consensus prediction on the test set yielded an accuracy of 0.667 and a balanced accuracy of 0.400. A more detailed breakdown of the consensus performance is provided by the classification report: 
+The overall performance of the consensus prediction on the test set yielded an accuracy of 0.667 and a balanced accuracy of 0.400. A more detailed breakdown of the consensus performance is provided by the classification report:
 \begin{table}[h!]
     \centering
     \scalebox{0.8}{%
@@ -711,7 +711,7 @@ The best-performing model for each data type generated the following predictions
 \\
 A consensus prediction was derived by applying majority voting across these individual model outputs, resulting in a final prediction of $[0\ 0\ 0\ 0\ 0\ 0]$. This consensus prediction was then evaluated against the true labels which were $[0\ 0\ 0\ 0\ 1\ 0]$.\\
 \\
-The overall performance of the consensus prediction on the test set yielded an accuracy of 0.833 and a balanced accuracy of 0.500. A more detailed breakdown of the consensus performance is provided by the classification report: 
+The overall performance of the consensus prediction on the test set yielded an accuracy of 0.833 and a balanced accuracy of 0.500. A more detailed breakdown of the consensus performance is provided by the classification report:
 \begin{table}[h!]
     \centering
     \scalebox{0.8}{%
@@ -746,7 +746,7 @@ This magnitude of standard error implies that any accuracy value calculated on t
 \\
 Looking at this from another perspective, the small sample size directly impacts the width of confidence intervals, such as the Clopper-Pearson interval, which is often used for proportions based on small sample sizes. The Clopper-Pearson interval provides an exact confidence interval for binomial proportions, especially appropriate for small samples or cases when the normal approximation might fail. It gives us a range within which we are confident that the "true accuracy" or "true proportion" actually lies, based on our observed data. This method calculates the confidence interval by identifying all values of the true proportion $p$ for which the observed data would be reasonably likely, given the chosen confidence level.\\
 \\
-The interval is computed based on the cumulative probabilities of the binomial distribution. Mathematically, for an observed proportion $\hat{p} = x/n$ (where $x$ is the number of successes in 
+The interval is computed based on the cumulative probabilities of the binomial distribution. Mathematically, for an observed proportion $\hat{p} = x/n$ (where $x$ is the number of successes in
 $n$ trials), the Clopper-Pearson interval at a confidence level $1-\alpha$ is given by the bounds:
 \[
 \text{Lower bound} = \text{BetaInv}\left(\frac{\alpha}{2};\, x,\, n - x + 1\right)
@@ -782,7 +782,7 @@ To systematically implement the exploratory strategy outlined above, a standardi
   \label{fig:pipeline-2}
 \end{figure}
 
-\subsubsection{Preprocessing \hyperref[fig:pipeline-2]{(A, B, C, F)}} 
+\subsubsection{Preprocessing \hyperref[fig:pipeline-2]{(A, B, C, F)}}
 \noindent The initial data preparation steps, specifically handling missing data \hyperref[fig:pipeline-2]{(A)}, compressing correlated features \hyperref[fig:pipeline-2]{(B)}, and encoding class labels \hyperref[fig:pipeline-2]{(C)}, and later scaling the features \hyperref[fig:pipeline-2]{(F)}, were performed using the identical procedures as detailed in Section~\ref{sec:consensus_model_approach}.
 
 \subsubsection*{Split dataset \hyperref[fig:pipeline-2]{(D)}}
@@ -806,7 +806,7 @@ The first method used was standard \gls{smote} \cite{Chawla2002SMOTE}, which, as
 \noindent
 As a prime example of a variation focusing on challenging areas, Borderline-\gls{smote} \cite{Han2005Borderline} was applied. Proposed by Han et al. in 2005, this variant is based on the reasoning that minority samples located in the borderline regions near the decision boundary are particularly difficult for classifiers to learn. By specifically adding more synthetic samples in these ambiguous regions, the method aims to help the classifier distinguish between classes better. The core idea of Borderline-\gls{smote} is to first identify minority samples that are in 'danger' of being misclassified. Using k-nearest neighbors (\acrshort{kknn}), each minority sample is classified into a 'noise', 'safe' or 'danger' zone based on the ratio ($r$) of majority instances among its neighbors. A sample is considered 'noise' if all its neighbors are majority class ($r=1$), in a 'safe' zone if most neighbors are minority class ($r < 0.5$), and in the 'danger' (or 'borderline') zone if the mix is significant ($0.5 \leq r < 1$). Unlike standard \gls{smote} which oversamples all minority samples, Borderline-\gls{smote} focuses its synthetic sample generation only on those minority samples identified as being in the 'danger' zone, synthesizing new instances by interpolating between a danger-zone sample and its minority neighbors. This targeted approach aims to reinforce the decision boundary in regions considered critical for classification, as illustrated in Figure~\ref{fig:SMOTE-Borderline}.\\
 \begin{figure}[h!]
-  \centering  
+  \centering
   \includegraphics[width=0.9\textwidth]{images/SMOTE-ADASYN.png}
   \caption[Illustration of \acrshort{adasyn} Sample Generation]{Illustration of the \acrshort{adasyn} synthetic sample generation process. The left panel shows original minority samples. The right panel shows synthetic minority samples (pink) generated by \acrshort{adasyn}, demonstrating the addition of small random variations that cause the synthetic points to be slightly scattered around the interpolation lines between neighbors. Figure made in same style as images presented in \cite{Truong2022SMOTEVariants}.}
   \label{fig:SMOTE-ADASYN}
@@ -848,7 +848,7 @@ Given the inherent class imbalance of the dataset, Balanced Accuracy was selecte
 Furthermore, statistical significance was assessed using permutation tests applied to the training data. The permutation test technique, also used for reasons related to limited data as discussed in Subsection~\ref{subsec:pipeline_structure_for_heterogeneous_datasets}, is illustrated and explained in detail in Figure~\ref{fig:P-value_test-1}. This involved repeatedly permuting the true class labels of the training data and recalculating the Balanced Accuracy to determine the likelihood of achieving the observed training performance by chance.\\
 \\
 The Balanced Accuracy score, its 95\% bootstrapped confidence interval, and the p-value from the permutation test were computed for each trained model under every oversampling condition for each dataset. These performance parameters were then saved. these saved evaluation metrics served as the basis for the subsequent filtering and selection of "best" performing model configurations prior to the \gls{shap} analysis for feature importance identification.
- 
+
 \subsection{Feature Importance Assessment using \gls{shap}}
 \label{subsec:shap-explanation}
 % \todo{
@@ -857,7 +857,7 @@ The Balanced Accuracy score, its 95\% bootstrapped confidence interval, and the 
 %     \item \textbf{SHAP Calculation Details:} Describe which data instances were used for SHAP calculation and mention the specific SHAP explainer(s) employed.
 % \end{itemize}
 % }
-\noindent 
+\noindent
 Knowing which factors contribute to a model's prediction is essential, especially in complex biological contexts where machine learning is used to uncover insights into underlying mechanisms. In this study, identifying the features that significantly influence the prediction of vaccine response is key to understanding the potential biological or clinical associations involved. The goal of feature importance techniques is to measure how much each input feature contributes to the model's output.\\
 \\
 To assess feature importance and provide interpretable explanations for the models, \gls{shap} \cite{ApprouchForModelPredictions} was used. \gls{shap} is a unified framework rooted in cooperative game theory, using Shapley values to assess the contribution of each feature to the difference between an individual prediction and the average prediction. Formally, the \gls{shap} value of a feature for a specific instance represents the average marginal contribution of that feature's value to the prediction, considering all possible combinations of features. A fundamental property of \gls{shap} values is their additivity, which provides a clear link between feature contributions and the model's output. For any given instance $x$, the \gls{shap} values ($\phi_i$) for all features $i=1, \dots, M$ sum up to the difference between the model's output for that instance, $f(x)$, and the expected base value (average output) over the dataset, $E[f(x)]$. This relationship can be formally expressed as:
@@ -916,22 +916,22 @@ While various oversampling and undersampling techniques were explored to address
 \gls{smote}-\gls{enn} combines the \acrfull{smote}, which generates synthetic samples for the minority class, with \acrfull{enn}, a technique that removes samples (both synthetic and original) considered "noisy" if their class label differs from the majority of their neighbors as seen in Figure~\ref{fig:SMOTE-ENN}. In practice, particularly with potentially noisy biological data, this combined approach was found to be excessively aggressive. It led to the generation of a significant number of synthetic samples while simultaneously removing a substantial portion of the original data points from the training set. This process resulted in training datasets that were not representative of the true underlying data distribution, potentially introducing bias and hindering the model's ability to generalize to unseen data.\\
 \\
 The consequence of this aggressive resampling was observed in the inconsistent and often unreliable performance of models trained with \gls{smote}-\gls{enn} on the unseen test set. Despite achieving seemingly good performance on the modified training data (as indicated by cross-validation scores), the models' performance on the original, unmodified test set varied significantly. Sometimes appearing high potentially due to chance or overfitting to the distorted training distribution, and other times being very poor. This unpredictability raised concerns about the reliability of any model trained using this method for downstream interpretation.\\
-\begin{figure}[h!] 
-    \centering 
+\begin{figure}[h!]
+    \centering
 
     % First row of subfigures (e.g., a & b)
     \begin{subfigure}[b]{0.48\textwidth}
         \centering
-        \includegraphics[width=\textwidth]{images/smote_een_fig1a.png} 
-        \caption{Balanced Accuracy Scores} 
+        \includegraphics[width=\textwidth]{images/smote_een_fig1a.png}
+        \caption{Balanced Accuracy Scores}
         \label{fig:smote_enn_fig1a}
     \end{subfigure}
     \hfill
     \begin{subfigure}[b]{0.48\textwidth}
         \centering
         \includegraphics[width=0.9\linewidth]{images/smote_een_fig1b.png}
-        \caption{\gls{pca} Visualization of Training Data} 
-        \label{fig:smote_enn_fig1b} 
+        \caption{\gls{pca} Visualization of Training Data}
+        \label{fig:smote_enn_fig1b}
     \end{subfigure}
 
     \vspace{1em}
@@ -947,12 +947,12 @@ The consequence of this aggressive resampling was observed in the inconsistent a
     \begin{subfigure}[b]{0.48\textwidth}
         \centering
         \includegraphics[width=\textwidth]{images/smote_een_fig1d.png}
-        \caption{Decision Boundary with test set samples} 
+        \caption{Decision Boundary with test set samples}
         \label{fig:smote_enn_fig1d}
     \end{subfigure}
 
     \caption[Visualizing \gls{smote}-\gls{enn} on Cytokines]{Visualizing the aggressive sampling behavior of \gls{smote}-\gls{enn} and its effect on model learning using the Cytokines dataset. (a) Balanced Accuracy scores on train and test sets for models trained with \gls{smote}-\gls{enn}. (b) \gls{pca} visualization of the training data distribution after \gls{smote}-\gls{enn} application, highlighting synthetic and removed original samples. (c, d) Examples of decision boundaries learned by representative models trained on this distorted data in the \gls{pca} space.}
-    \label{fig:smote-enn-example-1} 
+    \label{fig:smote-enn-example-1}
 \end{figure}
 
 
@@ -987,11 +987,11 @@ The consequence of this aggressive resampling was observed in the inconsistent a
     \begin{subfigure}[b]{0.48\textwidth}
         \centering
         \includegraphics[width=\textwidth]{images/smote_een_fig2d.png}
-        \caption{Decision Boundary with test set samples} 
+        \caption{Decision Boundary with test set samples}
         \label{fig:smote_enn_fig2d}
     \end{subfigure}
 
-    
+
     \caption[Visualizing \gls{smote}-\gls{enn} on Cytometry]{Visualizing the aggressive sampling behavior of \gls{smote}-\gls{enn} and its effect on model learning using the Cytometry dataset. (a) Balanced Accuracy scores on train and test sets for models trained with \gls{smote}-\gls{enn}. (b) \gls{pca} visualization of the training data distribution after \gls{smote}-\gls{enn} application, highlighting synthetic and removed original samples and showing the severe reduction in original minority samples. (c, d) Examples of decision boundaries learned by representative models trained on this distorted data in the \gls{pca} space.}
 
     \label{fig:smote-enn-example-2}
@@ -1077,23 +1077,23 @@ For the Cytometry dataset, applying the same selection criteria resulted in the 
         \toprule
         Model & Oversampling & Test Bal. Acc. & Train $p$-val & Train Bal. Acc. ($\mu$/Md) \\
         \midrule
-        
+
         Random Forest       & smote & 0.750 & 0.000 & 0.815140 \ \ \ / \ \ \ 0.820000 \\
         Logistic Regression & smote & 0.625 & 0.002 & 0.673100 \ \ \ / \ \ \ 0.680000 \\
         SVM                 & smote & 0.625 & 0.000 & 0.838920 \ \ \ / \ \ \ 0.840000 \\
         Naive Bayes         & smote & 0.625 & 0.000 & 0.862480 \ \ \ / \ \ \ 0.860000 \\
-        
+
         Random Forest       & smote-borderline & 0.750 & 0.000 & 0.816960 \ \ \ / \ \ \ 0.820000 \\
         Logistic Regression & smote-borderline & 0.625 & 0.002 & 0.674820 \ \ \ / \ \ \ 0.680000 \\
         SVM                 & smote-borderline & 0.625 & 0.000 & 0.837080 \ \ \ / \ \ \ 0.840000 \\
         Naive Bayes         & smote-borderline & 0.625 & 0.000 & 0.861980 \ \ \ / \ \ \ 0.860000 \\
-        
+
         Random Forest       & smote-adasyn & 0.750 & 0.003 & 0.807230 \ \ \ / \ \ \ 0.803333 \\
         Logistic Regression & smote-adasyn & 0.625 & 0.008 & 0.708343 \ \ \ / \ \ \ 0.706667 \\
         SVM                 & smote-adasyn & 0.625 & 0.001 & 0.789600 \ \ \ / \ \ \ 0.800000 \\
         Decision Tree       & smote-adasyn & 0.500 & 0.001 & 0.797597 \ \ \ / \ \ \ 0.800000 \\
         Naive Bayes         & smote-adasyn & 0.625 & 0.000 & 0.850100 \ \ \ / \ \ \ 0.860000 \\
-        
+
         Random Forest       & smote-smotetomek & 0.750 & 0.000 & 0.798965 \ \ \ / \ \ \ 0.800000 \\
         Logistic Regression & smote-smotetomek & 0.625 & 0.018 & 0.653180 \ \ \ / \ \ \ 0.655000 \\
         SVM                 & smote-smotetomek & 0.625 & 0.000 & 0.813845 \ \ \ / \ \ \ 0.815000 \\
@@ -1102,13 +1102,13 @@ For the Cytometry dataset, applying the same selection criteria resulted in the 
     \end{tabular}
     }
     \caption[Selected Models for Cytometry ]{Models selected for aggregated SHAP analysis for the Cytometry dataset.}
-    \label{tab:cytometry_selected_models_uncompressed} 
+    \label{tab:cytometry_selected_models_uncompressed}
 \end{table}
 \begin{figure}[h!]
     \centering
     \includegraphics[width=0.9\linewidth]{images/Aggregated_SHAP_cytometry_uncompressed.png}
     \caption[Aggregated SHAP plot for Cytometry]{Aggregated \gls{shap} summary plot for the Cytometry dataset. The same SHAP values are used in the elbow plot shown in Appendix~\ref{appendix:elbow_plots}, Figure~\ref{fig:elbow_plot_cytomery_uncompressed}, where the cutoff is visualised.}
-    \label{fig:cytometry_aggregated_shap} 
+    \label{fig:cytometry_aggregated_shap}
 \end{figure}
 
 \noindent
@@ -1134,13 +1134,13 @@ For the \acrshort{rna} dataset, which comprises 382 features, the application of
 
         Logistic Regression & smote & 0.500 & 0.000 & 0.833840 \ \ \ / \ \ \ 0.84000 \\
         SVM                 & smote & 0.625 & 0.000 & 0.823600 \ \ \ / \ \ \ 0.82000 \\
-        
+
         Logistic Regression & smote-borderline & 0.500 & 0.000 & 0.832860 \ \ \ / \ \ \ 0.84000 \\
         SVM                 & smote-borderline & 0.625 & 0.000 & 0.824820 \ \ \ / \ \ \ 0.82000 \\
-        
+
         Logistic Regression & smote-adasyn & 0.500 & 0.000 & 0.830560 \ \ \ / \ \ \ 0.84000 \\
         SVM                 & smote-adasyn & 0.625 & 0.000 & 0.805060 \ \ \ / \ \ \ 0.80000 \\
-        
+
         Logistic Regression & smote-smotetomek & 0.500 & 0.000 & 0.833280 \ \ \ / \ \ \ 0.84000 \\
         SVM                 & smote-smotetomek & 0.625 & 0.000 & 0.824700 \ \ \ / \ \ \ 0.82000 \\
 
@@ -1154,7 +1154,7 @@ For the \acrshort{rna} dataset, which comprises 382 features, the application of
     \centering
     \includegraphics[width=0.85\linewidth]{images/Aggregated_SHAP_RNA_uncompressed.png}
     \caption[Aggregated SHAP plot for SHAP]{Aggregated SHAP summary plot for the SHAP dataset. The same SHAP values are used in the elbow plot shown in Appendix~\ref{appendix:elbow_plots}, Figure~\ref{fig:elbow_plot_rna_uncompressed}, where the cutoff is visualised.}
-    \label{fig:rna_aggregated_shap} 
+    \label{fig:rna_aggregated_shap}
 \end{figure}
 
 \noindent
@@ -1177,11 +1177,11 @@ For the Clonal Depth dataset, the application of the selection criteria resulted
         Random Forest           & smote & 1.0 & 0.029 & 0.696842 \ \ \ / \ \ \ 0.700000 \\
         Logistic Regression     & smote & 1.0 & 0.034 & 0.638033 \ \ \ / \ \ \ 0.641667 \\
         SVM                     & smote & 1.0 & 0.044 & 0.697933 \ \ \ / \ \ \ 0.700000 \\
-        
+
         Random Forest           & smote-borderline & 1.0 & 0.029 & 0.700858 \ \ \ / \ \ \ 0.700000 \\
         Logistic Regression     & smote-borderline & 1.0 & 0.034 & 0.642033 \ \ \ / \ \ \ 0.641667 \\
         SVM                     & smote-borderline & 1.0 & 0.044 & 0.699200 \ \ \ / \ \ \ 0.704167 \\
-        
+
         Random Forest           & smote-smotetomek & 1.0 & 0.003 & 0.762267 \ \ \ / \ \ \ 0.766667 \\
         Logistic Regression     & smote-smotetomek & 1.0 & 0.004 & 0.742033 \ \ \ / \ \ \ 0.733333 \\
         SVM                     & smote-smotetomek & 1.0 & 0.000 & 0.770467 \ \ \ / \ \ \ 0.766667 \\
@@ -1215,26 +1215,26 @@ This challenge is especially pronounced in the context of very small datasets, s
 \\
 Furthermore, the interaction between the initial data split and oversampling techniques like \gls{smote} amplifies this issue. Although \gls{smote} is correctly applied only to the training data (n=32), if this small training partition, by chance, contains a biased or unrepresentative subset of the minority class or certain feature combinations, \gls{smote} will generate synthetic samples that reflect and amplify these specific characteristics. Consequently, the models learn patterns that are highly specialized to that particular, augmented training set generated from a specific initial split. When these models are then evaluated on an equally small and potentially distinct n=8 unseen test set (derived from the same initial split), the learned patterns may not generalize well. This explains why changing the initial random seed, which alters both the training and test sets and, subsequently, the synthetic data generated by \gls{smote}, results in different model learning outcomes and performance figures. The models' learned patterns, and thus their stability and perceived performance, become intrinsically tied to the specific composition of the data provided by that particular random split. This is illustrated in Figure~\ref{fig:train_test_split_problem}, where two different train/test splits of the same dataset lead to different regions of synthetic sample generation (shown in blue).
 
-\begin{figure}[h!] 
-    \centering 
+\begin{figure}[h!]
+    \centering
 
     % First row of subfigures (e.g., a & b)
     \begin{subfigure}[b]{0.49\textwidth}
         \centering
-        \includegraphics[width=\textwidth]{images/split_problem_1.png} 
-        \caption{An initial data split of 4 test samples} 
+        \includegraphics[width=\textwidth]{images/split_problem_1.png}
+        \caption{An initial data split of 4 test samples}
         \label{fig:split_problem_1}
     \end{subfigure}
     \hfill
     \begin{subfigure}[b]{0.49\textwidth}
         \centering
         \includegraphics[width=\linewidth]{images/split_problem_2.png}
-        \caption{An alternative data split of 4 test samples} 
-        \label{fig:split_problem_2} 
+        \caption{An alternative data split of 4 test samples}
+        \label{fig:split_problem_2}
     \end{subfigure}
 
     \caption[Illustration of Split Dependency]{Illustration of split dependency in small datasets. These two plots show different random train/test splits of the same dataset and demonstrate how the composition of the hold-out test set can vary significantly. This variation directly impacts what the models learn, especially due to the use of \gls{smote} for upsampling. The red samples are the selected test samples for the underrepresented class. The blue regions represent areas where potential synthetic samples can be generated. In (a), the training split leads to \gls{smote} generating samples in one part of the feature space, while in (b), a different split results in synthetic samples being generated in a different region. This means the distribution of the underrepresented class varies substantially between the two splits, leading the models to learn different patterns and ultimately affecting their generalization performance.}
-    \label{fig:train_test_split_problem} 
+    \label{fig:train_test_split_problem}
 \end{figure}
 
 \noindent
@@ -1268,7 +1268,7 @@ Regarding the Cytokines dataset, while the precise feature importance values fro
         \caption{Stable Features clonal breadth}
         \label{fig:stable_features_clonal_breadth}
     \end{subfigure}
-    
+
     \begin{subfigure}[b]{0.48\textwidth}
         \centering
         \includegraphics[width=\textwidth]{images/trajectory_clonal_depth.png}
@@ -1282,7 +1282,7 @@ Regarding the Cytokines dataset, while the precise feature importance values fro
         \caption{Stable Features clonal depth}
         \label{fig:stable_features_clonal_depth}
     \end{subfigure}
-    
+
     \begin{subfigure}[b]{0.48\textwidth}
         \centering
         \includegraphics[width=\textwidth]{images/trajectory_cytometry.png}
@@ -1296,7 +1296,7 @@ Regarding the Cytokines dataset, while the precise feature importance values fro
         \caption{Stable Features cytometry}
         \label{fig:stable_features_cytometry}
     \end{subfigure}
-    
+
     \caption[Feature Importance Trajectories and Stable Features 1]{Visual representation of feature importance convergence. The left column shows the trajectory of feature importance across 100, 200, 300, 400, and 500 iterations for converging datasets (e.g., Clonal Breadth, Clonal Depth, or Cytometry). The right column displays the stable feature importance after 500 iterations.}
     \label{fig:feature_trajectories_plots}
 \end{figure}
@@ -1320,7 +1320,7 @@ Despite having only 40 features, the Cytokines dataset exhibited persistent inst
         \caption{trajectory \acrshort{rna}}
         \label{fig:trajectory_RNA}
     \end{subfigure}
-    
+
     \begin{subfigure}[b]{0.48\textwidth}
         \centering
         \includegraphics[width=\textwidth]{images/stable_features_cytokines.png}
@@ -1334,7 +1334,7 @@ Despite having only 40 features, the Cytokines dataset exhibited persistent inst
         \caption{Stable Features \acrshort{rna}}
         \label{fig:stable_features_RNA}
     \end{subfigure}
-    
+
     \caption[Feature Importance Trajectories and Stable Features 2]{Visual representation of feature importance convergence. The top row shows the trajectory of feature importance across 100, 200, 300, 400, and 500 iterations for converging datasets (e.g., cytokines and \acrshort{rna} data). The bottom row displays the 'stable' feature importance after 500 iterations.}
     \label{fig:feature_trajectories_plots2}
 \end{figure}
@@ -1364,7 +1364,7 @@ Some features show a median mean \gls{shap} value of 0, both in compressed and u
         \caption{trajectory \acrshort{rna} compressed}
         \label{fig:trajectory_RNA_compressed}
     \end{subfigure}
-    
+
     \begin{subfigure}[b]{0.48\textwidth}
         \centering
         \includegraphics[width=\textwidth]{images/stable_features_cytokines.png}
@@ -1378,12 +1378,12 @@ Some features show a median mean \gls{shap} value of 0, both in compressed and u
         \caption{Stable Features \acrshort{rna} compressed}
         \label{fig:stable_features_RNA_compressed}
     \end{subfigure}
-    
+
     \caption[Feature Importance Trajectories and Stable compressed Features]{Visual representation of feature importance convergence. The top row shows the trajectory of the compressed feature importance across 100, 200, 300, 400, and 500 iterations for converging datasets (e.g., cytokines and \acrshort{rna} data). The bottom row displays the stable compressed feature importance after 500 iterations.}
     \label{fig:feature_trajectories_plots3}
 \end{figure}
 \pagebreak
-\noindent 
+\noindent
 The empirical assessment of feature importance stability across numerous iterations and data partitions leads to several critical conclusions regarding the reliability of our model interpretations.\\
 \\
 Firstly, a highly robust finding across all datasets is the consistent directional influence of features. Regardless of compression applied or fluctuations in their absolute importance ranking, if a feature's higher values consistently pushed predictions towards a specific class in one split, this qualitative relationship was preserved across all iterations. This consistent directional impact provides a reliable and biologically interpretable basis for understanding feature effects, even when quantitative importance scores vary.\\
@@ -1393,6 +1393,10 @@ Secondly, datasets that are inherently lower-dimensional, such as Clonal Depth a
 Thirdly, for high-dimensional datasets like \acrshort{rna} and Cytokines, compressing features proved to be an effective and often necessary strategy for achieving more stable and reliable feature importance estimates within practical computational constraints. The primary benefit of compression lies in the increased consistency of which features (or feature clusters) are identified as important across different data views, significantly reducing the issue of features appearing and disappearing from the top ranks due to random sampling variations.\\
 \\
 Finally, the persistent instability observed in the uncompressed Cytokines data, even after 500 iterations, coupled with the fact that even compressed Cytokines data still required significant adjustments to converge, strongly suggests that this dataset may not carry a sufficiently strong or clear predictive signal for the given response labels. While compression successfully distills and clarifies the available signal, it cannot inherently create a strong signal where none exists. This implies the Cytokines dataset is likely inherently "noisy" or less informative for the specific predictive task. This explains why some features consistently registered zero importance, as they provide negligible or inconsistent contributions to the model's predictions.
+
+\section{Data and Code Availability}
+\noindent
+All code and scripts used for data processing, model training, and analysis are publicly available on GitHub at https://github.com/Elias-Dams/multimodal-data-integration-predictive-modeling-measles-vaccine-response-cross-validation.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
